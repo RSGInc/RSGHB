@@ -1,0 +1,31 @@
+Package: RSGHB
+Type: Package
+Title: Functions for Hierarchical Bayesian Estimation: A Flexible Approach
+Version: 0.1
+Date: 2012-08-11
+Author: Jeffrey Dumont, RSG, Inc.
+Maintainer: Jeffrey Dumont, <jeff.dumont@rsginc.com>
+Description: This package can be used to estimate models using a hierarchical Bayesian framework. The flexibility comes in allowing the user to specify the likelihood function directly instead of assuming predetermined model structures. Types of models that can be estimated with this code include the family of discrete choice models (Multinomial Logit, Mixed Logit, Nested Logit, and Latent Class) as well ordered response models like ordered probit and ordered logit. In addition, the package allows for flexibility in specifying parameters as either fixed (non-varying across individuals) or random with continuous distributions. Parameter distributions supported include normal, positive log-normal, negative log-normal, positive truncated normal and the Johnson SB distribution.
+License: GPL-3
+LazyData: true
+Collate:
+    'checkModel.R'
+    'createBasicMaxDiffFile.R'
+    'createBasicMNLFile.R'
+    'createGlobalVariables.R'
+    'go.R'
+    'hb.R'
+    'nextA.R'
+    'nextB.R'
+    'nextF.R'
+    'nextDind.R'
+    'nextD.R'
+    'plotA.R'
+    'plotF.R'
+    'plotLog.R'
+    'prepareModel.R'
+    'RSGHB-internal.R'
+    'trans.R'
+    'vech.R'
+    'writeLog.R'
+    'xpnd.R'
