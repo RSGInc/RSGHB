@@ -5,9 +5,15 @@ createGlobalVariables <- function()
 {
      modelname     <<- paste("HBModel",round(runif(1)*10000000,0),sep="")
      
+     constraintsNorm <<- NULL
+     
      gSIGDIG       <<- 10        # number of significant digits for reporting purposes
      
-     priorVariance <<- 2.0       # Train's original code use the number of parameters
+     # Vectors of parameter names
+     gVarNamesNormal <<- c()    # Random Coefficients based on transformation of normals
+     gVarNamesFixed  <<- c()    # Fixed Coefficients
+     
+     priorVariance <<- 2.0       
      # Sawtooth uses a default of 2
      # Adjusting the prior variance upwards puts more emphasis on the 
      # fitting to the respondents' individual data
@@ -69,5 +75,6 @@ createGlobalVariables <- function()
      starttime     <<- Sys.time()    # used to calculate seconds per iteration
      
      distNames     <<- c("N","LN+","LN-","TN","JSB")  # short names for the distributions
+     constraintLabels <<- c("<",">")
      # Normal, Postive Log-Normal, Negative Log-Normal, Positive Truncated Normal, Johnson SB
 }

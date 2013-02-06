@@ -16,9 +16,19 @@ plotLog <- function(model)
      
      logStats <- read.table(fn,header=F,skip=i+1,sep="\t")
      
-     # need to adjust this if we ever add more statistics to the plotting
-     names(logStats) <- c("Iteration","Log-Likelihood","RLH","Param_RMS")
+     hasRandom <- F
      
+     if(dim(logStats)[2]==5)
+     {
+          hasRandom <- T     
+     }
+        
+     names(logStats)[1:3] <- c("Iteration","Log-Likelihood","RLH")
+     # need to adjust this if we ever add more statistics to the plotting
+     if(hasRandom) 
+     {
+          names(logStats)[4:5] <- c("Param_RMS","Avg. Variance")
+     }
      # adjust the par settings to allow for stacked plotting
      
      fn.png <- paste(model,"_logPlot.png",sep="")
@@ -26,21 +36,31 @@ plotLog <- function(model)
      # plot once to a file
      png(fn.png)
      
-     par(mfrow=c(3,1),mar=c(4.1,4.1,2.1,2.1))
+     par(mfrow=c(2+hasRandom*2,1),mar=c(4.1,4.1,2.1,2.1))
      
      # plot each of the statistics to assese convergence
      plot(logStats[,1],logStats[,2],type="l",xlab=names(logStats)[1],ylab=names(logStats)[2])
      plot(logStats[,1],logStats[,3],type="l",xlab=names(logStats)[1],ylab=names(logStats)[3])
-     plot(logStats[,1],logStats[,4],type="l",xlab=names(logStats)[1],ylab=names(logStats)[4])
+     
+     if(hasRandom)
+     {
+          plot(logStats[,1],logStats[,4],type="l",xlab=names(logStats)[1],ylab=names(logStats)[4])
+          plot(logStats[,1],logStats[,5],type="l",xlab=names(logStats)[1],ylab=names(logStats)[5])
+     }
      
      dev.off()
      
-     par(mfrow=c(3,1),mar=c(4.1,4.1,2.1,2.1))
+     par(mfrow=c(2+hasRandom*2,1),mar=c(4.1,4.1,2.1,2.1))
      
      # plot once to the screen     
      plot(logStats[,1],logStats[,2],type="l",xlab=names(logStats)[1],ylab=names(logStats)[2])
      plot(logStats[,1],logStats[,3],type="l",xlab=names(logStats)[1],ylab=names(logStats)[3])
-     plot(logStats[,1],logStats[,4],type="l",xlab=names(logStats)[1],ylab=names(logStats)[4])
+     
+     if(hasRandom)
+     {
+          plot(logStats[,1],logStats[,4],type="l",xlab=names(logStats)[1],ylab=names(logStats)[4])
+          plot(logStats[,1],logStats[,5],type="l",xlab=names(logStats)[1],ylab=names(logStats)[5])
+     }
      
      # reset the par values so we don't effect other plotting
      par(mfrow=c(1,1),mar=c(5.1,4.1,4.1,2.1))

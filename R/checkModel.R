@@ -1,18 +1,13 @@
-checkModel <- function()
+checkModel <- function(nodiagnostics=F)
 {
      
      passChecks=T
-     
+
      # model checks to make sure things are coded properly
      
      # the user needs to specify some variables. lets make sure they exist.
      
-     if(is.null(choicedata))
-     {
-          passChecks=F    
-          cat("\n********FATAL ERROR: Variable - choicedata - is undefined.\n")          
-     }     
-     if(is.null(gDIST))
+     if(is.null(gDIST)&gNIV>0)
      {
           passChecks=F    
           cat("\n********FATAL ERROR: Variable - gDIST - is undefined.\n")          
@@ -40,7 +35,7 @@ checkModel <- function()
      if(is.null(likelihood))
      {
           passChecks=F    
-          cat("\n********FATAL ERROR: Variable - likelihood - is undefined.\n")
+          cat("\n********FATAL ERROR: The likelihood function is undefined.\n")
      }
      
      # check to see if we have some variables
@@ -60,13 +55,16 @@ checkModel <- function()
           cat("\n********FATAL ERROR: The number of distributions specified in gDist doesn't equal the number of random coefficients in the model.\n")
      }
      # check to the see if the distributions specified exists in the set of allowable distributions
-     for(d in gDIST)
+     if(gNIV > 0)
      {
-          if(d < 1 | d > length(distNames))
+          for(d in gDIST)
           {
-               passChecks <- F
-               cat("\n********FATAL ERROR: The specified distributions ", d, " in gDist do not exist\n")          
-          }     
+               if(d < 1 | d > length(distNames))
+               {
+                    passChecks <- F
+                    cat("\n********FATAL ERROR: The specified distributions ", d, " in gDist do not exist\n")          
+               }     
+          }
      }
      # check to see if we have enough starting values for both the random and fixed coefficients
      if(gNIV!=length(svN))
@@ -84,13 +82,7 @@ checkModel <- function()
      {
           passChecks <- F
           cat("\n********FATAL ERROR: Expecting to find a respondent identifier column called - ID - in your dataset. None found.\n")          
-     }     
-     # the software assumes that there exists a choice column called Choice
-     if(is.null(choicedata$Choice))
-     {
-          passChecks <- F
-          cat("\n********FATAL ERROR: Expecting to find a choice column called - Choice - in your dataset. None found.\n")          
-     }    
+     }         
           
      if(passChecks)
      {
@@ -107,35 +99,54 @@ checkModel <- function()
           cat("Initial Log-Likelihood: ",sum(log(likelihood(FC,B))),"\n",sep="\t")
           
           
-   	  if(gFIV > 0)
-	  {
-	  	cat("Fixed parameters estimated:","\n")
-	 	for(i in 1:gFIV)
-	 	{
-	 	     cat(gVarNamesFixed[i],"\n")
-	 	}
-	  }
-	  if(gNIV>0)
-	  {
-		cat("Random Parameters estimated (Distribution):","\n")
-                for(i in 1:gNIV)
-                {
-                      cat(gVarNamesNormal[i],"(",distNames[gDIST[i]],")","\n")
-                }
+   	     if(gFIV > 0)
+	     {
+	  	     cat("Fixed parameters estimated:","\n")
+	 	     for(i in 1:gFIV)
+	 	     {
+	 	          cat(gVarNamesFixed[i],"\n")
+	 	     }
+	     }
+          
+	     if(gNIV>0)
+	     {
+		     cat("Random Parameters estimated (Distribution):","\n")
+               for(i in 1:gNIV)
+               {
+                    cat(gVarNamesNormal[i],"(",distNames[gDIST[i]],")","\n")
+               }
           }
-                  
-          cat("\n","Choice Matrix","\n")
           
-          choiceMatrix <- cbind(table(choice),round(prop.table(table(choice)),2))
+          if(!is.null(constraintsNorm))
+          {
+               cat("Constraints applied to random parameters (param1 - inequality - param2):","\n")
+               for(i in 1:length(constraintsNorm))
+               {
+                    if(constraintsNorm[[i]][3]==0)
+                         cat(gVarNamesNormal[constraintsNorm[[i]][1]],constraintLabels[constraintsNorm[[i]][2]],0,"\n")
+                    if(constraintsNorm[[i]][3]!=0)
+                         cat(gVarNamesNormal[constraintsNorm[[i]][1]],constraintLabels[constraintsNorm[[i]][2]],gVarNamesNormal[constraintsNorm[[i]][3]],"\n")
+               }
+               
+          }
           
-          dimnames(choiceMatrix)[[2]] <- c("Count","%")
-          print(choiceMatrix)
+          if(!is.null(Choice))
+          {
+               cat("\n","Choice Matrix","\n")
+               choiceMatrix <- cbind(table(Choice),round(prop.table(table(Choice)),2))
+          
+               dimnames(choiceMatrix)[[2]] <- c("Count","%")
+               print(choiceMatrix)
+          }
           
           cat("\n\n\n")
-          rl <- readline("Enter 1 to Estimate Model, 2 to Stop Model")
-          if(rl!=1)
+          if(!nodiagnostics)
           {
-               passChecks=F
+               rl <- readline("Enter 1 to Estimate Model, 2 to Stop Model")
+               if(rl!=1)
+               {
+                    passChecks=F
+               }
           }
      }
      return(passChecks)

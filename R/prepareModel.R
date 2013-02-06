@@ -1,11 +1,10 @@
-prepareModel <-
-function()
+prepareModel <- function()
 {
      
      # Global variable setting
      gNP        <<- length(unique(choicedata$ID))       # Number of people
      
-     choice     <<- choicedata$Choice
+     Choice     <<- choicedata$Choice
      
      gNOBS      <<- dim(choicedata)[1]
      
@@ -21,13 +20,16 @@ function()
      # B must have NP columns and NIV rows
      # Dmat must have NIV columns and NIV rows and be symmetric
      
-     A <<- matrix(0,nrow=gNIV,ncol=1)
-     B <<- matrix(0,nrow=gNP,ncol=gNIV)
-     Dmat <<- priorVariance * diag(gNIV)
+     if(length(gVarNamesNormal) > 0)
+     {
+          A <<- matrix(0,nrow=gNIV,ncol=1)
+          B <<- matrix(0,nrow=gNP,ncol=gNIV)
+          Dmat <<- priorVariance * diag(gNIV)
  
-     A[,1] <<- svN        # initialize to analyst specified starting values
+          A[,1] <<- svN        # initialize to analyst specified starting values
      
-     B <<- 1 + B
-     B <<- B  * matrix(t(A),nrow=gNP,ncol=gNIV,byrow=T)
+          B <<- 1 + B
+          B <<- B  * matrix(t(A),nrow=gNP,ncol=gNIV,byrow=T)
+     }
      
 }

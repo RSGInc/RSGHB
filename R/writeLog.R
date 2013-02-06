@@ -1,10 +1,13 @@
-writeLog <-
-function(r,p,a,b,f)
+writeLog <- function(r,p,a,b,d,fc)
 {
          
-     cr <- rainbow(gNIV)
+     cr <- rainbow(gNIV+gFIV)
      
-     paramRMS <- sqrt(.Internal(mean(apply(trans(b),1,function(x)x^2))))    #use .Internal for speed
+     if(gNIV >0)
+     {
+          paramRMS <- sqrt(.Internal(mean(apply(trans(b),1,function(x)x^2))))    #use .Internal for speed
+          avgVariance <- .Internal(mean(apply(trans(b),1,var)))
+     }
      
      #Some printing progress to the screen
      
@@ -13,22 +16,29 @@ function(r,p,a,b,f)
      cat("Iteration: ", r, "\n",sep="\t")
      cat("-----------------------------------------------------------","\n")
      # Model Statistics
-     cat("RHO (Normal): ", rho, "\n")
-     cat("RHO (Fixed): ", rhoF, "\n")     
+     if(gNIV>0){
+          cat("RHO (Normal): ", rho, "\n")
+     }
+     if(gFIV>0){
+          cat("RHO (Fixed): ", rhoF, "\n")     
+     }
      cat("Log-Likelihood: ",signif(sum(log(p)),gSIGDIG),"\n",sep="\t")
      cat("RLH: ",signif(mean(p^(1/TIMES)),gSIGDIG),"\n",sep="\t")
-     cat("Parameter RMS:",signif(paramRMS,gSIGDIG),"\n")
-     
+     if(gNIV >0)
+     {
+          cat("Parameter RMS:",signif(paramRMS,gSIGDIG),"\n")
+          cat("Avg. Variance:",signif(avgVariance,gSIGDIG),"\n")
+     }
      
      cat("-----------------------------------------------------------","\n")
      
      # fixed coefficients
      if(gFIV > 0)
      {
-     cat("Current values for fixed coefficients","\n")
+          cat("Current values for fixed coefficients","\n")
           for(i in 1:gFIV)
           {
-               cat(gVarNamesFixed[i],":",signif(f[i],gSIGDIG),"\n",sep="\t")
+               cat(gVarNamesFixed[i],":",signif(fc[i],gSIGDIG),"\n",sep="\t")
           }
      }
      
@@ -58,8 +68,11 @@ function(r,p,a,b,f)
           cat("Number of draws used per individual:",gNEREP,"\n",sep="\t")
           cat("Random Seed:",gSeed,"\n",sep="\t")
           cat("Total iterations:",gNCREP + gNEREP,"\n",sep="\t")
-          cat("Prior Variance:", priorVariance,"\n",sep="\t")
-          cat("Degrees of Freedom:", degreesOfFreedom,"\n",sep="\t")
+          if(gNIV>0)
+          {
+               cat("Prior Variance:", priorVariance,"\n",sep="\t")
+               cat("Degrees of Freedom:", degreesOfFreedom,"\n",sep="\t")
+          }
           cat("Number of parameters:",gNIV + gFIV,"\n",sep="\t")
           
           if(gFIV > 0)
@@ -78,13 +91,32 @@ function(r,p,a,b,f)
                     cat(gVarNamesNormal[i],"(",distNames[gDIST[i]],")","\n")
                }
           }
+          if(!is.null(constraintsNorm))
+          {
+               cat("Constraints applied to random parameters (param1 - inequality - param2):","\n")
+               for(i in 1:length(constraintsNorm))
+               {
+                    if(constraintsNorm[[i]][3]==0)
+                         cat(gVarNamesNormal[constraintsNorm[[i]][1]],constraintLabels[constraintsNorm[[i]][2]],0,"\n")
+                    if(constraintsNorm[[i]][3]!=0)
+                         cat(gVarNamesNormal[constraintsNorm[[i]][1]],constraintLabels[constraintsNorm[[i]][2]],gVarNamesNormal[constraintsNorm[[i]][3]],"\n")
+               }
+               
+          }
+          
           cat("Estimated:",format(Sys.time(), "%a %b %d %X %Y"),"\n",sep="\t")
           
           cat("-----------------------------------------------------------","\n")
           
           cat("\n")
-          cat("Iteration","Log-Likelihood","RLH","Parameter RMS","\t")
-          
+          if(gNIV > 0)
+          {
+               cat("Iteration","Log-Likelihood","RLH","Parameter RMS","Avg. Variance","\t")
+          }
+          if(gNIV == 0)
+          {
+               cat("Iteration","Log-Likelihood","RLH","\t")
+          }          
           sink()	
           
           # setting up the plot for the alphas
@@ -110,7 +142,7 @@ function(r,p,a,b,f)
      {
           for(i in 1:gFIV)
           {
-               points(r,f[i],pch=20,col=cr[gNIV + i],cex=0.5)
+               points(r,fc[i],pch=20,col=cr[gNIV + i],cex=0.5)
           }
      }
      
@@ -121,12 +153,27 @@ function(r,p,a,b,f)
      
      cat("\n")
      
-     cat(
-          r,
-          signif(sum(log(p)),gSIGDIG),
-          signif(mean(p^(1/TIMES)),gSIGDIG),
-          signif(paramRMS,gSIGDIG),sep="\t"
+     if(gNIV > 0)
+     {    
+          cat(
+               r,
+               signif(sum(log(p)),gSIGDIG),
+               signif(mean(p^(1/TIMES)),gSIGDIG),
+               signif(paramRMS,gSIGDIG),
+               signif(avgVariance,gSIGDIG),sep="\t"
+               )
+     }
+     if(gNIV == 0)
+     {
+          
+          cat(
+               r,
+               signif(sum(log(p)),gSIGDIG),
+               signif(mean(p^(1/TIMES)),gSIGDIG),
+               sep="\t"
           )
+     }
+     
      
      sink()
      

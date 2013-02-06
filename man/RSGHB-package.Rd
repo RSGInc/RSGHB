@@ -66,7 +66,7 @@ There are a number of global variables that can be set to control the model esti
 Jeffrey Dumont, RSG, Inc.
 }
 \usage{
-checkmodel()
+checkModel()
 createGlobalVariables()
 createBasicMNLFile()
 createBasicMaxDiffFile()

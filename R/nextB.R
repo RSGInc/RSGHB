@@ -1,9 +1,57 @@
-nextB <-
-function(a, b, d, p, f)
+nextB <- function(a, b, d, p, f)
 {
      
      # note the multiplication by rho. this is the "jumping distribution"
      bnew <- b + matrix(rnorm(gNP*gNIV),nrow=gNP,ncol=gNIV)%*%chol(d)*sqrt(rho)
+     
+     # apply constraints here
+     # cycle through constraints till no constraints are violated
+     if(!is.null(constraintsNorm))
+     {
+          totalConstraintsViolated <- 999
+          
+          while(totalConstraintsViolated > 0)
+          {
+               totalConstraintsViolated <- 0
+               for(i in 1:length(constraintsNorm))
+               {
+                    firstpar  <- constraintsNorm[[i]][1]
+                    condition <- constraintsNorm[[i]][2]  # 1 = <, 2 = >
+                    secondpar <- constraintsNorm[[i]][3]
+                    # less than constraint
+                    if(condition==1)
+                    {
+                         if(secondpar==0)
+                         {          
+                              constraintsViolated <- bnew[,firstpar]>0
+                              bnew[constraintsViolated,firstpar] <- 0
+                         }
+                         if(secondpar!=0)
+                         {
+                              constraintsViolated <- bnew[,firstpar]>bnew[,secondpar]
+                              bnew[constraintsViolated,c(firstpar,secondpar)] <- bnew[constraintsViolated,secondpar]
+                         }
+                    } # if 1
+                    if(condition==2)
+                    {
+                         if(secondpar==0)
+                         {          
+                              constraintsViolated <- bnew[,firstpar]<0
+                              bnew[constraintsViolated,firstpar] <- 0
+                         }
+                         if(secondpar!=0)
+                         {
+                              constraintsViolated <- bnew[,firstpar]<bnew[,secondpar]
+                              bnew[constraintsViolated,c(firstpar,secondpar)] <- bnew[constraintsViolated,secondpar]
+                         }
+                    } # if 2
+               
+                    totalConstraintsViolated <- totalConstraintsViolated + sum(constraintsViolated)
+                    
+               } # for
+               
+          } # while
+     } # if
      
      bn   <- bnew - matrix(t(a),nrow=gNP,ncol=gNIV,byrow=T)
      bo   <- b - matrix(t(a),nrow=gNP,ncol=gNIV,byrow=T)
