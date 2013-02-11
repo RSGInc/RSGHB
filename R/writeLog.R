@@ -1,12 +1,12 @@
-writeLog <- function(r,p,a,b,d,fc)
+writeLog <- function(r,p,a,b,d,f,rho,rhoF)
 {
          
      cr <- rainbow(gNIV+gFIV)
      
      if(gNIV >0)
      {
-          paramRMS <- sqrt(.Internal(mean(apply(trans(b),1,function(x)x^2))))    #use .Internal for speed
-          avgVariance <- .Internal(mean(apply(trans(b),1,var)))
+          paramRMS <- sqrt(mean(apply(trans(b),1,function(x)x^2)))    #use .Internal for speed
+          avgVariance <- mean(apply(trans(b),1,var))
      }
      
      #Some printing progress to the screen
@@ -38,7 +38,7 @@ writeLog <- function(r,p,a,b,d,fc)
           cat("Current values for fixed coefficients","\n")
           for(i in 1:gFIV)
           {
-               cat(gVarNamesFixed[i],":",signif(fc[i],gSIGDIG),"\n",sep="\t")
+               cat(gVarNamesFixed[i],":",signif(f[i],gSIGDIG),"\n",sep="\t")
           }
      }
      
@@ -142,7 +142,7 @@ writeLog <- function(r,p,a,b,d,fc)
      {
           for(i in 1:gFIV)
           {
-               points(r,fc[i],pch=20,col=cr[gNIV + i],cex=0.5)
+               points(r,f[i],pch=20,col=cr[gNIV + i],cex=0.5)
           }
      }
      

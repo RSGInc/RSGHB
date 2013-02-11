@@ -7,7 +7,7 @@
  Generates a log file as the estimation occurs. Also generates output to the screen.
 }
 \usage{
-writeLog(r, p, a, b, d, fc)
+writeLog(r, p, a, b, d, f)
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{

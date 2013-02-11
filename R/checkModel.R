@@ -1,4 +1,4 @@
-checkModel <- function(nodiagnostics=F)
+checkModel <- function(nodiagnostics=F, env=parent.frame())
 {
      
      passChecks=T
@@ -7,7 +7,7 @@ checkModel <- function(nodiagnostics=F)
      
      # the user needs to specify some variables. lets make sure they exist.
      
-     if(is.null(gDIST)&gNIV>0)
+     if(is.null(gDIST)&env$gNIV>0)
      {
           passChecks=F    
           cat("\n********FATAL ERROR: Variable - gDIST - is undefined.\n")          
@@ -38,10 +38,6 @@ checkModel <- function(nodiagnostics=F)
           cat("\n********FATAL ERROR: The likelihood function is undefined.\n")
      }
      
-     # check to see if we have some variables
-     gNIV       <<- length(gVarNamesNormal)   # Number of Normal Independent Variables
-     gFIV       <<- length(gVarNamesFixed)    # Number of Non-Random Independent Variables
-     
      if(gNIV+gFIV==0)
      {
           passChecks=F    
@@ -59,7 +55,7 @@ checkModel <- function(nodiagnostics=F)
      {
           for(d in gDIST)
           {
-               if(d < 1 | d > length(distNames))
+               if(d < 1 | d > length(env$distNames))
                {
                     passChecks <- F
                     cat("\n********FATAL ERROR: The specified distributions ", d, " in gDist do not exist\n")          
@@ -67,12 +63,12 @@ checkModel <- function(nodiagnostics=F)
           }
      }
      # check to see if we have enough starting values for both the random and fixed coefficients
-     if(gNIV!=length(svN))
+     if(env$gNIV!=length(svN))
      {
           passChecks <- F    
           cat("\n********FATAL ERROR: There are too many/not enough starting values for the random coefficients. Check your sVN vector.\n")          
      }
-     if(gFIV!=length(FC))
+     if(env$gFIV!=length(FC))
      {
           passChecks <- F    
           cat("\n********FATAL ERROR: There are too many/not enough starting values for the fixed coefficients. Check your FC vector.\n")          
@@ -86,23 +82,23 @@ checkModel <- function(nodiagnostics=F)
           
      if(passChecks)
      {
-          prepareModel()
+          prepareModel(env)
           
           cat(rep("\n",128))
           cat("Diagnostic checks passed. ")
           cat("Please review before proceeding","\n\n")
           cat("Number of Individuals: ",gNP,"\n",sep="\t")
           cat("Number of Observations: ",gNOBS,"\n",sep="\t")
-          cat("Prior variance: ", priorVariance,"\n",sep="\t")
-          cat("Degrees of Freedom: ", degreesOfFreedom,"\n",sep="\t")
-          cat("Avg. Number of Observations per Individual: ",gNOBS / gNP,"\n",sep="\t")
+          cat("Prior variance: ", env$priorVariance,"\n",sep="\t")
+          cat("Degrees of Freedom: ", env$degreesOfFreedom,"\n",sep="\t")
+          cat("Avg. Number of Observations per Individual: ",env$gNOBS / gNP,"\n",sep="\t")
           cat("Initial Log-Likelihood: ",sum(log(likelihood(FC,B))),"\n",sep="\t")
           
           
    	     if(gFIV > 0)
 	     {
 	  	     cat("Fixed parameters estimated:","\n")
-	 	     for(i in 1:gFIV)
+	 	     for(i in 1:env$gFIV)
 	 	     {
 	 	          cat(gVarNamesFixed[i],"\n")
 	 	     }
@@ -111,21 +107,21 @@ checkModel <- function(nodiagnostics=F)
 	     if(gNIV>0)
 	     {
 		     cat("Random Parameters estimated (Distribution):","\n")
-               for(i in 1:gNIV)
+               for(i in 1:env$gNIV)
                {
-                    cat(gVarNamesNormal[i],"(",distNames[gDIST[i]],")","\n")
+                    cat(gVarNamesNormal[i],"(",env$distNames[gDIST[i]],")","\n")
                }
           }
           
-          if(!is.null(constraintsNorm))
+          if(!is.null(env$constraintsNorm))
           {
                cat("Constraints applied to random parameters (param1 - inequality - param2):","\n")
-               for(i in 1:length(constraintsNorm))
+               for(i in 1:length(env$constraintsNorm))
                {
                     if(constraintsNorm[[i]][3]==0)
-                         cat(gVarNamesNormal[constraintsNorm[[i]][1]],constraintLabels[constraintsNorm[[i]][2]],0,"\n")
+                         cat(gVarNamesNormal[env$constraintsNorm[[i]][1]],env$constraintLabels[env$constraintsNorm[[i]][2]],0,"\n")
                     if(constraintsNorm[[i]][3]!=0)
-                         cat(gVarNamesNormal[constraintsNorm[[i]][1]],constraintLabels[constraintsNorm[[i]][2]],gVarNamesNormal[constraintsNorm[[i]][3]],"\n")
+                         cat(gVarNamesNormal[env$constraintsNorm[[i]][1]],env$constraintLabels[env$constraintsNorm[[i]][2]],env$gVarNamesNormal[env$constraintsNorm[[i]][3]],"\n")
                }
                
           }

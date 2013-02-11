@@ -14,7 +14,11 @@
  This function needs to be called first at the top of the user-specified model script. It creates a number of global variables which then could be adjusted based on the model specification desired. The global variables created are:
  
 \emph{modelname} - The model name which is used for creating output files. (Defaults to paste("HBModel",round(runif(1)*10000000,0),sep=""))
-     
+
+\emph{constraintsNorm} - A list of constraints applied to model parameters during estimation. This uses a tying algorithm during estimation to make sure individual level coefficients satisfy constraints. (Defaults to NULL which results in an unconstrained model)
+
+\emph{fixedA} - This is a vector of specific values to which means of the random parameters are constrained. This can be used to estimate an Error Components model. (Defaults to NULL)
+
 \emph{gSIGDIG} - The number of significant digits for reporting purposes. (Defaults to 10)
 
 \emph{priorVariance} - The amount of prior variance assumed. (Defaults to 2.0)       
@@ -34,9 +38,6 @@
 \emph{gStoreDraws} - A boolean value to store the draws for the individual level coefficients. (Defaults to F)
      
 \emph{gSeed} - The random seed. (Defaults to 0)
- 
-}
-\references{
 }
 \author{
  Jeffrey Dumont, RSG, Inc.

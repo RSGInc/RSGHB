@@ -6,6 +6,7 @@ createGlobalVariables <- function()
      modelname     <<- paste("HBModel",round(runif(1)*10000000,0),sep="")
      
      constraintsNorm <<- NULL
+     fixedA <<- NULL
      
      gSIGDIG       <<- 10        # number of significant digits for reporting purposes
      

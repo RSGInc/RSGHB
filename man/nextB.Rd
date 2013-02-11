@@ -19,8 +19,5 @@ nextB(a, b, d, p, f)
 \author{
  Jeffrey Dumont, RSG, Inc.
 }
-\note{
-
-}
 \keyword{ ~kwd1 }
 \keyword{ ~kwd2 }% __ONLY ONE__ keyword per line

@@ -1,12 +1,12 @@
 hb <- function(a, b, d, f, env=parent.frame())
 {
     
-     starttime <<- Sys.time()
+     env$starttime <- Sys.time()
      
      # sets random seed.	  
      if(gSeed==0)
      {
-     	  gSeed <<- ceiling(runif(1)*1000000)
+     	  env$gSeed <- ceiling(runif(1)*1000000)
      }
      	       
      set.seed(gSeed,kind="default",normal.kind="default")
@@ -15,7 +15,7 @@ hb <- function(a, b, d, f, env=parent.frame())
      
      # Iterate until convergence #
      
-     writeLog(0,p,a,b,d,f)
+     writeLog(0,p,a,b,d,f,rho,rhoF)
      
      # the burn-in iterations
      for(r in  1:gNCREP)
@@ -30,6 +30,19 @@ hb <- function(a, b, d, f, env=parent.frame())
           
                a <- nextA(b, d)
                
+               # this constrains the means of the random parameters to be user-specified
+               # this is necessary for such things as error components logit.
+               if(!is.null(fixedA))
+               {
+                    for(rp in 1:gNIV)
+                    {
+                         if(!is.na(fixedA[rp]))
+                         {
+                              a[rp] <- fixedA[rp]     
+                         }
+                    }
+               }     
+                    
                if(gFULLCV==1) {
                     d <- nextD(a, b)
                } 
@@ -47,7 +60,7 @@ hb <- function(a, b, d, f, env=parent.frame())
           }
                    
           if(r%%gINFOSKIP == 0) {
-               writeLog(r,p,a,b,d,f)
+               writeLog(r,p,a,b,d,f,rho,rhoF)
           }
           
           r <- r + 1
@@ -78,6 +91,19 @@ hb <- function(a, b, d, f, env=parent.frame())
                p      <- out[[3]]     
                
                a <- nextA(b, d)
+               
+               # this constrains the means of the random parameters to be user-specified
+               # this is necessary for such things as error components logit.
+               if(!is.null(fixedA))
+               {
+                    for(rp in 1:gNIV)
+                    {
+                         if(!is.na(fixedA[rp]))
+                         {
+                              a[rp] <- fixedA[rp]     
+                         }
+                    }
+               } 
                
                if(gFULLCV==1) {
                     d <- nextD(a, b)
@@ -121,7 +147,7 @@ hb <- function(a, b, d, f, env=parent.frame())
           
           if(r%%gINFOSKIP == 0) {
                
-               writeLog(gNCREP + r,p,a,b,d,f)
+               writeLog(gNCREP + r,p,a,b,d,f,rho,rhoF)
                
           }
      }

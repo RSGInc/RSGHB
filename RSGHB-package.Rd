@@ -6,9 +6,15 @@
 Functions for Hierarchical Bayesian Estimation: A Flexible Approach
 }
 \description{
- This package can be used to estimate models using a hierarchical Bayesian framework. The flexibility comes in allowing the user to specify the likelihood function directly instead of assuming predetermined model structures. Types of models that can be estimated with this code include the family of discrete choice models (Multinomial Logit, Mixed Logit, Nested Logit, and Latent Class) as well ordered response models like ordered probit and ordered logit. In addition, the package allows for flexibility in specifying parameters as either fixed (non-varying across individuals) or random with continuous distributions. Parameter distributions supported include normal, positive log-normal, negative log-normal, positive truncated normal and the Johnson SB distribution.
- 
- A number of the functions that exist in this package had their origins in Kenneth Train's Matlab and Gauss code for doing hierarchical Bayesian estimation.
+This package can be used to estimate models using a hierarchical Bayesian framework. The flexibility comes in allowing the user to specify the likelihood function directly instead of assuming predetermined model structures. Types of models that can be estimated with this code include the family of discrete choice models (Multinomial Logit, Mixed Logit, Nested Logit, Error Components Logit and Latent Class) as well ordered response models like ordered probit and ordered logit. In addition, the package allows for flexibility in specifying parameters as either fixed (non-varying across individuals) or random with continuous distributions. Parameter distributions supported include normal, positive log-normal, negative log-normal, positive truncated normal and the Johnson SB distribution.
+
+Kenneth Train's Matlab and Gauss code for doing hierarchical Bayesian estimation has served as the basis for a few of the functions included in this package. These Matlab/Gauss functions have been rewritten to be optimized within R. Considerable code has been added to increase the flexibility and usability of the code base.   
+
+Train's original Gauss and Matlab code can be found here: http://elsa.berkeley.edu/Software/abstracts/train1006mxlhb.html
+
+See Train's chapter on HB in Discrete Choice with Simulation here: http://elsa.berkeley.edu/books/choice2.html; 
+
+and his paper on using HB with non-normal distributions here: http://elsa.berkeley.edu/~train/trainsonnier.pdf
 }
 \details{
 
@@ -62,46 +68,52 @@ There are a number of global variables that can be set to control the model esti
      
 }
 
-\author{
-Jeffrey Dumont, RSG, Inc.
-}
 \usage{
-checkModel()
+checkModel(nodiagnostics = F)
 createGlobalVariables()
 createBasicMNLFile()
 createBasicMaxDiffFile()
-go()
-hb(a,b,d,f)
+go(nodiagnostics = F)
+hb(a,b,d,f,env)
 nextA(b,d)
 nextB(a,b,d,p,f)
 nextF(p,f,b)
 nextD(a,b)
 nextDind(a,b)
-plotA(model)
-plotF(model)
+plotA(model,columns=0)
+plotF(model,columns=0)
 plotLog(model)
 prepareModel()
 trans(b)
 vech(mat)
-writeLog(r,p,a,b,f)
+writeLog(r,p,a,b,d,f)
 xpnd(vec)
 }
 \arguments{
    \item{a}{ The current means of the underlying normal distributions for the set of random parameters - a vector of length gNIV }
    \item{b}{ The current values for the normally distributed individual-level parameters - a gNP x gNIV matrix }	
+   \item{columns}{A vector of particular columns to plot. A default of 0 plots all columns.}
    \item{d}{ The current variance-covariance matrix for the set of random parameters - a gNIV x gNIV matrix }
+   \item{env}{ The environment from which hb is called.}
    \item{f}{ The current value of the fixed (non-random) parameters - a vector of length gFIV }
    \item{mat}{ A symmetric matrix }
    \item{model}{ A string containing the model's name }
+   \item{nodiagnostics}{If set to TRUE no diagnostic report will be presented to the screen. Diagnostic checks will still be performed.}
    \item{p}{ The current likelihood values for each individual - a vector  of length gNP }
    \item{r}{ The current iteration of the Markov chain }
-   \item{vec}{ A vector }
+   \item{vec}{ A vector to expand into a symmetric matrix }
+   
 }
 \references{
  Rossi, P., Allenby G. and McCulloch, R. (2005). Bayesian Statistics and Marketing. John Wiley & Sons.
  
  Train, K. (2009) Discrete Choice Methods with Simulation. Cambridge University Press.
 }
+\author{
+Jeffrey Dumont, RSG, Inc.
+}
+
+
 \keyword{ package }
 \seealso{
 }

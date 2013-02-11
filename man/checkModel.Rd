@@ -8,7 +8,6 @@
  Validates the structure of the model prior to estimation by performing some diagnostic tests. For example, it looks to make sure required variables are set and are compatible with one another (e.g., there are distributional shapes specified for each of the random coefficients).
 }
 \details{
-
 This function is called automatically from the main estimation functions and does not need to be called directly by the user though it can be if desired. 
 
 This function performs the following diagnostic checks:
@@ -24,19 +23,15 @@ This function performs the following diagnostic checks:
 5. to make sure there are enough starting values for the random and fixed coefficents.
 
 6. to make sure that there is a respondent identifier in the choicedata data.frame called ID.
-
-7. to make sure that there is a choice column called Choice in the choicedata data.frame. 
-
 }
-
 \usage{
-checkModel()
+checkModel(nodiagnostics)
 }
-
+\arguments{
+     \item{nodiagnostics}{If set to TRUE no diagnostic report will be presented to the screen. Diagnostic checks will still be performed.}
+}
 \value{
  Returns True if the model passes the diagnositic checks. Returns False otherwise. Prints error messages to the screen. 
-}
-\references{
 }
 \author{
  Jeffrey Dumont, RSG, Inc.

@@ -10,8 +10,6 @@
 \usage{
  createBasicMaxDiffFile()
 }
-\references{
-}
 \author{
  Jeffrey Dumont, RSG, Inc.
 }

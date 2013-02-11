@@ -10,8 +10,6 @@
 \usage{
  createBasicMNLFile()
 }
-\references{
-}
 \author{
  Jeffrey Dumont, RSG, Inc.
 }
