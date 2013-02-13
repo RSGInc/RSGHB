@@ -1,5 +1,4 @@
-vech <-
-function(mat)
+vech <- function(mat)
 {
      
      nr <- dim(mat)[1]

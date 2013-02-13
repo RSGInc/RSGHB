@@ -1,8 +1,12 @@
-trans <- function(b)
+trans <- function(b,env)
 {
      C <- b
      
-     for(k in 1:gNIV)
+     gDIST     <- env$gDIST
+     gMAXCOEF <- env$gMAXCOEF
+     gMINCOEF <- env$gMINCOEF
+     
+     for(k in 1:dim(b)[2])
      {
           
           if(gDIST[k] ==2)	     # positive log-normal

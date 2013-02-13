@@ -1,13 +1,12 @@
-nextDind <-
-function(a, b)
+nextDind <- function(a, b, env)
 {
-     d <- matrix(0, gNIV, gNIV)
-     b <- matrix(t(a),nrow=gNP,ncol=gNIV,byrow=T) - b
+     d <- matrix(0, env$gNIV, env$gNIV)
+     b <- matrix(t(a),nrow=env$gNP,ncol=env$gNIV,byrow=T) - b
      
-     for(k in 1:gNIV)
+     for(k in 1:env$gNIV)
      {
           t <- 1 + t(b[,k])%*%b[,k]
-          s <- sqrt(1/t)[1,1]*matrix(rnorm(gNP+1),nrow=gNP+1,ncol=1)
+          s <- sqrt(1/t)[1,1]*matrix(rnorm(env$gNP+1),nrow=env$gNP+1,ncol=1)
           
           d[k,k] <- solve(t(s)%*%s)
      }

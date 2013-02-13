@@ -1,9 +1,9 @@
-nextF <- function(p,f,b)
+nextF <- function(p,f,b,env)
 {
      
-     fnew <- f + sqrt(rhoF) * rnorm(gFIV,0,1)
+     fnew <- f + sqrt(env$rhoF) * rnorm(env$gFIV,0,1)
      
-     pnew <- likelihood(fnew,b)
+     pnew <- env$likelihood(fnew,b,env)
      
      r    <- prod(pnew/p)
      

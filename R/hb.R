@@ -4,128 +4,125 @@ hb <- function(a, b, d, f, env=parent.frame())
      env$starttime <- Sys.time()
      
      # sets random seed.	  
-     if(gSeed==0)
+     if(env$gSeed==0)
      {
      	  env$gSeed <- ceiling(runif(1)*1000000)
      }
      	       
-     set.seed(gSeed,kind="default",normal.kind="default")
+     set.seed(env$gSeed,kind="default",normal.kind="default")
      
-     p <- likelihood(f,b)
+     p <- env$likelihood(f,b,env)
      
      # Iterate until convergence #
      
-     writeLog(0,p,a,b,d,f,rho,rhoF)
+     writeLog(0,p,a,b,d,f,env)
      
      # the burn-in iterations
-     for(r in  1:gNCREP)
+     for(r in 1:env$gNCREP)
      {
 
-          if(gNIV > 0) {
+          if(env$gNIV > 0) {
           
-               out    <- nextB(a, b, d, p, f)
+               out    <- nextB(a, b, d, p, f, env)
                b      <- out[[1]]
                accept <- out[[2]]
                p      <- out[[3]]
           
-               a <- nextA(b, d)
+               a <- nextA(b, d, env)
                
                # this constrains the means of the random parameters to be user-specified
                # this is necessary for such things as error components logit.
-               if(!is.null(fixedA))
+               if(!is.null(env$fixedA))
                {
-                    for(rp in 1:gNIV)
+                    for(rp in 1:env$gNIV)
                     {
-                         if(!is.na(fixedA[rp]))
+                         if(!is.na(env$fixedA[rp]))
                          {
-                              a[rp] <- fixedA[rp]     
+                              a[rp] <- env$fixedA[rp]     
                          }
                     }
                }     
                     
-               if(gFULLCV==1) {
-                    d <- nextD(a, b)
+               if(env$gFULLCV==1) {
+                    d <- nextD(a, b, env)
                } 
-               if(gFULLCV==0) {
-                    d <- nextDind(a, b)
+               if(env$gFULLCV==0) {
+                    d <- nextDind(a, b, env)
                }
           }
 
           # drawing a new set of fixed coefficients
-          if(gFIV > 0) {
-               out <- nextF(p,f,b)
+          if(env$gFIV > 0) {
+               out <- nextF(p,f,b,env)
                
                f  <- out[[1]]
                p  <- out[[2]]     
           }
                    
-          if(r%%gINFOSKIP == 0) {
-               writeLog(r,p,a,b,d,f,rho,rhoF)
+          if(r%%env$gINFOSKIP == 0) {
+               writeLog(r,p,a,b,d,f,env)
           }
           
-          r <- r + 1
      }
      
      # for storing draws
-     if(gStoreDraws){     
-          for(i in 1:gNP)
+     if(env$gStoreDraws){     
+          for(i in 1:env$gNP)
           {
-               storedDraws[[i]] <- matrix(0,gNEREP,gNIV)
-               dimnames(storedDraws[[i]])<-list(NULL,gVarNamesNormal)
+               env$storedDraws[[i]] <- matrix(0,env$gNEREP,env$gNIV)
+               dimnames(env$storedDraws[[i]])<-list(NULL,env$gVarNamesNormal)
           }    
      }
      
-     
      # Iterate after convergence collecting averages 
-     n <- gNEREP * gNSKIP
-     r <- 1
+     n <- env$gNEREP * env$gNSKIP
      
      for(r in 1:n)
      {
           
-          if(gNIV >0){
+          if(env$gNIV >0){
                     
-               out    <- nextB(a, b, d, p, f)
+               out    <- nextB(a, b, d, p, f, env)
                b      <- out[[1]]
                accept <- out[[2]]
                p      <- out[[3]]     
                
-               a <- nextA(b, d)
+               a <- nextA(b, d, env)
                
                # this constrains the means of the random parameters to be user-specified
                # this is necessary for such things as error components logit.
-               if(!is.null(fixedA))
+               if(!is.null(env$fixedA))
                {
-                    for(rp in 1:gNIV)
+                    for(rp in 1:env$gNIV)
                     {
-                         if(!is.na(fixedA[rp]))
+                         if(!is.na(env$fixedA[rp]))
                          {
-                              a[rp] <- fixedA[rp]     
+                              a[rp] <- env$fixedA[rp]     
                          }
                     }
                } 
                
-               if(gFULLCV==1) {
-                    d <- nextD(a, b)
+               if(env$gFULLCV==1) {
+                    d <- nextD(a, b, env)
                }     
-               if(gFULLCV==0) {
-                    d <- nextDind(a, b)
+               if(env$gFULLCV==0) {
+                    d <- nextDind(a, b, env)
                }
                
-               if(r%%gNSKIP == 0) {
-                    C <- trans(b)
-                    env$ma[ ,(r/gNSKIP)] <- a
-                    env$md[ ,(r/gNSKIP)] <- vech(d)
-                    env$mp[,r/gNSKIP] <- p^(1/TIMES)    #RLH Calculation
+               if(r%%env$gNSKIP == 0) {
+                    C <- trans(b,env)
+                    env$ma[ ,(r/env$gNSKIP)] <- a
+                    env$md[ ,(r/env$gNSKIP)] <- vech(d)
+                    env$mp[,r/env$gNSKIP] <- p^(1/env$TIMES)    #RLH Calculation
                     env$mb <- env$mb + b
                     env$mb.squared <- env$mb.squared + b^2
                     env$mc <- env$mc + C
                     env$mc.squared <- env$mc.squared + C^2
-                    if(gStoreDraws)
+                    if(env$gStoreDraws)
                     {
-                         for(i in 1:gNP)
+                         for(i in 1:env$gNP)
                          {
-                              env$storedDraws[[i]][(r/gNSKIP),] <- C[i,]
+                              env$storedDraws[[i]][(r/env$gNSKIP),] <- C[i,]
                          }
                          
                     }
@@ -133,21 +130,21 @@ hb <- function(a, b, d, f, env=parent.frame())
                
           }
           
-          if(gFIV > 0){
+          if(env$gFIV > 0){
                # drawing a new set of fixed coefficients
-               out <- nextF(p,f,b)
+               out <- nextF(p,f,b,env)
                f   <- out[[1]]
                p   <- out[[2]]
                
-               if(r%%gNSKIP == 0) {
-                    env$mf[ ,(r/gNSKIP)] <- f
+               if(r%%env$gNSKIP == 0) {
+                    env$mf[ ,(r/env$gNSKIP)] <- f
                }
                
           }              
           
-          if(r%%gINFOSKIP == 0) {
+          if(r%%env$gINFOSKIP == 0) {
                
-               writeLog(gNCREP + r,p,a,b,d,f,rho,rhoF)
+               writeLog(env$gNCREP + r,p,a,b,d,f,env)
                
           }
      }
