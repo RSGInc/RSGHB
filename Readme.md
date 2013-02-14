@@ -3,5 +3,7 @@ This package can be used to estimate models using a hierarchical Bayesian framew
 Kenneth Train's Matlab and Gauss code for doing hierarchical Bayesian estimation has served as the basis for a few of the functions included in this package. These Matlab/Gauss functions have been rewritten to be optimized within R. Considerable code has been added to increase the flexibility and usability of the code base.   
 
 Train's original Gauss and Matlab code can be found here: http://elsa.berkeley.edu/Software/abstracts/train1006mxlhb.html
-See Train's chapter on HB in Discrete Choice with Simulation here: http://elsa.berkeley.edu/books/choice2.html; and 
-his paper on using HB with non-normal distributions here: http://elsa.berkeley.edu/~train/trainsonnier.pdf
+
+See Train's chapter on HB in Discrete Choice with Simulation here: http://elsa.berkeley.edu/books/choice2.html; 
+
+and his paper on using HB with non-normal distributions here: http://elsa.berkeley.edu/~train/trainsonnier.pdf
