@@ -7,7 +7,7 @@
 
 library(RSGHB)
 
-setwd("C:/Work/Code/HB/Examples/Basic Example - MNL with monotonic constraints")     		    # working directory
+setwd("C:\\Work\\Code\\HB\\RSGHB.git\\Examples\\Basic Example - MNL with monotonic constraints")     		    # working directory
 
 # ------------------
 # DATA PREPARATION
@@ -149,4 +149,3 @@ likelihood <- function(fc,b)
 
 # Estimate the model
 doHB(likelihood, choicedata, control)
-

@@ -7,7 +7,7 @@
 
 library(RSGHB)
 
-setwd("C:/Work/Code/HB/Examples/Advanced Example - Latent Class")     		    # working directory
+setwd("C:\\Work\\Code\\HB\\RSGHB.git\\Examples\\Advanced Example - Latent Class")     		    # working directory
 
 # ------------------
 # DATA PREPARATION

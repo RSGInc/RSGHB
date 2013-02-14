@@ -11,7 +11,7 @@ library(RSGHB)
 # ------------------
 # Global Settings
 # ------------------
-setwd("C:\\Work\\Code\\HB\\Examples\\Basic Example - Ordered Probit")     		    # working directory
+setwd("C:\\Work\\Code\\HB\\RSGHB.git\\Examples\\Basic Example - Ordered Probit")     		    # working directory
 
 
 # ------------------

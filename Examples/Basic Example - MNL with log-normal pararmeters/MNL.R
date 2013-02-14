@@ -7,7 +7,7 @@
 
 library(RSGHB)
 
-setwd("C:/Work/Code/HB/Examples/Basic Example - MNL with log-normal pararmeters")     		    # working directory
+setwd("C:\\Work\\Code\\HB\\RSGHB.git\\Examples\\Basic Example - MNL with log-normal pararmeters")     		    # working directory
 
 # ------------------
 # DATA PREPARATION

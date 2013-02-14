@@ -11,7 +11,7 @@
 
 library(RSGHB)
 
-setwd("C:/Work/Code/HB/Examples/Advanced Example - Nested Logit")     		    # working directory
+setwd("C:\\Work\\Code\\HB\\RSGHB.git\\Examples\\Advanced Example - Nested Logit")     		    # working directory
 
 
 

@@ -13,13 +13,19 @@ doHB <- function(likelihood_user,choicedata,control=list())
           }
 
           p <- likelihood_user(fc,C)
-        
-          p.temp <- data.table(gIDS,p)
-          setkey(p.temp,gIDS)
-               
-          p0     <- p.temp[,prod(p),by=gIDS]$V1
-            
-          p0     <- replace(p0,is.nan(p0),1e-32)
+          
+          p <- replace(p,is.na(p),1e-32)
+          
+          p0 <- rep(1,env$gNP)
+
+          p0 <- .C("aggregation", 
+             as.double(env$gIDS), 
+             as.double(env$gNOBS),
+             as.double(env$gNP),
+             as.double(p),
+             as.double(1:env$gNP),
+             as.double(p0)
+          )[[6]]
                
           return(p0)
      }
@@ -243,7 +249,7 @@ doHB <- function(likelihood_user,choicedata,control=list())
      constraintLabels <- c("<",">")     
      
      if(checkModel(nodiagnostics))
-     {
+     {     
           r <- 1
           # Post Burn-in iterations          
           ma <- matrix(0,nrow=gNIV,ncol=gNEREP)
