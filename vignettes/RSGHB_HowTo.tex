@@ -99,16 +99,8 @@ In this section, the code for estimating a multinomial logit model with fixed (n
 
 \hlfunctioncall{library}(RSGHB)
 
-\hlcomment{# Sets the working directory. RSGHB generates a number of output files}
-\hlcomment{# that will be written to this location.}
-\hlfunctioncall{setwd}(\hlstring{"C:/Work/Code/HB/RSGHB.git/RSGHB/vignettes/Example1"})
-
-\hlcomment{# ------------------ DATA PREPARATION ------------------}
-
-\hlcomment{# RSGHB assumes that respondents are identified with a ID column. The}
-\hlcomment{# choicedata data.frame needs to be sorted by respondent and then}
-\hlcomment{# experiment.}
-choicedata <- \hlfunctioncall{read.table}(\hlstring{"data_simulated.dat"}, sep = \hlstring{"\textbackslash{}t"}, header = T)
+\hlcomment{# load example data}
+\hlfunctioncall{data}(choicedata)
 
 \hlcomment{# We typically work with one one row per choice observations. This isn't}
 \hlcomment{# necessary however but it does lend it self to faster computation of the}
@@ -275,21 +267,13 @@ During the estimation, current estimates of the markov chains will be plotted to
 
 There are two main output files for this particular model - \emph{log} file and the \emph{\_F} file. RSGHB comes with some basic tools for plotting the contents of these files.
 
-The \emph{.log} file contains some statistics that can be used to understand if model convergence has been reached. Because this model contains only fixed coefficents, the log file contains just the root likelihood (RLH) and log-likelihood at each iteration defined by \emph{gINFOSKIP}.
+The \emph{.log} file contains some statistics that can be used to understand if model convergence has been reached. Because this model contains only fixed coefficents, the log file contains just the root likelihood (RLH) and log-likelihood at each iteration defined by \emph{gINFOSKIP} - see figure \ref{logfile1}.
 
-\begin{knitrout}
-\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
-\begin{alltt}
-\hlfunctioncall{setwd}(\hlstring{"C:/Work/Code/HB/RSGHB.git/RSGHB/vignettes/Example1"})
-
-\hlcomment{# plots the contents of the log file}
-\hlfunctioncall{plotLog}(modelname)
-\end{alltt}
-\end{kframe}
-\includegraphics[width=\maxwidth]{figure/unnamed-chunk-4} 
-
-\end{knitrout}
-
+\begin{figure}
+\caption{Plotting of the Log file}
+\includegraphics[scale=0.50]{MNL_logPlot1.png}
+\label{logfile1}
+\end{figure}
 
 The \emph{\_F} file contains the set of fixed (non-random) coefficients for each iteration after convergence of the markov chain.
 
@@ -297,29 +281,20 @@ The \emph{\_F} file contains the set of fixed (non-random) coefficients for each
 \definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
 \begin{alltt}
 
-\hlfunctioncall{setwd}(\hlstring{"C:/Work/Code/HB/RSGHB.git/RSGHB/vignettes/Example1"})
+\hlfunctioncall{data}(Example1_F)
 
-Ffile <- \hlfunctioncall{read.table}(\hlfunctioncall{paste}(modelname, \hlstring{"_F.csv"}, sep = \hlstring{""}), header = T, sep = \hlstring{","})
-
-\hlfunctioncall{head}(Ffile)
+\hlfunctioncall{head}(Example1_F)
 \end{alltt}
 \begin{verbatim}
-##   iteration   ASC1   BTime   BCost
-## 1         1 0.9476 -0.1295 -0.6205
-## 2         2 0.9582 -0.1289 -0.6147
-## 3         3 0.9582 -0.1289 -0.6147
-## 4         4 0.9582 -0.1289 -0.6147
-## 5         5 0.9582 -0.1289 -0.6147
-## 6         6 0.9573 -0.1348 -0.6224
+##   iteration  ASC1   BTime   BCost
+## 1         1 1.030 -0.1460 -0.6586
+## 2         2 1.030 -0.1460 -0.6586
+## 3         3 1.030 -0.1460 -0.6586
+## 4         4 1.030 -0.1460 -0.6586
+## 5         5 1.030 -0.1460 -0.6586
+## 6         6 1.027 -0.1451 -0.6579
 \end{verbatim}
-\begin{alltt}
-
-\hlfunctioncall{plot}(Ffile[, 2], main = \hlstring{"Markov Chain for ASC1"}, ylab = \hlstring{"Estimate"}, xlab = \hlstring{"Iteration"}, 
-    type = \hlstring{"l"})
-\end{alltt}
 \end{kframe}
-\includegraphics[width=\maxwidth]{figure/unnamed-chunk-5} 
-
 \end{knitrout}
 
 
@@ -339,16 +314,8 @@ The setup and data preparation are very similar to the first model.
 
 \hlfunctioncall{library}(RSGHB)
 
-\hlcomment{# Sets the working directory. RSGHB generates a number of output files}
-\hlcomment{# that will be written to this location.}
-\hlfunctioncall{setwd}(\hlstring{"C:/Work/Code/HB/RSGHB.git/RSGHB/vignettes/Example2"})
-
-\hlcomment{# ------------------ DATA PREPARATION ------------------}
-
-\hlcomment{# RSGHB assumes that respondents are identified with a ID column. The}
-\hlcomment{# choicedata data.frame needs to be sorted by respondent and then}
-\hlcomment{# experiment.}
-choicedata <- \hlfunctioncall{read.table}(\hlstring{"data_simulated.dat"}, sep = \hlstring{"\textbackslash{}t"}, header = T)
+\hlcomment{# load example data}
+\hlfunctioncall{data}(choicedata)
 
 \hlcomment{# We typically work with one one row per choice observations. This isn't}
 \hlcomment{# necessary however but it does lend it self to faster computation of the}
@@ -356,13 +323,13 @@ choicedata <- \hlfunctioncall{read.table}(\hlstring{"data_simulated.dat"}, sep =
 \hlfunctioncall{head}(choicedata)
 \end{alltt}
 \begin{verbatim}
-##     ID thecount tt1 tt2 toll2 Choice
-## 1 8738        1  60  51  1.25      1
-## 2 8738        2  60  51  0.75      2
-## 3 8738        3  63  59  0.50      1
-## 4 8738        4  60  54  0.75      1
-## 5 8738        5  60  54  0.50      1
-## 6 8738        6  63  54  0.75      1
+##     ID thecount tt1 tt2 toll2 asc1 Choice
+## 1 8738        1  60  51  1.25    1      1
+## 2 8738        2  60  51  0.75    1      1
+## 3 8738        3  63  59  0.50    1      2
+## 4 8738        4  60  54  0.75    1      1
+## 5 8738        5  60  54  0.50    1      2
+## 6 8738        6  63  54  0.75    1      1
 \end{verbatim}
 \begin{alltt}
 
@@ -387,7 +354,7 @@ choice2 <- (choicedata$Choice == 2)
 \begin{verbatim}
 ## choice1
 ## FALSE  TRUE 
-##  4223  6019
+##  3560  6682
 \end{verbatim}
 \begin{alltt}
 
@@ -397,7 +364,7 @@ choice2 <- (choicedata$Choice == 2)
 \begin{verbatim}
 ## choice2
 ## FALSE  TRUE 
-##  6019  4223
+##  6682  3560
 \end{verbatim}
 \begin{alltt}
 
@@ -513,26 +480,17 @@ doHB(likelihood, choicedata, control)
 
 \subsection*{Evaluating the output}
 
-As in the first example, current estimates of the markov chains will be plotted to the screen - s ee figure \ref{MarkovChain2}. In this model, these represent the means of the underlying normals for the random parameters.
+As in the first example, current estimates of the markov chains will be plotted to the screen - see figure \ref{MarkovChain2}. In this model, these represent the means of the underlying normals for the random parameters.
 
 There are more output files for this model. RSGHB comes with some basic tools for plotting the contents of these files.
 
-The \emph{.log} file contains some statistics that can be used to understand if model convergence has been reached. Because this model includes random coefficients, the log file now contains the average variance and parameter root mean square (RMS) at each iteration.
+The \emph{.log} file contains some statistics that can be used to understand if model convergence has been reached. Because this model includes random coefficients, the log file now contains the average variance and parameter root mean square (RMS) at each iteration - see figure \ref{logfile2}. 
 
-\begin{knitrout}
-\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
-\begin{alltt}
-
-\hlfunctioncall{setwd}(\hlstring{"C:/Work/Code/HB/RSGHB.git/RSGHB/vignettes/Example2"})
-
-\hlcomment{# plots the contents of the log file}
-\hlfunctioncall{plotLog}(modelname)
-\end{alltt}
-\end{kframe}
-\includegraphics[width=\maxwidth]{figure/unnamed-chunk-9} 
-
-\end{knitrout}
-
+\begin{figure}
+\caption{Plotting of the Log file}
+\includegraphics[scale=0.50]{MNL_logPlot2.png}
+\label{logfile2}
+\end{figure}
 
 The \emph{\_A} file contain the sample-level means of the underlying normal at each iteration.
 
@@ -540,29 +498,20 @@ The \emph{\_A} file contain the sample-level means of the underlying normal at e
 \definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
 \begin{alltt}
 
-\hlfunctioncall{setwd}(\hlstring{"C:/Work/Code/HB/RSGHB.git/RSGHB/vignettes/Example2"})
+\hlfunctioncall{data}(Example2_A)
 
-Afile <- \hlfunctioncall{read.table}(\hlfunctioncall{paste}(modelname, \hlstring{"_A.csv"}, sep = \hlstring{""}), header = T, sep = \hlstring{","})
-
-\hlfunctioncall{head}(Afile)
+\hlfunctioncall{head}(Example2_A)
 \end{alltt}
 \begin{verbatim}
 ##   iteration   ASC1   BTime   BCost
-## 1         1 0.9775 -0.1483 -0.6599
-## 2         2 0.9866 -0.1401 -0.6580
-## 3         3 1.0055 -0.1513 -0.6767
-## 4         4 1.0203 -0.1340 -0.6463
-## 5         5 0.9973 -0.1358 -0.6371
-## 6         6 0.9784 -0.1320 -0.6372
+## 1         1 0.9502 -0.1249 -0.5975
+## 2         2 0.9192 -0.1345 -0.6017
+## 3         3 0.9334 -0.1276 -0.5895
+## 4         4 0.9543 -0.1386 -0.5932
+## 5         5 0.9488 -0.1187 -0.5895
+## 6         6 0.9399 -0.1178 -0.5912
 \end{verbatim}
-\begin{alltt}
-
-\hlfunctioncall{plot}(Afile[, 2], main = \hlstring{"Markov Chain for sample mean of ASC1"}, ylab = \hlstring{"Estimate"}, 
-    xlab = \hlstring{"Iteration"}, type = \hlstring{"l"})
-\end{alltt}
 \end{kframe}
-\includegraphics[width=\maxwidth]{figure/unnamed-chunk-10} 
-
 \end{knitrout}
 
 
@@ -572,75 +521,71 @@ The \emph{\_B} file contains the average across iterations of the individual lev
 \definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
 \begin{alltt}
 
-\hlfunctioncall{setwd}(\hlstring{"C:/Work/Code/HB/RSGHB.git/RSGHB/vignettes/Example2"})
+\hlfunctioncall{data}(Example2_B)
 
-Bfile <- \hlfunctioncall{read.table}(\hlfunctioncall{paste}(modelname, \hlstring{"_B.csv"}, sep = \hlstring{""}), header = T, sep = \hlstring{","})
-
-\hlfunctioncall{head}(Bfile)
+\hlfunctioncall{head}(Example2_B)
 \end{alltt}
 \begin{verbatim}
 ##   Respondent   ASC1    BTime   BCost
-## 1       8738 1.1536 -0.01117 -0.6535
-## 2       8740 1.1617 -0.01307 -0.5311
-## 3       8741 0.7044 -0.56812 -0.5114
-## 4       8742 1.1573 -0.27454 -0.6487
-## 5       8744 0.4327 -0.01753 -0.5461
-## 6       8745 0.9851 -0.29169 -0.5596
+## 1       8738 1.2066 -0.01700 -0.6707
+## 2       8740 1.1857 -0.01575 -0.5232
+## 3       8741 0.7790 -0.57719 -0.4940
+## 4       8742 1.1593 -0.27220 -0.6376
+## 5       8744 0.5109 -0.02025 -0.5083
+## 6       8745 1.0068 -0.29565 -0.5575
 \end{verbatim}
 \begin{alltt}
 
-BSDfile <- \hlfunctioncall{read.table}(\hlfunctioncall{paste}(modelname, \hlstring{"_Bsd.csv"}, sep = \hlstring{""}), header = T, sep = \hlstring{","})
+\hlfunctioncall{data}(Example2_Bsd)
 
-\hlfunctioncall{head}(BSDfile)
+\hlfunctioncall{head}(Example2_Bsd)
 \end{alltt}
 \begin{verbatim}
 ##   Respondent   ASC1  BTime  BCost
-## 1       8738 0.6587 0.1601 0.3968
-## 2       8740 0.6595 0.1644 0.3825
-## 3       8741 0.6689 0.2004 0.3839
-## 4       8742 0.6696 0.1563 0.3985
-## 5       8744 0.6565 0.1587 0.4008
-## 6       8745 0.6284 0.1607 0.3728
+## 1       8738 0.6501 0.1616 0.4068
+## 2       8740 0.6821 0.1693 0.4069
+## 3       8741 0.6917 0.2080 0.4230
+## 4       8742 0.6381 0.1567 0.4002
+## 5       8744 0.7009 0.1650 0.4296
+## 6       8745 0.6260 0.1676 0.4018
 \end{verbatim}
 \end{kframe}
 \end{knitrout}
 
 
-The \emph{\_C} file contains the average across iterations of the individual level draws for the random parameters including the appropriate transformations. The \emph{\_Csd} file provides the standard deviations of those individual draws. These two files are equivalent to the conditional distributions from models estimated using Maximum Simulated Likelihood methods.
+The \emph{\_C} file contains the average across iterations of the individual level draws for the random parameters including the appropriate transformations. The \emph{\_C} file also contains individual-specific measures of model fit (Root Likelihoods). The \emph{\_Csd} file provides the standard deviations of those individual draws. These two files are equivalent to the conditional distributions from models estimated using Maximum Simulated Likelihood methods.
 
 \begin{knitrout}
 \definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
 \begin{alltt}
 
-\hlfunctioncall{setwd}(\hlstring{"C:/Work/Code/HB/RSGHB.git/RSGHB/vignettes/Example2"})
+\hlfunctioncall{data}(Example2_C)
 
-Cfile <- \hlfunctioncall{read.table}(\hlfunctioncall{paste}(modelname, \hlstring{"_C.csv"}, sep = \hlstring{""}), header = T, sep = \hlstring{","})
-
-\hlfunctioncall{head}(Cfile)
+\hlfunctioncall{head}(Example2_C)
 \end{alltt}
 \begin{verbatim}
 ##   Respondent    RLH   ASC1    BTime   BCost
-## 1       8738 0.6726 1.1536 -0.01117 -0.6535
-## 2       8740 0.6303 1.1617 -0.01307 -0.5311
-## 3       8741 0.8423 0.7044 -0.56812 -0.5114
-## 4       8742 0.5145 1.1573 -0.27454 -0.6487
-## 5       8744 0.4823 0.4327 -0.01753 -0.5461
-## 6       8745 0.4940 0.9851 -0.29169 -0.5596
+## 1       8738 0.6762 1.2066 -0.01700 -0.6707
+## 2       8740 0.6326 1.1857 -0.01575 -0.5232
+## 3       8741 0.8420 0.7790 -0.57719 -0.4940
+## 4       8742 0.5145 1.1593 -0.27220 -0.6376
+## 5       8744 0.4781 0.5109 -0.02025 -0.5083
+## 6       8745 0.4920 1.0068 -0.29565 -0.5575
 \end{verbatim}
 \begin{alltt}
 
-CSDfile <- \hlfunctioncall{read.table}(\hlfunctioncall{paste}(modelname, \hlstring{"_Csd.csv"}, sep = \hlstring{""}), header = T, sep = \hlstring{","})
+\hlfunctioncall{data}(Example2_Csd)
 
-\hlfunctioncall{head}(CSDfile)
+\hlfunctioncall{head}(Example2_Csd)
 \end{alltt}
 \begin{verbatim}
 ##   Respondent   ASC1  BTime  BCost
-## 1       8738 0.6587 0.1601 0.3968
-## 2       8740 0.6595 0.1644 0.3825
-## 3       8741 0.6689 0.2004 0.3839
-## 4       8742 0.6696 0.1563 0.3985
-## 5       8744 0.6565 0.1587 0.4008
-## 6       8745 0.6284 0.1607 0.3728
+## 1       8738 0.6501 0.1616 0.4068
+## 2       8740 0.6821 0.1693 0.4069
+## 3       8741 0.6917 0.2080 0.4230
+## 4       8742 0.6381 0.1567 0.4002
+## 5       8744 0.7009 0.1650 0.4296
+## 6       8745 0.6260 0.1676 0.4018
 \end{verbatim}
 \end{kframe}
 \end{knitrout}
@@ -653,26 +598,24 @@ The \emph{\_D} file contains a row-based representation of the sample covariance
 \definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
 \begin{alltt}
 
-\hlfunctioncall{setwd}(\hlstring{"C:/Work/Code/HB/RSGHB.git/RSGHB/vignettes/Example2"})
+\hlfunctioncall{data}(Example2_D)
 
-Dfile <- \hlfunctioncall{read.table}(\hlfunctioncall{paste}(modelname, \hlstring{"_D.csv"}, sep = \hlstring{""}), header = T, sep = \hlstring{","})
-
-\hlfunctioncall{head}(Dfile)
+\hlfunctioncall{head}(Example2_D)
 \end{alltt}
 \begin{verbatim}
-##   iteration      X      X.1     X.2       X.3     X.4    X.5
-## 1         1 0.4060 -0.01448 0.06579 0.0043159 0.01233 0.1091
-## 2         2 0.3520 -0.01918 0.06392 0.0025858 0.01657 0.1119
-## 3         3 0.3981 -0.02825 0.06619 0.0052280 0.01506 0.1159
-## 4         4 0.4019 -0.02315 0.06263 0.0119998 0.01127 0.1031
-## 5         5 0.4149 -0.02466 0.06762 0.0005846 0.01413 0.1070
-## 6         6 0.4390 -0.02598 0.06316 0.0033442 0.01099 0.1015
+##   iteration   ASC1 ASC1xBTime ASC1xBCost      BTime BTimexBCost  BCost
+## 1         1 0.1996   -0.02085    0.06611 -0.0122684     0.03471 0.1830
+## 2         2 0.2068   -0.02099    0.06575 -0.0053138     0.03063 0.1854
+## 3         3 0.2206   -0.01673    0.06778 -0.0008272     0.03580 0.1873
+## 4         4 0.2136   -0.02086    0.06905  0.0055351     0.03120 0.1801
+## 5         5 0.2376   -0.01937    0.06593 -0.0054135     0.02932 0.1752
+## 6         6 0.2234   -0.02707    0.07341 -0.0128438     0.03041 0.1791
 \end{verbatim}
 \begin{alltt}
 
 \hlcomment{# building the covariance matrix}
 
-covMat <- \hlfunctioncall{xpnd}(\hlfunctioncall{colMeans}(Dfile[-1]))
+covMat <- \hlfunctioncall{xpnd}(\hlfunctioncall{colMeans}(Example2_D[-1]))
 
 \hlfunctioncall{rownames}(covMat) <- \hlfunctioncall{c}(\hlstring{"ASC1"}, \hlstring{"BTime"}, \hlstring{"BCost"})
 \hlfunctioncall{colnames}(covMat) <- \hlfunctioncall{c}(\hlstring{"ASC1"}, \hlstring{"BTime"}, \hlstring{"BCost"})
@@ -681,9 +624,9 @@ covMat
 \end{alltt}
 \begin{verbatim}
 ##           ASC1    BTime    BCost
-## ASC1   0.46179 -0.06016 -0.03624
-## BTime -0.06016  0.07694  0.02735
-## BCost -0.03624  0.02735  0.15864
+## ASC1   0.44636 -0.06659 -0.05475
+## BTime -0.06659  0.07915  0.03123
+## BCost -0.05475  0.03123  0.17248
 \end{verbatim}
 \end{kframe}
 \end{knitrout}

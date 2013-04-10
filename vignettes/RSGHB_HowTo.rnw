@@ -42,17 +42,8 @@ In this section, the code for estimating a multinomial logit model with fixed (n
 
 library(RSGHB)
 
-# Sets the working directory. RSGHB generates a number of output files that will be written to
-# this location.
-setwd("C:/Work/Code/HB/RSGHB.git/RSGHB/vignettes/Example1") 
-
-# ------------------
-# DATA PREPARATION
-# ------------------
-
-# RSGHB assumes that respondents are identified with a ID column. The choicedata data.frame
-# needs to be sorted by respondent and then experiment.
-choicedata <- read.table("data_simulated.dat",sep="\t",header=T)
+# load example data
+data(choicedata)
 
 # We typically work with one one row per choice observations. This isn't necessary however but it does lend it self to faster computation of the choice likelihoods
 head(choicedata)
@@ -179,27 +170,21 @@ During the estimation, current estimates of the markov chains will be plotted to
 
 There are two main output files for this particular model - \emph{log} file and the \emph{\_F} file. RSGHB comes with some basic tools for plotting the contents of these files.
 
-The \emph{.log} file contains some statistics that can be used to understand if model convergence has been reached. Because this model contains only fixed coefficents, the log file contains just the root likelihood (RLH) and log-likelihood at each iteration defined by \emph{gINFOSKIP}.
+The \emph{.log} file contains some statistics that can be used to understand if model convergence has been reached. Because this model contains only fixed coefficents, the log file contains just the root likelihood (RLH) and log-likelihood at each iteration defined by \emph{gINFOSKIP} - see figure \ref{logfile1}.
 
-<<fig.width=4,fig.height=4>>=
-setwd("C:/Work/Code/HB/RSGHB.git/RSGHB/vignettes/Example1") 
-
-# plots the contents of the log file
-plotLog(modelname)
-
-@
+\begin{figure}
+\caption{Plotting of the Log file}
+\includegraphics[scale=0.50]{MNL_logPlot1.png}
+\label{logfile1}
+\end{figure}
 
 The \emph{\_F} file contains the set of fixed (non-random) coefficients for each iteration after convergence of the markov chain.
 
 <<fig.width=4,fig.height=4>>=
 
-setwd("C:/Work/Code/HB/RSGHB.git/RSGHB/vignettes/Example1") 
+data(Example1_F)
 
-Ffile <- read.table(paste(modelname,"_F.csv",sep=""),header=T,sep=",")
-
-head(Ffile)
-
-plot(Ffile[,2],main="Markov Chain for ASC1",ylab="Estimate",xlab="Iteration",type="l")
+head(Example1_F)
 
 @
 
@@ -217,17 +202,8 @@ The setup and data preparation are very similar to the first model.
 
 library(RSGHB)
 
-# Sets the working directory. RSGHB generates a number of output files that will be written to
-# this location.
-setwd("C:/Work/Code/HB/RSGHB.git/RSGHB/vignettes/Example2") 
-
-# ------------------
-# DATA PREPARATION
-# ------------------
-
-# RSGHB assumes that respondents are identified with a ID column. The choicedata data.frame
-# needs to be sorted by respondent and then experiment.
-choicedata <- read.table("data_simulated.dat",sep="\t",header=T)
+# load example data
+data(choicedata)
 
 # We typically work with one one row per choice observations. This isn't necessary however but it does lend it self to faster computation of the choice likelihoods
 head(choicedata)
@@ -352,32 +328,25 @@ doHB(likelihood, choicedata, control)
 
 \subsection*{Evaluating the output}
 
-As in the first example, current estimates of the markov chains will be plotted to the screen - s ee figure \ref{MarkovChain2}. In this model, these represent the means of the underlying normals for the random parameters.
+As in the first example, current estimates of the markov chains will be plotted to the screen - see figure \ref{MarkovChain2}. In this model, these represent the means of the underlying normals for the random parameters.
 
 There are more output files for this model. RSGHB comes with some basic tools for plotting the contents of these files.
 
-The \emph{.log} file contains some statistics that can be used to understand if model convergence has been reached. Because this model includes random coefficients, the log file now contains the average variance and parameter root mean square (RMS) at each iteration.
+The \emph{.log} file contains some statistics that can be used to understand if model convergence has been reached. Because this model includes random coefficients, the log file now contains the average variance and parameter root mean square (RMS) at each iteration - see figure \ref{logfile2}. 
 
-<<fig.width=5,fig.height=5>>=
-
-setwd("C:/Work/Code/HB/RSGHB.git/RSGHB/vignettes/Example2") 
-
-# plots the contents of the log file
-plotLog(modelname)
-
-@
+\begin{figure}
+\caption{Plotting of the Log file}
+\includegraphics[scale=0.50]{MNL_logPlot2.png}
+\label{logfile2}
+\end{figure}
 
 The \emph{\_A} file contain the sample-level means of the underlying normal at each iteration.
 
 <<fig.width=4,fig.height=4>>=
 
-setwd("C:/Work/Code/HB/RSGHB.git/RSGHB/vignettes/Example2") 
+data(Example2_A)
 
-Afile <- read.table(paste(modelname,"_A.csv",sep=""),header=T,sep=",")
-
-head(Afile)
-
-plot(Afile[,2],main="Markov Chain for sample mean of ASC1",ylab="Estimate",xlab="Iteration",type="l")
+head(Example2_A)
 
 @
 
@@ -385,31 +354,27 @@ The \emph{\_B} file contains the average across iterations of the individual lev
 
 <<>>=
 
-setwd("C:/Work/Code/HB/RSGHB.git/RSGHB/vignettes/Example2") 
+data(Example2_B)
 
-Bfile <- read.table(paste(modelname,"_B.csv",sep=""),header=T,sep=",")
+head(Example2_B)
 
-head(Bfile)
+data(Example2_Bsd)
 
-BSDfile <- read.table(paste(modelname,"_Bsd.csv",sep=""),header=T,sep=",")
-
-head(BSDfile)
+head(Example2_Bsd)
 
 @
 
-The \emph{\_C} file contains the average across iterations of the individual level draws for the random parameters including the appropriate transformations. The \emph{\_Csd} file provides the standard deviations of those individual draws. These two files are equivalent to the conditional distributions from models estimated using Maximum Simulated Likelihood methods.
+The \emph{\_C} file contains the average across iterations of the individual level draws for the random parameters including the appropriate transformations. The \emph{\_C} file also contains individual-specific measures of model fit (Root Likelihoods). The \emph{\_Csd} file provides the standard deviations of those individual draws. These two files are equivalent to the conditional distributions from models estimated using Maximum Simulated Likelihood methods.
 
 <<>>=
 
-setwd("C:/Work/Code/HB/RSGHB.git/RSGHB/vignettes/Example2") 
+data(Example2_C)
 
-Cfile <- read.table(paste(modelname,"_C.csv",sep=""),header=T,sep=",")
+head(Example2_C)
 
-head(Cfile)
+data(Example2_Csd)
 
-CSDfile <- read.table(paste(modelname,"_Csd.csv",sep=""),header=T,sep=",")
-
-head(CSDfile)
+head(Example2_Csd)
 
 @
 
@@ -418,15 +383,13 @@ The \emph{\_D} file contains a row-based representation of the sample covariance
 
 <<>>=
 
-setwd("C:/Work/Code/HB/RSGHB.git/RSGHB/vignettes/Example2") 
+data(Example2_D)
 
-Dfile <- read.table(paste(modelname,"_D.csv",sep=""),header=T,sep=",")
-
-head(Dfile)
+head(Example2_D)
 
 # building the covariance matrix
 
-covMat <- xpnd(colMeans(Dfile[-1]))
+covMat <- xpnd(colMeans(Example2_D[-1]))
 
 rownames(covMat) <- c("ASC1","BTime","BCost")
 colnames(covMat) <- c("ASC1","BTime","BCost")
