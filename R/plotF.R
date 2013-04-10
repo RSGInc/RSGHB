@@ -3,10 +3,10 @@ plotF <- function(model,columns=0)
 
      fn <- paste(model,"_F.csv",sep="")
      
-     F <- read.table(fn,sep=",",header=T)
+     Fdata <- read.table(fn,sep=",",header=T)
      
-     gFIV <- ncol(F)-1
-     numIts <- nrow(F)
+     gFIV <- ncol(Fdata)-1
+     numIts <- nrow(Fdata)
      
      graphics.off()
      par(ask=T)
@@ -20,9 +20,9 @@ plotF <- function(model,columns=0)
      {
           par(oma=c(3,0,0,0))
           x <- (1:numIts)
-          trend <- lm(F[,i+1]~x)
+          trend <- lm(Fdata[,i+1]~x)
           
-          plot(F[,i+1],type="l",main=names(F)[i+1],xlab="Iteration",ylab="Value")
+          plot(Fdata[,i+1],type="l",main=names(Fdata)[i+1],xlab="Iteration",ylab="Value")
           lines(1:numIts,trend$fitted.values,col="Red",lwd=2)
           
           coefficients <- signif(summary(trend)$coefficients,2)          

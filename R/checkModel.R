@@ -79,7 +79,14 @@ checkModel <- function(nodiagnostics=F, env=parent.frame())
           passChecks <- F
           cat("\n********FATAL ERROR: Expecting to find a respondent identifier column called - ID - in your dataset. None found.\n")          
      }         
-          
+
+     # the software needs the data sorted by ID
+     if(sum(sort(env$choicedata$ID)==env$choicedata$ID)!=length(env$choicedata$ID))
+     {
+          passChecks <- F    
+          cat("\n********FATAL ERROR: The choice data is not sorted by ID.\n")               
+     }     
+     
      if(passChecks)
      {
           prepareModel(env)

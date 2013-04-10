@@ -1,0 +1,507 @@
+\documentclass{article}
+\usepackage[margin=1in]{geometry}
+%\VignetteIndexEntry{How to use RSGHB}
+
+\usepackage{url}
+\makeatletter
+\def\url@leostyle{%
+  \@ifundefined{selectfont}{\def\UrlFont{\sf}}{\def\UrlFont{\small\ttfamily}}}
+\makeatother
+\urlstyle{leo}
+
+\begin{document}
+
+\title{How to use RSGHB}
+\author{Jeffrey Dumont}
+\date{6 April 2013}
+\maketitle
+\abstract{This vignette describes the process for specifying, estimating and analyzing the output of a choice model with RSGHB. The document is structured into two case studies using different model structures. The synthetic choice data used in this document (as well as number of other examples using different model structures) can be downloaded from RSGHB github page - \url{https://github.com/jeffdumont/RSGHB}}
+
+\begin{center}
+\line(1,0){400}
+\end{center}
+
+\section*{RSGHB modeling file structure}
+
+The typical RSGHB model file has the following 4 main sections. We will walk through each of these 4 sections in the examples that follow.
+
+\begin{enumerate}
+     \item Setup and data preparation
+     \item Setting the controls for model estimation
+     \item Defining the likelihood function
+     \item Calling the doHB function to start the estimation process
+\end{enumerate}
+
+\section*{EXAMPLE 1: MNL Model with Fixed Parameters}
+
+In this section, the code for estimating a multinomial logit model with fixed (non-random) parameters is explained. In this example, synthetic respondents were presented with a choice between two travel alternatives - one that is toll free but slower and one that was priced but faster. Each respondent was presented with a panel of 8 choice tasks.
+
+\subsection*{Setup and Data Preparation}
+
+<<>>=
+
+library(RSGHB)
+
+# Sets the working directory. RSGHB generates a number of output files that will be written to
+# this location.
+setwd("C:/Work/Code/HB/RSGHB.git/RSGHB/vignettes/Example1") 
+
+# ------------------
+# DATA PREPARATION
+# ------------------
+
+# RSGHB assumes that respondents are identified with a ID column. The choicedata data.frame
+# needs to be sorted by respondent and then experiment.
+choicedata <- read.table("data_simulated.dat",sep="\t",header=T)
+
+# We typically work with one one row per choice observations. This isn't necessary however but it does lend it self to faster computation of the choice likelihoods
+head(choicedata)
+
+# We can then specify any variables from the choicedata data.frame that you'd like to use in the
+# utility equations in the likelihood function below. These can be any variables within the data or transformations of those variables. This example comes from transport so each alternative is defined by travel times and toll costs.
+TT1     <- choicedata$tt1
+TT2     <- choicedata$tt2
+TOLL2   <- choicedata$toll2
+
+# Here we specify the choice vectors. Note in this example there are only two alternatives. Also, dummying coding the choice vector is not necessary but allows for easier coding of the likelihood.
+choice1    <- (choicedata$Choice==1)
+choice2    <- (choicedata$Choice==2)
+
+# Frequency of choice for the first alternative
+table(choice1)
+
+# Frequency of choice for the second alternative.
+table(choice2)
+
+@
+
+\subsection*{Controling the Estimation Process}
+
+There are number of options for controling the estimation process. Please see the help file for doHB or the final section of this document for more details. Note that a number of controls have default values and do not need to be directly specified if the default is acceptable.
+
+<<>>=
+
+# ------------------
+# ESTIMATION CONTROL
+# ------------------
+
+# Setting control list for estimation (see ?doHB for more estimation options)
+
+# modelname is used for naming the output files
+modelname <- "MNL"          
+
+# gVarNamesFixed contains the names for the fixed (non-random) variables in your model. This will be used in output and also when displaying iteration detail to the screen.
+gVarNamesFixed <- c("ASC1","BTime","BCost")
+
+# FC contains the starting values for the fixed coefficients.
+FC <- c(0,0,0)                 
+
+# ITERATION SETTINGS
+
+# gNCREP contains the number of iterations to use prior to convergence
+gNCREP    <- 30000
+# gNEREP contains the number of iterations to keep for averaging after convergence has been reached
+gNEREP    <- 20000 	       
+# gNSKIP contains the number of iterations to do in between retaining draws for averaging
+gNSKIP    <- 1		       
+# gINFOSKIP controls how frequently to print info about the iteration process
+gINFOSKIP <- 250           
+
+# To simplify the doHB functional call, we put all of the control parameters into a single list that can be passed directly to doHB.
+control <- list(
+     modelname=modelname,
+     gVarNamesFixed=gVarNamesFixed,
+     FC=FC,
+     gNCREP=gNCREP,
+     gNEREP=gNEREP,
+     gNSKIP=gNSKIP,
+     gINFOSKIP=gINFOSKIP
+)
+
+@
+
+\subsection*{Writing the likelihood function}
+
+RSGHB is expecting the user-specificed likelihood function to take the parameters \emph{fc} and \emph{b} (even if they are not used within the function calculate the likelihood). The \emph{fc} parameter is a vector of fixed coefficients (they do not vary across individuals in your data). The \emph{b} parameter is a matrix of individual coefficients which are generated from the random coefficients in the model. In this example, we only focus on the \emph{fc} vector.
+
+It is important to note that the computation of the likelihood is the most computational taxing part of the estimation process. So coding the likelihood efficiently is essential to reduce run time of the model.
+
+
+<<>>=
+
+# ------------------
+# likelihood
+# ------------------
+
+likelihood <- function(fc,b)
+{
+
+  # defining the parameters          
+
+  # using cc var to index the fc vector simplifies the addition/subtraction of new parameters     
+  cc <- 1
+  ASC1   <- fc[cc];cc <- cc+1
+  Btime  <- fc[cc];cc <- cc+1
+  Btoll  <- fc[cc];cc <- cc+1  
+
+  # utility functions
+  v1 <- ASC1       + Btime * TT1                   
+  v2 <-              Btime * TT2 + Btoll * TOLL2   
+ 
+  # mnl probability statement
+  p  <- (exp(v1)*choice1 + exp(v2)*choice2) / (exp(v1) + exp(v2))
+	
+  return(p)
+}
+@
+
+\subsection*{Estimating the model}
+
+To start the model estimation process, the analyst needs to call the \emph{doHB} function passing in the \emph{likelihood} function, the \emph{choicedata} data.frame and the \emph{control} list. 
+
+\begin{verbatim}
+doHB(likelihood, choicedata, control)
+\end{verbatim}
+
+RSGHB will first perform a series of diagnostics on your model to catch common errors in model setup. In addition, it will provide you with some basice summary statistics on your choice data and model. Before estimation begins, RSGHB will present you with a confirmation prompt allowing you to cancel the model estimation.
+
+\begin{figure}
+\caption{Plotting of the Markov Chains during estimation}
+\includegraphics[scale=0.50]{MNL_markovChains.png}
+\label{MarkovChain}
+\end{figure}
+
+During the estimation, current estimates of the markov chains will be plotted to the screen. This plot is updated based on the control parameter \emph{gINFOSKIP} (see figure \ref{MarkovChain}). In addition, it will provide numerical iteration details in the R Console.
+
+
+
+\subsection*{Evaluating the output}
+
+There are two main output files for this particular model - \emph{log} file and the \emph{\_F} file. RSGHB comes with some basic tools for plotting the contents of these files.
+
+The \emph{.log} file contains some statistics that can be used to understand if model convergence has been reached. Because this model contains only fixed coefficents, the log file contains just the root likelihood (RLH) and log-likelihood at each iteration defined by \emph{gINFOSKIP}.
+
+<<fig.width=4,fig.height=4>>=
+setwd("C:/Work/Code/HB/RSGHB.git/RSGHB/vignettes/Example1") 
+
+# plots the contents of the log file
+plotLog(modelname)
+
+@
+
+The \emph{\_F} file contains the set of fixed (non-random) coefficients for each iteration after convergence of the markov chain.
+
+<<fig.width=4,fig.height=4>>=
+
+setwd("C:/Work/Code/HB/RSGHB.git/RSGHB/vignettes/Example1") 
+
+Ffile <- read.table(paste(modelname,"_F.csv",sep=""),header=T,sep=",")
+
+head(Ffile)
+
+plot(Ffile[,2],main="Markov Chain for ASC1",ylab="Estimate",xlab="Iteration",type="l")
+
+@
+
+
+
+\section*{EXAMPLE 2: MNL Model with Random Coefficients}
+
+In this section, we expand on the model estimated in EXAMPLE 1 by allowing the coefficients to vary across the individuals in our dataset. This type of model is referred to by many names - Random Coefficients Logit, Random Parameters Logit or Mixed Logit. 
+
+\subsection*{Setup and Data Preparation}
+
+The setup and data preparation are very similar to the first model.
+
+<<>>=
+
+library(RSGHB)
+
+# Sets the working directory. RSGHB generates a number of output files that will be written to
+# this location.
+setwd("C:/Work/Code/HB/RSGHB.git/RSGHB/vignettes/Example2") 
+
+# ------------------
+# DATA PREPARATION
+# ------------------
+
+# RSGHB assumes that respondents are identified with a ID column. The choicedata data.frame
+# needs to be sorted by respondent and then experiment.
+choicedata <- read.table("data_simulated.dat",sep="\t",header=T)
+
+# We typically work with one one row per choice observations. This isn't necessary however but it does lend it self to faster computation of the choice likelihoods
+head(choicedata)
+
+# We can then specify any variables from the choicedata data.frame that you'd like to use in the
+# utility equations in the likelihood function below. These can be any variables within the data or transformations of those variables. This example comes from transport so each alternative is defined by travel times and toll costs.
+TT1     <- choicedata$tt1
+TT2     <- choicedata$tt2
+TOLL2   <- choicedata$toll2
+
+# Here we specify the choice vectors. Note in this example there are only two examples. Also, dummying coding the choice vector is not necessary but allows for easier coding of the likelihood.
+choice1    <- (choicedata$Choice==1)
+choice2    <- (choicedata$Choice==2)
+
+# Frequency of choice for the first alternative
+table(choice1)
+
+# Frequency of choice for the second alternative.
+table(choice2)
+
+
+@
+
+
+\subsection*{Controling the Estimation Process}
+
+To allow for mixing of the parameters, we need to specify a few more controls to pass into the \emph{doHB} function.
+
+<<>>=
+
+# ------------------
+# ESTIMATION CONTROL
+# ------------------
+
+# Setting control list for estimation (see ?doHB for more estimation options)
+
+# modelname is used for naming the output files
+modelname <- "MNL"          
+
+# gVarNamesNormal provides names for the random parameters
+gVarNamesNormal <- c("ASC1","BTime","BCost")
+
+# gDIST specifies the type of continuous distribution to use for the random parameters. gDIST must have an entry for each value in gVarNamesNormal
+# The options are:
+# 1. normal
+# 2. log-nomal
+# 3. negative log-normal
+# 4. normal with all values below zero massed at zero
+# 5. Johnson SB with a specified min and max
+
+# In this example, we use normal distributions for all 3 of the parameters.
+gDIST <- c(1,1,1)
+
+# svN contains the starting values for the means of the normal distributions for each of the random parameters
+svN <- c(0,0,0)  
+
+# ITERATION SETTINGS
+
+# gNCREP contains the number of iterations to use prior to convergence
+gNCREP    <- 30000
+# gNEREP contains the number of iterations to keep for averaging after convergence has been reached
+gNEREP    <- 20000             
+# gNSKIP contains the number of iterations to do in between retaining draws for averaging
+gNSKIP    <- 1		       
+# gINFOSKIP controls how frequently to print info about the iteration process
+gINFOSKIP <- 250   
+
+# To simplify the doHB functional call, we put all of the control parameters into a single list that can be passed directly to doHB.
+control <- list(
+     modelname=modelname,
+     gVarNamesNormal=gVarNamesNormal,
+     gDIST=gDIST,
+     svN=svN,
+     gNCREP=gNCREP,
+     gNEREP=gNEREP,
+     gNSKIP=gNSKIP,
+     gINFOSKIP=gINFOSKIP
+)
+
+
+@
+
+\subsection*{Writing the likelihood function}
+
+To introduce mixing into the model, we switch from using \emph{fc} vector to using the \emph{b} matrix in the coding of the likelihood. The \emph{b} matrix contains the individual conditionals for the sample-level random coefficients. The matrix \emph{b} has one row per observation (an individual's coefficients are repeated across their choice observations automatically by RSGHB) and one column for each of the random parameters.
+
+<<>>=
+
+likelihood <- function(fc,b)
+{  
+     
+     # the change from using fc to b is the only change in the likelihood function required to allow for mixing.
+     cc     <- 1
+     ASC1   <- b[,cc];cc<-cc+1
+     Btime  <- b[,cc];cc<-cc+1
+     Btoll  <- b[,cc];cc<-cc+1  
+  
+     v1 <- ASC1       + Btime * TT1                   
+     v2 <-              Btime * TT2 + Btoll * TOLL2   
+ 
+     p  <- (exp(v1)*choice1 + exp(v2)*choice2) / (exp(v1) + exp(v2))
+     
+     return(p)
+}
+
+@
+
+\subsection*{Section 4: Estimating the model}
+
+Again, to start the model estimation process, the analyst needs to call the \emph{doHB} function passing in the \emph{likelihood} function, the \emph{choicedata} data.frame and the \emph{control} list. 
+
+\begin{verbatim}
+doHB(likelihood, choicedata, control)
+\end{verbatim}
+
+\begin{figure}
+\caption{Plotting of the Markov Chains during estimation}
+\includegraphics[scale=0.50]{MNL_markovChains2.png}
+\label{MarkovChain2}
+\end{figure}
+
+
+\subsection*{Evaluating the output}
+
+As in the first example, current estimates of the markov chains will be plotted to the screen - s ee figure \ref{MarkovChain2}. In this model, these represent the means of the underlying normals for the random parameters.
+
+There are more output files for this model. RSGHB comes with some basic tools for plotting the contents of these files.
+
+The \emph{.log} file contains some statistics that can be used to understand if model convergence has been reached. Because this model includes random coefficients, the log file now contains the average variance and parameter root mean square (RMS) at each iteration.
+
+<<fig.width=5,fig.height=5>>=
+
+setwd("C:/Work/Code/HB/RSGHB.git/RSGHB/vignettes/Example2") 
+
+# plots the contents of the log file
+plotLog(modelname)
+
+@
+
+The \emph{\_A} file contain the sample-level means of the underlying normal at each iteration.
+
+<<fig.width=4,fig.height=4>>=
+
+setwd("C:/Work/Code/HB/RSGHB.git/RSGHB/vignettes/Example2") 
+
+Afile <- read.table(paste(modelname,"_A.csv",sep=""),header=T,sep=",")
+
+head(Afile)
+
+plot(Afile[,2],main="Markov Chain for sample mean of ASC1",ylab="Estimate",xlab="Iteration",type="l")
+
+@
+
+The \emph{\_B} file contains the average across iterations of the individual level draws for the underlying normals for the random parameters. The \emph{\_Bsd} file provides the standard deviations of those individual draws.
+
+<<>>=
+
+setwd("C:/Work/Code/HB/RSGHB.git/RSGHB/vignettes/Example2") 
+
+Bfile <- read.table(paste(modelname,"_B.csv",sep=""),header=T,sep=",")
+
+head(Bfile)
+
+BSDfile <- read.table(paste(modelname,"_Bsd.csv",sep=""),header=T,sep=",")
+
+head(BSDfile)
+
+@
+
+The \emph{\_C} file contains the average across iterations of the individual level draws for the random parameters including the appropriate transformations. The \emph{\_Csd} file provides the standard deviations of those individual draws. These two files are equivalent to the conditional distributions from models estimated using Maximum Simulated Likelihood methods.
+
+<<>>=
+
+setwd("C:/Work/Code/HB/RSGHB.git/RSGHB/vignettes/Example2") 
+
+Cfile <- read.table(paste(modelname,"_C.csv",sep=""),header=T,sep=",")
+
+head(Cfile)
+
+CSDfile <- read.table(paste(modelname,"_Csd.csv",sep=""),header=T,sep=",")
+
+head(CSDfile)
+
+@
+
+
+The \emph{\_D} file contains a row-based representation of the sample covariance for each iteration. Note the use below of the xpnd function to convert to a matrix representation of the sample covariance.
+
+<<>>=
+
+setwd("C:/Work/Code/HB/RSGHB.git/RSGHB/vignettes/Example2") 
+
+Dfile <- read.table(paste(modelname,"_D.csv",sep=""),header=T,sep=",")
+
+head(Dfile)
+
+# building the covariance matrix
+
+covMat <- xpnd(colMeans(Dfile[-1]))
+
+rownames(covMat) <- c("ASC1","BTime","BCost")
+colnames(covMat) <- c("ASC1","BTime","BCost")
+
+covMat
+@
+
+\section*{RSGHB Control Parameters}
+
+Here is a list of the user-specified control parameters.
+
+
+\begin{description}
+
+\item[gVarNamesNormal] - A vector of charater-based names for the random parameters. \\
+Default: NULL
+
+\item[gVarNamesFixed] - A vector of character-based names for the fixed parameters.\\
+Default: NULL
+
+\item[gDIST] - A vector of integers (1-5) which indicate which type of distribution should be applied to the random coefficients - 1 = Normal, 2 = Postive Log-Normal, 3 = Negative Log-Normal, 4 = Censored Normal, 5 = Johnson SB. There should be an element for each name in gVarNamesNormal. \\ Default: NULL
+
+\item[FC] - A vector of starting values for the fixed coefficients. There should be an element for each name in gVarNamesFixed.\\ 
+Default: NULL
+
+\item[svN] - A vector of starting values for the means of the underlying normals for the random parameters. There should be an element for each name in gVarNamesNormal.\\ Default: NULL
+
+\item[gNCREP] - Number of burn-in iterations to use prior to convergence.\\ 
+Default: 100000
+
+\item[gNEREP] - Number of iterations to keep for averaging after convergence has been reached.\\ Default: 100000
+
+\item[gNSKIP] - Number of iterations in between retaining draws for averaging.\\ 
+Default: 1
+
+\item[gINFOSKIP] - Number of iterations in between printing/saving information about the iteration process.
+\\ Default: 250
+
+\item[modelname] - The model name which is used for creating output files. 
+\\ Default: paste("HBModel",round(runif(1)*10000000,0),sep=""))
+
+\item[gSIGDIG] - The number of significant digits for reporting purposes.\\ 
+Default: 10
+
+\item[priorVariance] - The amount of prior variance assumed.\\ 
+Default: 2.0
+
+\item[degreesOfFreedom] - Additional degrees of freedom for the prior covariance matrix (not including the number of parameters.\\ 
+Default: 5
+
+\item[rho] - The initial proportionality fraction for the jumping distribution for the Metropolis-Hastings algorithm for the random parameters. This fraction is adjusted by the program after each iteration to attain an acceptance rate of about 0.3.\\ 
+Default: 0.1
+
+\item[rhoF] - The proportionality fraction for the jumping distribution for the Metropolis-Hastings algorithm for the fixed parameters. Unlike rho, this value is not adjusted as the markov chain proceeds. \\
+Default: 0.0001
+
+\item[gFULLCV] - A number that indicates if a full or independent covariance structure should be used for the random parameters. A value of 1 indicated full and 0 for an independent structure.\\ Default: 1
+
+\item[gMINCOEF] - A vector of minimums for the Johnson SB distributions. If Johnson SB is used, each random parameter needs an element but only the elements that correspond to a 5 in gDIST are used. \\ 
+Default: 0
+
+\item[gMAXCOEF] - Like gMINCOEF but for the maximum of the Johnson SB distribution. 
+\\ Default: 0
+
+\item[gStoreDraws] - A boolean value to store the draws for the individual level coefficients. \\ Default: F
+
+\item[gSeed] - The random seed.\\ 
+Default: 0
+
+\item[constraintsNorm] - This is a list of monotonic constraints to be applied during estimation. The structure of the constraints is c(param1number - inequality - param2number). For constraints relative to 0, use 0 instead of the param2number. For the inequality, use 1 for < and 2 for >. Example \begin{verbatim}constraintsNorm <- list(c(5,1,0),c(6,1,5),c(7,1,6),c(8,1,7))\end{verbatim} would constrain the 5th parameter < 0, the 6th parameter < 5th parameter, the 7th parameter < the 6th parameter, etc. \\ Default: NULL
+
+\item[nodiagnostics] - If set to TRUE, the diagnostic report will not be reported to the screen with a prompt to continue. This makes batch processing easier to implement.\\ 
+Default: FALSE
+
+\end{description}     
+
+
+\end{document}

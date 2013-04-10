@@ -5,7 +5,7 @@ writeLog <- function(r,p,a,b,d,f,env)
      
      if(env$gNIV >0)
      {
-          paramRMS <- sqrt(mean(apply(trans(b,env),1,function(x)x^2)))    #use .Internal for speed
+          paramRMS <- sqrt(mean(apply(trans(b,env),1,function(x)x^2)))   
           avgVariance <- mean(apply(trans(b,env),1,var))
      }
      

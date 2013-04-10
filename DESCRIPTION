@@ -1,7 +1,7 @@
 Package: RSGHB
 Type: Package
 Title: Functions for Hierarchical Bayesian Estimation: A Flexible Approach
-Version: 1.0
+Version: 1.01
 Date: 2013-02-08
 Author: Jeff Dumont <Jeff.Dumont@rsginc.com>, Jeff Keller <Jeff.Keller@rsginc.com>, Chase Carpenter <Chase.Carpenter@rsginc.com>
 Maintainer: Jeff Dumont <Jeff.Dumont@rsginc.com>

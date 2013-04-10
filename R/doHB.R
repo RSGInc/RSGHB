@@ -9,12 +9,21 @@ doHB <- function(likelihood_user,choicedata,control=list())
           {
                gIDS <- env$gIDS 
                C    <- trans(b,env)
-               C    <- C[gIDS,]
+               
+               if(env$gNIV > 1)
+               {
+                    C    <- C[gIDS,]
+               }
+               
+               if(env$gNIV==1)
+               {                    
+                    C    <- matrix(C[gIDS],ncol=env$gNIV)
+               }
           }
 
           p <- likelihood_user(fc,C)
           
-          p <- replace(p,is.na(p),1e-32)
+          p <- replace(p,is.na(p),1e-323)
           
           p0 <- rep(1,env$gNP)
 
@@ -26,6 +35,8 @@ doHB <- function(likelihood_user,choicedata,control=list())
              as.double(1:env$gNP),
              as.double(p0)
           )[[6]]
+          
+          p0 <- replace(p0,p0<1e-323,1e-323)
                
           return(p0)
      }
@@ -34,140 +45,140 @@ doHB <- function(likelihood_user,choicedata,control=list())
      # USER-SPECIFIED GLOBAL VARIABLES
      # These can be over-written by the analyst by specifying
      # entries in the control list
-     if(is.null(control$modelname))
+     if(is.null(control[["modelname"]]))
      {
           modelname <- paste("HBModel",round(runif(1)*10000000,0),sep="")
      } else
      {
-          modelname <- control$modelname
+          modelname <- control[["modelname"]]
      }
 
-     if(is.null(control$gVarNamesNormal))
+     if(is.null(control[["gVarNamesNormal"]]))
      {
           gVarNamesNormal <- c()
      } else
      {
-          gVarNamesNormal <- control$gVarNamesNormal
+          gVarNamesNormal <- control[["gVarNamesNormal"]]
      }
      
-     if(is.null(control$gVarNamesFixed))
+     if(is.null(control[["gVarNamesFixed"]]))
      {
           gVarNamesFixed <- c()
      } else
      {
-          gVarNamesFixed <- control$gVarNamesFixed
+          gVarNamesFixed <- control[["gVarNamesFixed"]]
      }
      
-     if(is.null(control$gDIST))
+     if(is.null(control[["gDIST"]]))
      {
           gDIST <- c()
      } else
      {
-          gDIST <- control$gDIST
+          gDIST <- control[["gDIST"]]
      }
      
-     if(is.null(control$FC))
+     if(is.null(control[["FC"]]))
      {
           FC <- c()
      } else
      {
-          FC <- control$FC
+          FC <- control[["FC"]]
      }
      
-     if(is.null(control$svN))
+     if(is.null(control[["svN"]]))
      {
           svN <- c()
      } else
      {
-          svN <- control$svN
+          svN <- control[["svN"]]
      }
      
-     if(is.null(control$gNCREP))
+     if(is.null(control[["gNCREP"]]))
      {
           gNCREP <- 100000
      } else
      {
-          gNCREP <- control$gNCREP
+          gNCREP <- control[["gNCREP"]]
      }
      
-     if(is.null(control$gNEREP))
+     if(is.null(control[["gNEREP"]]))
      {
           gNEREP <- 100000
      } else
      {
-          gNEREP <- control$gNEREP
+          gNEREP <- control[["gNEREP"]]
      }
      
-     if(is.null(control$gNSKIP))
+     if(is.null(control[["gNSKIP"]]))
      {
           gNSKIP <- 1
      } else
      {
-          gNSKIP <- control$gNSKIP
+          gNSKIP <- control[["gNSKIP"]]
      }
      
-     if(is.null(control$gINFOSKIP))
+     if(is.null(control[["gINFOSKIP"]]))
      {
           gINFOSKIP <- 250
      } else
      {
-          gINFOSKIP <- control$gINFOSKIP
+          gINFOSKIP <- control[["gINFOSKIP"]]
      }
      
-     if(is.null(control$constraintsNorm))
+     if(is.null(control[["constraintsNorm"]]))
      {
           constraintsNorm <- NULL
      } else
      {
-          constraintsNorm <- control$constraintsNorm
+          constraintsNorm <- control[["constraintsNorm"]]
      }
      
-     if(is.null(control$fixedA))
+     if(is.null(control[["fixedA"]]))
      {
           fixedA <- NULL
      } else
      {
-          fixedA <- control$fixedA
+          fixedA <- control[["fixedA"]]
      }
 
-     if(is.null(control$nodiagnostics))
+     if(is.null(control[["nodiagnostics"]]))
      {
           nodiagnostics <- F
      } else
      {
-          nodiagnostics <- control$nodiagnostics
+          nodiagnostics <- control[["nodiagnostics"]]
      }
      
      # number of significant digits for reporting purposes
-     if(is.null(control$gSIGDIG))
+     if(is.null(control[["gSIGDIG"]]))
      {
           gSIGDIG <- 10 
      } else
      {
-          gSIGDIG <- control$gSIGDIG
+          gSIGDIG <- control[["gSIGDIG"]]
      }     
      
      # Sawtooth uses a default of 2
      # Adjusting the prior variance upwards puts more emphasis on the 
      # fitting to the respondents' individual data
-     if(is.null(control$priorVariance))
+     if(is.null(control[["priorVariance"]]))
      {
           priorVariance <- 2.0 
      } else
      {
-          priorVariance <- control$priorVariance
+          priorVariance <- control[["priorVariance"]]
      }      
      
      
      # additional degrees of freedom for the prior covariance matrix (not including the number of parameters
      # the higher the value, the greater the influence of the prior variance
      # sawtooth defaults to 5
-     if(is.null(control$degreesOfFreedom))
+     if(is.null(control[["degreesOfFreedom"]]))
      {
           degreesOfFreedom    <- 5 
      } else
      {
-          degreesOfFreedom <- control$degreesOfFreedom
+          degreesOfFreedom <- control[["degreesOfFreedom"]]
      }  
      
      
@@ -176,50 +187,68 @@ doHB <- function(likelihood_user,choicedata,control=list())
      # an acceptance rate of about .3 in the Metropolis-Hastings algorithm for the B's
      
      # this is used in the MH algorithm for the normal random coefficients
-     if(is.null(control$rho))
+     if(is.null(control[["rho"]]))
      {
           rho <- 0.1
      } else
      {
-          rho <- control$rho
+          rho <- control[["rho"]]
      }  
      
      # this is used in the MH algorithm for the fixed (non-random) coefficients
-     if(is.null(control$rhoF))
+     if(is.null(control[["rhoF"]]))
      {
           rhoF <- 0.0001
      } else
      {
-          rhoF <- control$rhoF
+          rhoF <- control[["rhoF"]]
      }  
      
      # Want full or diagonal covariance matrix for random coefficients?
      # Set FULLCV=1 for full cov matrix, FULLCV=0 for diagonal matrix.
-     if(is.null(control$gFULLCV))
+     if(is.null(control[["gFULLCV"]]))
      {
           gFULLCV <- 1
      } else
      {
-          gFULLCV <- control$gFULLCV
+          gFULLCV <- control[["gFULLCV"]]
      } 
      
      # if you want to store the individual draws
-     if(is.null(control$gStoreDraws))
+     if(is.null(control[["gStoreDraws"]]))
      {
           gStoreDraws <- F
      } else
      {
-          gStoreDraws <- control$gStoreDraws
+          gStoreDraws <- control[["gStoreDraws"]]
      } 
      
      # the random seed
-     if(is.null(control$gSeed))
+     if(is.null(control[["gSeed"]]))
      {
           gSeed <- 0 
      } else
      {
-          gSeed <- control$gSeed
+          gSeed <- control[["gSeed"]]
      } 
+     
+     # used in the johnson SB distribution
+     if(is.null(control[["gMINCOEF"]]))
+     {
+          gMINCOEF <- 0 
+     } else
+     {
+          gMINCOEF <- control[["gMINCOEF"]]
+     } 
+     
+     if(is.null(control[["gMAXCOEF"]]))
+     {
+          gMAXCOEF <- 0 
+     } else
+     {
+          gMAXCOEF <- control[["gMAXCOEF"]]
+     } 
+     
      
      # End user-specified GLOBAL VARIABLEs     
      

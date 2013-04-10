@@ -2,7 +2,6 @@ nextB <- function(a, b, d, p, f, env)
 {
      
      constraintsNorm <- env$constraintsNorm
-     rho <- env$rho
      
      # note the multiplication by rho. this is the "jumping distribution"
      bnew <- b + matrix(rnorm(env$gNP*env$gNIV),nrow=env$gNP,ncol=env$gNIV)%*%chol(d)*sqrt(env$rho)
@@ -86,7 +85,7 @@ nextB <- function(a, b, d, p, f, env)
           env$rho <- env$rho + 0.001
      }
 
-     if(rho<0)
+     if(env$rho<0)
      {
           env$rho <- 0.001          
      }
