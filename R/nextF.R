@@ -5,9 +5,12 @@ nextF <- function(p,f,b,env)
      
      pnew <- env$likelihood(fnew,b,env)
      
-     r    <- prod(pnew/p)
+     #r    <- prod(pnew/p)
      
-     ind  <- ( runif(1) <= r )
+     r    <- sum(log(pnew)-log(p))
+          
+     # ind  <- ( runif(1) <= r )
+     ind  <- ( log(runif(1)) <= r )
           
      pnew <- pnew * ind + p * ( 1 - ind )
      

@@ -49,12 +49,45 @@ hb <- function(a, b, d, f, env=parent.frame())
                if(env$gFULLCV==0) {
                     d <- nextDind(a, b, env)
                }
+               
+               if(!is.null(env$fixedD))
+               {
+                    for(rp in 1:env$gNIV)
+                    {
+                         if(!is.na(env$fixedD[rp]))
+                         {
+                              d[rp,rp] <- env$fixedD[rp]     
+                         }
+                    }
+               } 
+               
+               
           }
 
           # drawing a new set of fixed coefficients
           if(env$gFIV > 0) {
+               
                out <- nextF(p,f,b,env)
                
+               if(sum(out[[1]]==f)!=env$gFIV)
+               {
+                    env$acceptanceRateF <- env$acceptanceRateF + 1
+               }
+               
+               if((r%%100)==0)
+               {
+                    if(env$acceptanceRateF/100 < 0.25)
+                    {
+                         env$rhoF <- env$rhoF - env$rhoF/50 
+                    }
+                    if(env$acceptanceRateF/100 > 0.25)
+                    {
+                         env$rhoF <- env$rhoF + env$rhoF/50
+                    }               
+                    
+                    env$acceptanceRateF <- 0
+               }     
+                    
                f  <- out[[1]]
                p  <- out[[2]]     
           }
@@ -109,6 +142,17 @@ hb <- function(a, b, d, f, env=parent.frame())
                     d <- nextDind(a, b, env)
                }
                
+               if(!is.null(env$fixedD))
+               {
+                    for(rp in 1:env$gNIV)
+                    {
+                         if(!is.na(env$fixedD[rp]))
+                         {
+                              d[rp,rp] <- env$fixedD[rp]     
+                         }
+                    }
+               } 
+               
                if(r%%env$gNSKIP == 0) {
                     C <- trans(b,env)
                     env$ma[ ,(r/env$gNSKIP)] <- a
@@ -133,6 +177,26 @@ hb <- function(a, b, d, f, env=parent.frame())
           if(env$gFIV > 0){
                # drawing a new set of fixed coefficients
                out <- nextF(p,f,b,env)
+               
+               if(sum(out[[1]]==f)!=env$gFIV)
+               {
+                    env$acceptanceRateF <- env$acceptanceRateF + 1
+               }
+               
+               if((r%%100)==0)
+               {
+                    if(env$acceptanceRateF/100 < 0.25)
+                    {
+                         env$rhoF <- env$rhoF - env$rhoF/50 
+                    }
+                    if(env$acceptanceRateF/100 > 0.25)
+                    {
+                         env$rhoF <- env$rhoF + env$rhoF/50 
+                    }               
+                    
+                    env$acceptanceRateF <- 0
+               }                          
+
                f   <- out[[1]]
                p   <- out[[2]]
                
@@ -143,9 +207,7 @@ hb <- function(a, b, d, f, env=parent.frame())
           }              
           
           if(r%%env$gINFOSKIP == 0) {
-               
                writeLog(env$gNCREP + r,p,a,b,d,f,env)
-               
           }
      }
      

@@ -65,12 +65,14 @@ nextB <- function(a, b, d, p, f, env)
      # of D and A	
      # the relative densities are important because without any reference to how the betas fit in with the current
      # estimates of A and D, you'd end up with 
-     r.new <- pnew / p * exp(-0.5 * (colSums(t(bn)*(solve(d)%*%t(bn))) -	colSums(t(bo)*(solve(d)%*%t(bo)))))
+     # r.new <- pnew / p * exp(-0.5 * (colSums(t(bn)*(solve(d)%*%t(bn))) -	colSums(t(bo)*(solve(d)%*%t(bo)))))
+     r.new <- (log(pnew) + -0.5 * (colSums(t(bn)*(solve(d)%*%t(bn)))) - log(p) - -0.5 * (colSums(t(bo)*(solve(d)%*%t(bo)))))
      
      # if r.new > 1 then we accept the new estimate of beta. if r.new < 1 then we accept the new estimate
      # with probability = r.new
      
-     ind  <- (r.new >= 1) + (r.new < 1)*(matrix(runif(env$gNP),nrow=env$gNP) <= r.new)
+     #ind  <- (r.new >= 1) + (r.new < 0)*(matrix(runif(env$gNP),nrow=env$gNP) <= r.new)
+     ind  <- (r.new >= 0) + (r.new < 0)*(log(matrix(runif(env$gNP),nrow=env$gNP)) <= r.new)
      nind <- 1*(ind==0)
      
      # this is the acceptance rate. the target for this 0.3 (though Sawtooth allows for the user to specify this).

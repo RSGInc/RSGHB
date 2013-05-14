@@ -14,7 +14,7 @@ function(vec)
           for(j in 1:i)
           {
                if(j<=i){
-                    rM[i,j] = vec[k]
+                    rM[i,j] <- vec[k]
                     k <- k + 1
                }
           }	

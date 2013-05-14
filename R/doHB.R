@@ -140,6 +140,14 @@ doHB <- function(likelihood_user,choicedata,control=list())
      {
           fixedA <- control[["fixedA"]]
      }
+     
+     if(is.null(control[["fixedD"]]))
+     {
+          fixedD <- NULL
+     } else
+     {
+          fixedD <- control[["fixedD"]]
+     }
 
      if(is.null(control[["nodiagnostics"]]))
      {
@@ -276,6 +284,9 @@ doHB <- function(likelihood_user,choicedata,control=list())
      distNames     <- c("N","LN+","LN-","TN","JSB")  # short names for the distributions
                          # Normal, Postive Log-Normal, Negative Log-Normal, Positive Truncated Normal, Johnson SB
      constraintLabels <- c("<",">")     
+     
+     acceptanceRateF <- 0
+     rhoFadj         <- 1e-5
      
      if(checkModel(nodiagnostics))
      {     
