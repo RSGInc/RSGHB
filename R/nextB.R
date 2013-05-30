@@ -80,17 +80,17 @@ nextB <- function(a, b, d, p, f, env)
 
      if(i < 0.3)
      {
-          env$rho <- env$rho - 0.001
+          env$rho <- env$rho - env$rho/10
      }
      if(i > 0.3)
      {
-          env$rho <- env$rho + 0.001
+          env$rho <- env$rho + env$rho/10
      }
 
-     if(env$rho<0)
-     {
-          env$rho <- 0.001          
-     }
+     #if(env$rho<0)
+     #{
+     #     env$rho <- 0.0001          
+     #}
      
      # i've just converted it to matrix form to make the multiplication simpler.
      mind  <- matrix(0,nrow = env$gNP,ncol=env$gNIV)
