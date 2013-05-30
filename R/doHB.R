@@ -151,7 +151,7 @@ doHB <- function(likelihood_user,choicedata,control=list())
 
      if(is.null(control[["nodiagnostics"]]))
      {
-          nodiagnostics <- F
+          nodiagnostics <- FALSE
      } else
      {
           nodiagnostics <- control[["nodiagnostics"]]
@@ -225,7 +225,7 @@ doHB <- function(likelihood_user,choicedata,control=list())
      # if you want to store the individual draws
      if(is.null(control[["gStoreDraws"]]))
      {
-          gStoreDraws <- F
+          gStoreDraws <- FALSE
      } else
      {
           gStoreDraws <- control[["gStoreDraws"]]
@@ -333,18 +333,26 @@ doHB <- function(likelihood_user,choicedata,control=list())
 	     dev.off()
      
           if(gNIV > 0)
-          {     
-               write.table(ma,paste(modelname,"_A.csv",sep=""),sep=",",row.names=F)
-               write.table(md,paste(modelname,"_D.csv",sep=""),sep=",",row.names=F)
-            	write.table(mb,paste(modelname,"_B.csv",sep=""),sep=",",row.names=F)
-     	     write.table(mbsd,paste(modelname,"_Bsd.csv",sep=""),sep=",",row.names=F)
-               write.table(mc,paste(modelname,"_C.csv",sep=""),sep=",",row.names=F)
-               write.table(mcsd,paste(modelname,"_Csd.csv",sep=""),sep=",",row.names=F)
+          {    
+               fma <- paste0(modelname,"_A.csv")
+               fmd <- paste0(modelname,"_D.csv")
+               fmb <- paste0(modelname,"_B.csv")
+               fmbsd <- paste0(modelname,"_Bsd.csv")
+               fmc <- paste0(modelname,"_C.csv")
+               fmcsd <- paste0(modelname, "_Csd.csv")
+               
+               write.table(signif(ma,gSIGDIG),  fma    ,sep=",",row.names=FALSE)
+               write.table(signif(md,gSIGDIG),  fmd    ,sep=",",row.names=FALSE)
+               write.table(signif(mb,gSIGDIG),  fmb    ,sep=",",row.names=FALSE)
+               write.table(signif(mbsd,gSIGDIG),fmbsd  ,sep=",",row.names=FALSE)
+               write.table(signif(mc,gSIGDIG),  fmc    ,sep=",",row.names=FALSE)
+               write.table(signif(mcsd,gSIGDIG),fmcsd  ,sep=",",row.names=FALSE)
           }
                
           if(gFIV>0)
-          {     
-               write.table(mf,paste(modelname,"_F.csv",sep=""),sep=",",row.names=F)
+          {
+               mfName <- paste0(modelname,"_F.csv")
+               write.table(signif(mf,gSIGDIG),mfName,sep=",",row.names=FALSE)
           }
      
           if(gStoreDraws)
@@ -352,9 +360,9 @@ doHB <- function(likelihood_user,choicedata,control=list())
                cat("Creating individual draw files.","\n")     
                for(i in 1:gNP)
                {
-                    fn <- paste("Draws_",respIDs[i],".csv",sep="") 
+                    fn <- paste0("Draws_",respIDs[i],".csv") 
                     
-                    write.table(storedDraws[[i]],fn,sep=",",row.names=F,col.names=T)
+                    write.table(signif(storedDraws[[i]], gSIGDIG),fn,sep=",",row.names=FALSE,col.names=TRUE)
                     
                }
           }
