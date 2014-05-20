@@ -25,9 +25,9 @@ hb <- function(a, b, d, f, env=parent.frame())
           
                out    <- nextB(a, b, d, p, f, env)
                b      <- out[[1]]
-               accept <- out[[2]]
+               env$acceptanceRatePerc <- out[[2]]
                p      <- out[[3]]
-          
+               
                a <- nextA(b, d, env)
                
                # this constrains the means of the random parameters to be user-specified
@@ -49,6 +49,11 @@ hb <- function(a, b, d, f, env=parent.frame())
                if(env$gFULLCV==0) {
                     d <- nextDind(a, b, env)
                }
+               
+               #if((r%%100)==0)
+               #{
+               #     print(d)     
+               #}
                
                if(!is.null(env$fixedD))
                {
@@ -74,13 +79,16 @@ hb <- function(a, b, d, f, env=parent.frame())
                     env$acceptanceRateF <- env$acceptanceRateF + 1
                }
                
+               # targeting an acceptance rate of 0.25
                if((r%%100)==0)
                {
-                    if(env$acceptanceRateF/100 < 0.25)
+                    env$acceptanceRateFPerc <- env$acceptanceRateF/100
+                    
+                    if(env$acceptanceRateFPerc < env$targetAcceptanceFixed)
                     {
                          env$rhoF <- env$rhoF - env$rhoF/50 
                     }
-                    if(env$acceptanceRateF/100 > 0.25)
+                    if(env$acceptanceRateFPerc > env$targetAcceptanceFixed)
                     {
                          env$rhoF <- env$rhoF + env$rhoF/50
                     }               
@@ -117,7 +125,7 @@ hb <- function(a, b, d, f, env=parent.frame())
                     
                out    <- nextB(a, b, d, p, f, env)
                b      <- out[[1]]
-               accept <- out[[2]]
+               env$acceptanceRatePerc <- out[[2]]
                p      <- out[[3]]     
                
                a <- nextA(b, d, env)
@@ -148,10 +156,10 @@ hb <- function(a, b, d, f, env=parent.frame())
                     {
                          if(!is.na(env$fixedD[rp]))
                          {
-                              d[rp,rp] <- env$fixedD[rp]     
+                              d[rp,rp] <- env$fixedD[rp]    
                          }
                     }
-               } 
+               }   
                
                if(r%%env$gNSKIP == 0) {
                     C <- trans(b,env)
@@ -183,15 +191,18 @@ hb <- function(a, b, d, f, env=parent.frame())
                     env$acceptanceRateF <- env$acceptanceRateF + 1
                }
                
+               # targeting an acceptance rate of 0.25
                if((r%%100)==0)
                {
-                    if(env$acceptanceRateF/100 < 0.25)
+                    env$acceptanceRateFPerc <- env$acceptanceRateF/100
+                    
+                    if(env$acceptanceRateFPerc < env$targetAcceptanceFixed)
                     {
                          env$rhoF <- env$rhoF - env$rhoF/50 
                     }
-                    if(env$acceptanceRateF/100 > 0.25)
+                    if(env$acceptanceRateFPerc > env$targetAcceptanceFixed)
                     {
-                         env$rhoF <- env$rhoF + env$rhoF/50 
+                         env$rhoF <- env$rhoF + env$rhoF/50
                     }               
                     
                     env$acceptanceRateF <- 0

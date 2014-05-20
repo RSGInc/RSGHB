@@ -7,7 +7,7 @@
 \description{
 The user can initiate the model estimation by calling the \emph{doHB()} function. The function will perform some initial diagnostic tests to look for common errors in specifying the model. Upon completion, the function will write a number of output files with the model parameters and convergence statistics to the user's working directory. 
 
-The flexibility comes in allowing the user to specify the likelihood function directly instead of assuming predetermined model structures. Types of models that can be estimated with this code include the family of discrete choice models (Multinomial Logit, Mixed Logit, Nested Logit, Error Components Logit and Latent Class) as well ordered response models like ordered probit and ordered logit. In addition, the package allows for flexibility in specifying parameters as either fixed (non-varying across individuals) or random with continuous distributions. Parameter distributions supported include normal, positive log-normal, negative log-normal, positive truncated normal and the Johnson SB distribution.  
+The flexibility comes in allowing the user to specify the likelihood function directly instead of assuming predetermined model structures. Types of models that can be estimated with this code include the family of discrete choice models (Multinomial Logit, Mixed Logit, Nested Logit, Error Components Logit and Latent Class) as well ordered response models like ordered probit and ordered logit. In addition, the package allows for flexibility in specifying parameters as either fixed (non-varying across individuals) or random with continuous distributions. Parameter distributions supported include normal, positive/negative log-normal, positive/negative censored normal, the Johnson SB distribution, and positive/negative uniform.  
 
 Kenneth Train's Matlab and Gauss code for doing hierarchical Bayesian estimation has served as the basis for a few of the functions included in this package. (See references below).
 }
@@ -30,7 +30,7 @@ There are a number of global variables that can be set to control the model esti
 
 \emph{gVarNamesFixed} - A vector of character-based names for the fixed parameters. (Defaults to NULL)
 
-\emph{gDIST} - A vector of integers (1-5) which indicate which type of distribution should be applied to the random parameters - 1 = Normal, 2 = Postive Log-Normal, 3 = Negative Log-Normal, 4 = Censored Normal, 5 = Johnson SB. There should be an element for each name in \emph{gVarNamesNormal}. (Defaults to NULL)
+\emph{gDIST} - A vector of integers (1-8) which indicate which type of distribution should be applied to the random parameters - 1 = Normal, 2 = Postive Log-Normal, 3 = Negative Log-Normal, 4 = Positive Censored Normal, 5 = Negative Censored Normal, 6 = Johnson SB, 7 = Positive Uniform, 8 = Negative Uniform. There should be an element for each name in \emph{gVarNamesNormal}. (Defaults to NULL)
 
 \emph{FC} - A vector of starting values for the fixed parameters. There should be an element for each name in \emph{gVarNamesFixed}. (Defaults to NULL)
 
@@ -50,11 +50,17 @@ There are a number of global variables that can be set to control the model esti
 
 \emph{priorVariance} - The amount of prior variance assumed. (Defaults to 2.0)       
 
+\emph{pvMatrix} - A custom prior covariance matrix can be used in estimation. If specified in the control list, the custom matrix will override the default prior covariance matrix used by RSGHB. The prior covariance matrix needs to be a matrix object and of the correct size - length(gVarNamesNormal) x length(gVarNamesNormal).   
+
 \emph{degreesOfFreedom} - Additional degrees of freedom for the prior covariance matrix (not including the number of parameters. (Defaults to 5)           
      
 \emph{rho} - The initial proportionality fraction for the jumping distribution  for the Metropolis-Hastings algorithm for the random parameters. This fraction is adjusted by the program after each iteration to attain an acceptance rate of about 0.3 (Defaults to 0.1)       
 
-\emph{rhoF} - The proportionality fraction for the jumping distribution for the Metropolis-Hastings algorithm for the fixed parameters. Unlike \emph{rho}, this value is not adjusted as the markov chain proceeds. (Defaults to 0.0001)
+\emph{rhoF} - The proportionality fraction for the jumping distribution for the Metropolis-Hastings algorithm for the fixed parameters. (Defaults to 0.0001)
+
+\emph{targetAcceptanceNormal} - The target acceptance rate in the Metropolis-Hastings algorithm for the random parameters. (Defaults to 0.3)
+
+\emph{targetAcceptanceFixed} - The target acceptance rate in the Metropolis-Hastings algorithm for the fixed parameters. (Defaults to 0.3)
           
 \emph{gFULLCV} - A number that indicates if a full or independent covariance structure should be used for the random parameters. A value of 1 indicated full and 0 for an independent structure. (Defaults to 1)
           
@@ -69,6 +75,11 @@ There are a number of global variables that can be set to control the model esti
 \emph{constraintsNorm} - This is a list of monotonic constraints to be applied during estimation. The structure of the constraints is c(param1number - inequality - param2number). For constraints relative to 0, use 0 instead of the param2number. For the inequality, use 1 for < and 2 for >. Example constraintsNorm <- list(c(5,1,0),c(6,1,5),c(7,1,6),c(8,1,7)) would constrain the 5th parameter < 0, the 6th parameter < 5th parameter, the 7th parameter < the 6th parameter, etc. (Defaults to NULL)
 
 \emph{nodiagnostics} - If set to TRUE, the diagnostic report will not be reported to the screen with a prompt to continue. This makes batch processing easier to implement. (Defaults to FALSE)
+
+\emph{fixedA} - This allows the analyst to fix means of the underlying normal distribution of random variables to certain values as opposed to estimating them. This would be important for example in an error components logit model or an integrated choice and latent variable model. The format for this input is a vector of length equal to the number of random parameters. Use NA for variables that should be estimated, e.g., fixedA = c(NA, NA, NA, NA, NA, NA, NA, 0). In this case, the mean of the underlying normal for the 8th random variable would be fixed to 0.
+
+\emph{fixedD} - This allows the analyst to fix the variance of the underlying normal distribution of the random variables to certain values as opposed to estimating them. This would be important for example in an integrated choice and latent variable model. The format for this input is a vector of length equal to the number of random parameters. Use NA for variables that should be estimated, e.g.,
+ fixedD = c(NA, NA, NA, NA, NA, NA, NA, 1). In this case, the variance of the underlying normal for the 8th random variable would be fixed to 1.
 
 \bold{Output files}
 
@@ -85,6 +96,8 @@ A number of output files will be generated.
 \emph{F file} - This file contains the set of fixed (non-random) parameters for each iteration after convergence.
 
 \emph{Log file} - This contains some statistics that can be used to understand if model convergence has been reached.
+
+\emph{PV Matrix} - This file contains the prior covariance matrix that was assumed during the estimation of the model.
 }
 \references{
 
@@ -98,14 +111,12 @@ Train, K. Original Gauss and Matlab code: http://elsa.berkeley.edu/Software/abst
 
 data(choicedata)
 
-x1 <- choicedata$x1
-xprice <- choicedata$xprice
+tt1 <- choicedata$tt1
+tt2 <- choicedata$tt2
+toll2 <- choicedata$toll2
 
-y1 <- choicedata$y1
-yprice <- choicedata$yprice
-
-choice1    <- (choicedata$choices==1)
-choice2    <- (choicedata$choices==2)
+choice1 <- (choicedata$Choice==1)
+choice2 <- (choicedata$Choice==2)
 
 control <- list(
      modelname="MNL_WTPSpace",
@@ -125,10 +136,10 @@ likelihood <- function(fc,b)
      cc    <- 1
      wtp1  <- b[,cc];cc=cc+1
      price <- b[,cc];cc=cc+1
-  
+     
      # discrete choice model in WTP-space
-     v1 <- price * xprice + price * wtp1 * x1
-     v2 <- price * yprice + price * wtp1 * y1
+     v1 <-                 price * wtp1 * tt1
+     v2 <- price * toll2 + price * wtp1 * tt2
      
      p  <- (exp(v1)*choice1 + exp(v2)*choice2) / (exp(v1) + exp(v2))
      

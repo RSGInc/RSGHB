@@ -18,9 +18,11 @@ writeLog <- function(r,p,a,b,d,f,env)
      # Model Statistics
      if(env$gNIV>0){
           cat("RHO (Normal): ", env$rho, "\n")
+          cat("Acceptance Rate (Normal): ", env$acceptanceRatePerc, "\n")  
      }
      if(env$gFIV>0){
           cat("RHO (Fixed): ", env$rhoF, "\n")     
+          cat("Acceptance Rate (Fixed): ", env$acceptanceRateFPerc, "\n")     
      }
      cat("Log-Likelihood: ",signif(sum(log(p)),env$gSIGDIG),"\n",sep="\t")
      cat("RLH: ",signif(mean(p^(1/env$TIMES)),env$gSIGDIG),"\n",sep="\t")
@@ -45,12 +47,29 @@ writeLog <- function(r,p,a,b,d,f,env)
      # Normal Coefficients
      if(env$gNIV > 0)
      {
-          cat("Current values for the means of the underlying normals\nfor the random parameters","\n")
+          cat("Current values for the population means of the random parameters","\n")
+          meanBetas <- colMeans(trans(b,env))
           for(i in 1:env$gNIV)
           {
                cat(env$gVarNamesNormal[i],":",signif(t(a)[,i],env$gSIGDIG),"\n",sep="\t")
           }
      }
+     
+     # outputs to the screen time estimate of completion
+     if(r>0)
+     {
+          cat("-----------------------------------------------------------","\n")
+          
+          tpi <- as.numeric(difftime(Sys.time(),env$starttime,units="sec"))/env$gINFOSKIP
+          env$starttime <- Sys.time() # makes the forecast based on the most recent iterations
+          
+          cat("Time per iteration:",signif(tpi,1),"seconds")
+          
+          cat("\n")
+          cat("Time to completion:",signif((env$gNCREP + env$gNEREP * env$gNSKIP - r)*tpi/60,4),"minutes")
+          cat("\n")
+     }
+     cat("-----------------------------------------------------------","\n")
      
      cN <- F
      
@@ -72,6 +91,10 @@ writeLog <- function(r,p,a,b,d,f,env)
           {
                cat("Prior Variance:", env$priorVariance,"\n",sep="\t")
                cat("Degrees of Freedom:", env$degreesOfFreedom,"\n",sep="\t")
+               if(env$useCustomPVMatrix)
+               {
+                    cat("Custom Prior Matrix Used: ", TRUE,"\n",sep="\t")
+               }
           }
           cat("Number of parameters:",env$gNIV + env$gFIV,"\n",sep="\t")
           
@@ -104,18 +127,27 @@ writeLog <- function(r,p,a,b,d,f,env)
                
           }
           
-          cat("Estimated:",format(Sys.time(), "%a %b %d %X %Y"),"\n",sep="\t")
+          cat("\n\nEstimated:",format(Sys.time(), "%a %b %d %X %Y"),"\n",sep="\t")
           
           cat("-----------------------------------------------------------","\n")
           
           cat("\n")
           if(env$gNIV > 0)
           {
-               cat("Iteration","Log-Likelihood","RLH","Parameter RMS","Avg. Variance","\t")
+               if(env$gFIV==0)
+               {
+                    cat("Iteration","Log-Likelihood","RLH","Parameter RMS","Avg. Variance","Acceptance Rate (Normal)","\t")
+               }
+               
+               if(env$gFIV > 0)
+               {
+                    cat("Iteration","Log-Likelihood","RLH","Parameter RMS","Avg. Variance","Acceptance Rate (Normal)","Acceptance Rate (Fixed)","\t")
+               }
+               
           }
           if(env$gNIV == 0)
           {
-               cat("Iteration","Log-Likelihood","RLH","\t")
+               cat("Iteration","Log-Likelihood","RLH","Acceptance Rate (Fixed)","\t")
           }          
           sink()	
           
@@ -153,15 +185,34 @@ writeLog <- function(r,p,a,b,d,f,env)
      
      cat("\n")
      
+     # writing to the log file
      if(env$gNIV > 0)
      {    
-          cat(
-               r,
-               signif(sum(log(p)),env$gSIGDIG),
-               signif(mean(p^(1/env$TIMES)),env$gSIGDIG),
-               signif(paramRMS,env$gSIGDIG),
-               signif(avgVariance,env$gSIGDIG),sep="\t"
+          if(env$gFIV==0)
+          {
+               cat(
+                    r,
+                    signif(sum(log(p)),env$gSIGDIG),
+                    signif(mean(p^(1/env$TIMES)),env$gSIGDIG),
+                    signif(paramRMS,env$gSIGDIG),
+                    signif(avgVariance,env$gSIGDIG),
+                    signif(env$acceptanceRatePerc,env$gSIGDIG),
+                    sep="\t"
+                    )
+          }
+          if(env$gFIV>0)
+          {
+               cat(
+                    r,
+                    signif(sum(log(p)),env$gSIGDIG),
+                    signif(mean(p^(1/env$TIMES)),env$gSIGDIG),
+                    signif(paramRMS,env$gSIGDIG),
+                    signif(avgVariance,env$gSIGDIG),
+                    signif(env$acceptanceRatePerc,env$gSIGDIG),
+                    signif(env$acceptanceRateFPerc,env$gSIGDIG),
+                    sep="\t"
                )
+          }          
      }
      if(env$gNIV == 0)
      {
@@ -170,6 +221,7 @@ writeLog <- function(r,p,a,b,d,f,env)
                r,
                signif(sum(log(p)),env$gSIGDIG),
                signif(mean(p^(1/env$TIMES)),env$gSIGDIG),
+               signif(env$acceptanceRateFPerc,env$gSIGDIG),
                sep="\t"
           )
      }
@@ -177,18 +229,6 @@ writeLog <- function(r,p,a,b,d,f,env)
      
      sink()
      
-     # outputs to the screen time estimate of completion
-     if(r>0)
-     {
-          cat("-----------------------------------------------------------","\n")
-          
-          tpi <- as.numeric(difftime(Sys.time(),env$starttime,units="sec"))/r
-          cat("Time per iteration:",signif(tpi,1),"seconds")
-          
-          cat("\n")
-          cat("Time to completion:",signif((env$gNCREP + env$gNEREP * env$gNSKIP - r)*tpi/60,4),"minutes")
-          cat("\n")
-     }
-     cat("-----------------------------------------------------------","\n")
+
      
 }

@@ -77,12 +77,12 @@ nextB <- function(a, b, d, p, f, env)
      
      # this is the acceptance rate. the target for this 0.3 (though Sawtooth allows for the user to specify this).
      i <- colSums(ind)/env$gNP
-
-     if(i < 0.3)
+     
+     if(i < env$targetAcceptanceNormal)
      {
           env$rho <- env$rho - env$rho/10
      }
-     if(i > 0.3)
+     if(i > env$targetAcceptanceNormal)
      {
           env$rho <- env$rho + env$rho/10
      }

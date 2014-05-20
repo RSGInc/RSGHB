@@ -257,6 +257,31 @@ doHB <- function(likelihood_user,choicedata,control=list())
           gMAXCOEF <- control[["gMAXCOEF"]]
      } 
      
+     if(is.null(control[["pvMatrix"]]))
+     {
+          useCustomPVMatrix <- FALSE
+          pvMatrix <- NULL
+     } else
+     {
+          useCustomPVMatrix <- TRUE
+          pvMatrix <- control[["pvMatrix"]]
+     }  
+     
+     if(is.null(control[["targetAcceptanceNormal"]]))
+     {
+          targetAcceptanceNormal <- 0.3 
+     } else
+     {
+          targetAcceptanceNormal <- control[["targetAcceptanceNormal"]]
+     } 
+     
+     if(is.null(control[["targetAcceptanceFixed"]]))
+     {
+          targetAcceptanceFixed <- 0.3 
+     } else
+     {
+          targetAcceptanceFixed <- control[["targetAcceptanceFixed"]]
+     } 
      
      # End user-specified GLOBAL VARIABLEs     
      
@@ -279,13 +304,50 @@ doHB <- function(likelihood_user,choicedata,control=list())
      gNIV          <- length(gVarNamesNormal)         # Number of random normal coefficients
      gFIV          <- length(gVarNamesFixed)         # Number of fixed (non-random) coefficients
      
+     # Make sure the output files don't already exist
+     # if they do, append ~1 to the model name.
+     orig <- modelname
+     i <- 1     
+     while(any(file.exists(paste0(modelname, c(".log", "_A.csv", "_B.csv", "_Bsd.csv", "_C.csv", "_Csd.csv", "_D.csv", "_F.csv")))))
+     {
+          modelname <- paste0(orig,"~",i)
+          i <- i + 1
+     }
+     
+     if(is.null(pvMatrix))
+     {
+          pvMatrix <- priorVariance * diag(gNIV)
+     }
+
+     # need to make sure the pvMatrix is a matrix.
+     if(!is.matrix(pvMatrix))
+     {
+          stop("\npvMatrix is not a matrix. Make sure that your prior covariance matrix is ",gNIV," by ",gNIV,".")          
+     }
+     
+     # need to fail if pvMatrix is of the wrong size
+     if(nrow(pvMatrix)!= gNIV|ncol(pvMatrix)!= gNIV)
+     {
+          stop("\nThe prior covariance matrix is of the wrong size. This can occur only when the user specifies a custom prior covariance matrix. Make sure that your prior covariance matrix is ",gNIV," by ",gNIV,".")          
+     }
+     
+
+     
+     # writing out the custom prior covariance matrix
+     rownames(pvMatrix) <- colnames(pvMatrix) <- gVarNamesNormal
+     write.table(pvMatrix,paste0(modelname,"_pvMatrix.csv"),sep=",",row.names=TRUE,col.names=TRUE)
+          
      starttime     <- Sys.time()    # used to calculate seconds per iteration
      
-     distNames     <- c("N","LN+","LN-","TN","JSB")  # short names for the distributions
-                         # Normal, Postive Log-Normal, Negative Log-Normal, Positive Truncated Normal, Johnson SB
+     distNames     <- c("N","LN+","LN-","CN+","CN-","JSB","U+","U-")  # short names for the distributions
+                      # Normal, Postive Log-Normal, Negative Log-Normal, Positive Censored Normal, Negative Censored Normal, Johnson SB, Positive Uniform, Negative Uniform
      constraintLabels <- c("<",">")     
      
-     acceptanceRateF <- 0
+     # acceptance rate calculations
+     acceptanceRatePerc  <- 0
+     acceptanceRateF     <- 0    # this is the count over the last 100 iterations.
+     acceptanceRateFPerc <- 0
+     
      rhoFadj         <- 1e-5
      
      if(checkModel(nodiagnostics))
@@ -308,6 +370,12 @@ doHB <- function(likelihood_user,choicedata,control=list())
           {
                ma   <- cbind(iteration=1:gNEREP,t(ma))
                md   <- cbind(iteration=1:gNEREP,t(md))
+               
+               # for labeling the D matrix
+               labelmatrix <-  matrix(1:(gNIV^2),gNIV,gNIV)
+               rownames(labelmatrix) <- colnames(labelmatrix) <- gVarNamesNormal
+               dlabels <- paste0(rownames(labelmatrix)[vech(row(labelmatrix))]," x ",colnames(labelmatrix)[vech(col(labelmatrix))])
+               colnames(md) <- c("iteration",dlabels)
                
                mcsd <- cbind(id=respIDs,sqrt((mc.squared-mc^2/gNEREP)/gNEREP))
                mc   <- cbind(id=respIDs,RLH=rowMeans(mp),mc/gNEREP)

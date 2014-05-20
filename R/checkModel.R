@@ -87,11 +87,16 @@ checkModel <- function(nodiagnostics=F, env=parent.frame())
           cat("\n********FATAL ERROR: The choice data is not sorted by ID.\n")               
      }
      
-     #Make sure the output files don't already exist
-     if(any(file.exists(paste0(modelname, c(".log", "_A.csv", "_B.csv", "_Bsd.csv", "_C.csv", "_Csd.csv", "_D.csv", "_F.csv")))))
+     if((!is.null(env$fixedA))&length(env$fixedA)!=length(env$gVarNamesNormal))
      {
           passChecks <- FALSE    
-          cat("\n********FATAL ERROR: It appears output files for a model run with this modelname already exist.\n")             
+          cat("\n********FATAL ERROR: The fixedA vector is not of the same length as the gVarNamesNormal vector.\n") 
+     }
+     
+     if((!is.null(env$fixedD))&length(env$fixedD)!=length(env$gVarNamesNormal))
+     {
+          passChecks <- FALSE    
+          cat("\n********FATAL ERROR: The fixedD vector is not of the same length as the gVarNamesNormal vector.\n") 
      }
      
      if(passChecks)
@@ -103,27 +108,42 @@ checkModel <- function(nodiagnostics=F, env=parent.frame())
           cat("Please review before proceeding","\n\n")
           cat("Number of Individuals: ",env$gNP,"\n",sep="\t")
           cat("Number of Observations: ",env$gNOBS,"\n",sep="\t")
-          cat("Prior variance: ", env$priorVariance,"\n",sep="\t")
+          
+          if(env$useCustomPVMatrix)
+          {
+               cat("Custom Prior Matrix Used: ", TRUE,"\n",sep="\t")
+          } else {
+               cat("Prior variance: ", env$priorVariance,"\n",sep="\t")
+          }
+          
+          if(env$gNIV>0)
+          {               
+               cat("Target Acceptance (Normal): ", env$targetAcceptanceNormal,"\n",sep="\t")
+          }
+          if(env$gFIV>0)
+          {
+               cat("Target Acceptance (Fixed): ", env$targetAcceptanceFixed,"\n",sep="\t")
+          }
+          
           cat("Degrees of Freedom: ", env$degreesOfFreedom,"\n",sep="\t")
           cat("Avg. Number of Observations per Individual: ",env$gNOBS / env$gNP,"\n",sep="\t")
           cat("Initial Log-Likelihood: ",sum(log(env$likelihood(env$FC,env$B,env))),"\n",sep="\t")
           
-          
    	     if(env$gFIV > 0)
 	     {
-	  	     cat("Fixed parameters estimated:","\n")
+	  	     cat("Fixed parameters estimated - start value:","\n")
 	 	     for(i in 1:env$gFIV)
 	 	     {
-	 	          cat(env$gVarNamesFixed[i],"\n")
+	 	          cat(env$gVarNamesFixed[i]," -",env$FC[i],"\n")
 	 	     }
 	     }
           
 	     if(env$gNIV>0)
 	     {
-		     cat("Random Parameters estimated (Distribution):","\n")
+		     cat("Random Parameters estimated (Distribution) - start value:","\n")
                for(i in 1:env$gNIV)
                {
-                    cat(env$gVarNamesNormal[i],"(",env$distNames[env$gDIST[i]],")","\n")
+                    cat(env$gVarNamesNormal[i],"(",env$distNames[env$gDIST[i]],") -", env$svN[i],"\n")
                }
           }
           
@@ -137,7 +157,6 @@ checkModel <- function(nodiagnostics=F, env=parent.frame())
                     if(env$constraintsNorm[[i]][3]!=0)
                          cat(env$gVarNamesNormal[env$constraintsNorm[[i]][1]],env$constraintLabels[env$constraintsNorm[[i]][2]],env$gVarNamesNormal[env$constraintsNorm[[i]][3]],"\n")
                }
-               
           }
           
           if(!is.null(env$Choice))
