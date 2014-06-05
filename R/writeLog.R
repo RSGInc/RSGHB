@@ -47,7 +47,7 @@ writeLog <- function(r,p,a,b,d,f,env)
      # Normal Coefficients
      if(env$gNIV > 0)
      {
-          cat("Current values for the population means of the random parameters","\n")
+          cat("Current values for the population means of the underlying normals","\n")
           meanBetas <- colMeans(trans(b,env))
           for(i in 1:env$gNIV)
           {

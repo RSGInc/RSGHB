@@ -1,4 +1,4 @@
-\documentclass{article}\usepackage{graphicx, color}
+\documentclass{article}\usepackage[]{graphicx}\usepackage[]{color}
 %% maxwidth is the original width if it is less than linewidth
 %% otherwise use linewidth (to make sure the graphics do not exceed the margin)
 \makeatletter
@@ -11,22 +11,16 @@
 }
 \makeatother
 
-\IfFileExists{upquote.sty}{\usepackage{upquote}}{}
-\definecolor{fgcolor}{rgb}{0.2, 0.2, 0.2}
-\newcommand{\hlnumber}[1]{\textcolor[rgb]{0,0,0}{#1}}%
-\newcommand{\hlfunctioncall}[1]{\textcolor[rgb]{0.501960784313725,0,0.329411764705882}{\textbf{#1}}}%
-\newcommand{\hlstring}[1]{\textcolor[rgb]{0.6,0.6,1}{#1}}%
-\newcommand{\hlkeyword}[1]{\textcolor[rgb]{0,0,0}{\textbf{#1}}}%
-\newcommand{\hlargument}[1]{\textcolor[rgb]{0.690196078431373,0.250980392156863,0.0196078431372549}{#1}}%
-\newcommand{\hlcomment}[1]{\textcolor[rgb]{0.180392156862745,0.6,0.341176470588235}{#1}}%
-\newcommand{\hlroxygencomment}[1]{\textcolor[rgb]{0.43921568627451,0.47843137254902,0.701960784313725}{#1}}%
-\newcommand{\hlformalargs}[1]{\textcolor[rgb]{0.690196078431373,0.250980392156863,0.0196078431372549}{#1}}%
-\newcommand{\hleqformalargs}[1]{\textcolor[rgb]{0.690196078431373,0.250980392156863,0.0196078431372549}{#1}}%
-\newcommand{\hlassignement}[1]{\textcolor[rgb]{0,0,0}{\textbf{#1}}}%
-\newcommand{\hlpackage}[1]{\textcolor[rgb]{0.588235294117647,0.709803921568627,0.145098039215686}{#1}}%
-\newcommand{\hlslot}[1]{\textit{#1}}%
-\newcommand{\hlsymbol}[1]{\textcolor[rgb]{0,0,0}{#1}}%
-\newcommand{\hlprompt}[1]{\textcolor[rgb]{0.2,0.2,0.2}{#1}}%
+\definecolor{fgcolor}{rgb}{0.345, 0.345, 0.345}
+\newcommand{\hlnum}[1]{\textcolor[rgb]{0.686,0.059,0.569}{#1}}%
+\newcommand{\hlstr}[1]{\textcolor[rgb]{0.192,0.494,0.8}{#1}}%
+\newcommand{\hlcom}[1]{\textcolor[rgb]{0.678,0.584,0.686}{\textit{#1}}}%
+\newcommand{\hlopt}[1]{\textcolor[rgb]{0,0,0}{#1}}%
+\newcommand{\hlstd}[1]{\textcolor[rgb]{0.345,0.345,0.345}{#1}}%
+\newcommand{\hlkwa}[1]{\textcolor[rgb]{0.161,0.373,0.58}{\textbf{#1}}}%
+\newcommand{\hlkwb}[1]{\textcolor[rgb]{0.69,0.353,0.396}{#1}}%
+\newcommand{\hlkwc}[1]{\textcolor[rgb]{0.333,0.667,0.333}{#1}}%
+\newcommand{\hlkwd}[1]{\textcolor[rgb]{0.737,0.353,0.396}{\textbf{#1}}}%
 
 \usepackage{framed}
 \makeatletter
@@ -63,14 +57,15 @@
   \@ifundefined{selectfont}{\def\UrlFont{\sf}}{\def\UrlFont{\small\ttfamily}}}
 \makeatother
 \urlstyle{leo}
+\IfFileExists{upquote.sty}{\usepackage{upquote}}{}
 
 \begin{document}
 
 \title{How to use RSGHB}
 \author{Jeffrey Dumont}
-\date{6 April 2013}
+\date{21 May 2014}
 \maketitle
-\abstract{This vignette describes the process for specifying, estimating and analyzing the output of a choice model with RSGHB. The document is structured into two case studies using different model structures. The synthetic choice data used in this document (as well as number of other examples using different model structures) can be downloaded from RSGHB github page - \url{https://github.com/jeffdumont/RSGHB}}
+\abstract{This vignette describes the process for specifying, estimating and analyzing the output of a choice model with RSGHB. The document is structured into two case studies using different model structures. The synthetic choice data used in this document (as well as number of other examples using different model structures) can be downloaded from the RSGHB github page - \url{https://github.com/jeffdumont/RSGHB}}
 
 \begin{center}
 \line(1,0){400}
@@ -96,16 +91,15 @@ In this section, the code for estimating a multinomial logit model with fixed (n
 \begin{knitrout}
 \definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
 \begin{alltt}
+\hlkwd{library}\hlstd{(RSGHB)}
 
-\hlfunctioncall{library}(RSGHB)
+\hlcom{# load example data}
+\hlkwd{data}\hlstd{(choicedata)}
 
-\hlcomment{# load example data}
-\hlfunctioncall{data}(choicedata)
-
-\hlcomment{# We typically work with one one row per choice observations. This isn't}
-\hlcomment{# necessary however but it does lend it self to faster computation of the}
-\hlcomment{# choice likelihoods}
-\hlfunctioncall{head}(choicedata)
+\hlcom{# We typically work with one one row per choice observations. This isn't}
+\hlcom{# necessary however but it does lend it self to faster computation of the}
+\hlcom{# choice likelihoods}
+\hlkwd{head}\hlstd{(choicedata)}
 \end{alltt}
 \begin{verbatim}
 ##     ID thecount tt1 tt2 toll2 asc1 Choice
@@ -117,24 +111,23 @@ In this section, the code for estimating a multinomial logit model with fixed (n
 ## 6 8738        6  63  54  0.75    1      1
 \end{verbatim}
 \begin{alltt}
+\hlcom{# We can then specify any variables from the choicedata data.frame that}
+\hlcom{# you'd like to use in the utility equations in the likelihood function}
+\hlcom{# below. These can be any variables within the data or transformations of}
+\hlcom{# those variables. This example comes from transport so each alternative is}
+\hlcom{# defined by travel times and toll costs.}
+\hlstd{TT1} \hlkwb{<-} \hlstd{choicedata}\hlopt{$}\hlstd{tt1}
+\hlstd{TT2} \hlkwb{<-} \hlstd{choicedata}\hlopt{$}\hlstd{tt2}
+\hlstd{TOLL2} \hlkwb{<-} \hlstd{choicedata}\hlopt{$}\hlstd{toll2}
 
-\hlcomment{# We can then specify any variables from the choicedata data.frame that}
-\hlcomment{# you'd like to use in the utility equations in the likelihood function}
-\hlcomment{# below. These can be any variables within the data or transformations of}
-\hlcomment{# those variables. This example comes from transport so each alternative}
-\hlcomment{# is defined by travel times and toll costs.}
-TT1 <- choicedata$tt1
-TT2 <- choicedata$tt2
-TOLL2 <- choicedata$toll2
+\hlcom{# Here we specify the choice vectors. Note in this example there are only}
+\hlcom{# two alternatives. Also, dummying coding the choice vector is not necessary}
+\hlcom{# but allows for easier coding of the likelihood.}
+\hlstd{choice1} \hlkwb{<-} \hlstd{(choicedata}\hlopt{$}\hlstd{Choice} \hlopt{==} \hlnum{1}\hlstd{)}
+\hlstd{choice2} \hlkwb{<-} \hlstd{(choicedata}\hlopt{$}\hlstd{Choice} \hlopt{==} \hlnum{2}\hlstd{)}
 
-\hlcomment{# Here we specify the choice vectors. Note in this example there are only}
-\hlcomment{# two alternatives. Also, dummying coding the choice vector is not}
-\hlcomment{# necessary but allows for easier coding of the likelihood.}
-choice1 <- (choicedata$Choice == 1)
-choice2 <- (choicedata$Choice == 2)
-
-\hlcomment{# Frequency of choice for the first alternative}
-\hlfunctioncall{table}(choice1)
+\hlcom{# Frequency of choice for the first alternative}
+\hlkwd{table}\hlstd{(choice1)}
 \end{alltt}
 \begin{verbatim}
 ## choice1
@@ -142,9 +135,8 @@ choice2 <- (choicedata$Choice == 2)
 ##  3560  6682
 \end{verbatim}
 \begin{alltt}
-
-\hlcomment{# Frequency of choice for the second alternative.}
-\hlfunctioncall{table}(choice2)
+\hlcom{# Frequency of choice for the second alternative.}
+\hlkwd{table}\hlstd{(choice2)}
 \end{alltt}
 \begin{verbatim}
 ## choice2
@@ -162,41 +154,40 @@ There are number of options for controling the estimation process. Please see th
 \begin{knitrout}
 \definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
 \begin{alltt}
+\hlcom{# ------------------ ESTIMATION CONTROL ------------------}
 
-\hlcomment{# ------------------ ESTIMATION CONTROL ------------------}
+\hlcom{# Setting control list for estimation (see ?doHB for more estimation}
+\hlcom{# options)}
 
-\hlcomment{# Setting control list for estimation (see ?doHB for more estimation}
-\hlcomment{# options)}
+\hlcom{# modelname is used for naming the output files}
+\hlstd{modelname} \hlkwb{<-} \hlstr{"MNL"}
 
-\hlcomment{# modelname is used for naming the output files}
-modelname <- \hlstring{"MNL"}
+\hlcom{# gVarNamesFixed contains the names for the fixed (non-random) variables in}
+\hlcom{# your model. This will be used in output and also when displaying iteration}
+\hlcom{# detail to the screen.}
+\hlstd{gVarNamesFixed} \hlkwb{<-} \hlkwd{c}\hlstd{(}\hlstr{"ASC1"}\hlstd{,} \hlstr{"BTime"}\hlstd{,} \hlstr{"BCost"}\hlstd{)}
 
-\hlcomment{# gVarNamesFixed contains the names for the fixed (non-random) variables}
-\hlcomment{# in your model. This will be used in output and also when displaying}
-\hlcomment{# iteration detail to the screen.}
-gVarNamesFixed <- \hlfunctioncall{c}(\hlstring{"ASC1"}, \hlstring{"BTime"}, \hlstring{"BCost"})
+\hlcom{# FC contains the starting values for the fixed coefficients.}
+\hlstd{FC} \hlkwb{<-} \hlkwd{c}\hlstd{(}\hlnum{0}\hlstd{,} \hlnum{0}\hlstd{,} \hlnum{0}\hlstd{)}
 
-\hlcomment{# FC contains the starting values for the fixed coefficients.}
-FC <- \hlfunctioncall{c}(0, 0, 0)
+\hlcom{# ITERATION SETTINGS}
 
-\hlcomment{# ITERATION SETTINGS}
+\hlcom{# gNCREP contains the number of iterations to use prior to convergence}
+\hlstd{gNCREP} \hlkwb{<-} \hlnum{30000}
+\hlcom{# gNEREP contains the number of iterations to keep for averaging after}
+\hlcom{# convergence has been reached}
+\hlstd{gNEREP} \hlkwb{<-} \hlnum{20000}
+\hlcom{# gNSKIP contains the number of iterations to do in between retaining draws}
+\hlcom{# for averaging}
+\hlstd{gNSKIP} \hlkwb{<-} \hlnum{1}
+\hlcom{# gINFOSKIP controls how frequently to print info about the iteration}
+\hlcom{# process}
+\hlstd{gINFOSKIP} \hlkwb{<-} \hlnum{250}
 
-\hlcomment{# gNCREP contains the number of iterations to use prior to convergence}
-gNCREP <- 30000
-\hlcomment{# gNEREP contains the number of iterations to keep for averaging after}
-\hlcomment{# convergence has been reached}
-gNEREP <- 20000
-\hlcomment{# gNSKIP contains the number of iterations to do in between retaining}
-\hlcomment{# draws for averaging}
-gNSKIP <- 1
-\hlcomment{# gINFOSKIP controls how frequently to print info about the iteration}
-\hlcomment{# process}
-gINFOSKIP <- 250
-
-\hlcomment{# To simplify the doHB functional call, we put all of the control}
-\hlcomment{# parameters into a single list that can be passed directly to doHB.}
-control <- \hlfunctioncall{list}(modelname = modelname, gVarNamesFixed = gVarNamesFixed, FC = FC, 
-    gNCREP = gNCREP, gNEREP = gNEREP, gNSKIP = gNSKIP, gINFOSKIP = gINFOSKIP)
+\hlcom{# To simplify the doHB functional call, we put all of the control parameters}
+\hlcom{# into a single list that can be passed directly to doHB.}
+\hlstd{control} \hlkwb{<-} \hlkwd{list}\hlstd{(}\hlkwc{modelname} \hlstd{= modelname,} \hlkwc{gVarNamesFixed} \hlstd{= gVarNamesFixed,} \hlkwc{FC} \hlstd{= FC,}
+    \hlkwc{gNCREP} \hlstd{= gNCREP,} \hlkwc{gNEREP} \hlstd{= gNEREP,} \hlkwc{gNSKIP} \hlstd{= gNSKIP,} \hlkwc{gINFOSKIP} \hlstd{= gINFOSKIP)}
 \end{alltt}
 \end{kframe}
 \end{knitrout}
@@ -212,32 +203,31 @@ It is important to note that the computation of the likelihood is the most compu
 \begin{knitrout}
 \definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
 \begin{alltt}
+\hlcom{# ------------------ likelihood ------------------}
 
-\hlcomment{# ------------------ likelihood ------------------}
+\hlstd{likelihood} \hlkwb{<-} \hlkwa{function}\hlstd{(}\hlkwc{fc}\hlstd{,} \hlkwc{b}\hlstd{) \{}
 
-likelihood <- \hlfunctioncall{function}(fc, b) \{
-    
-\hlcomment{    # defining the parameters}
-    
-\hlcomment{    # using cc var to index the fc vector simplifies the addition/subtraction}
-\hlcomment{    # of new parameters}
-    cc <- 1
-    ASC1 <- fc[cc]
-    cc <- cc + 1
-    Btime <- fc[cc]
-    cc <- cc + 1
-    Btoll <- fc[cc]
-    cc <- cc + 1
-    
-\hlcomment{    # utility functions}
-    v1 <- ASC1 + Btime * TT1
-    v2 <- Btime * TT2 + Btoll * TOLL2
-    
-\hlcomment{    # mnl probability statement}
-    p <- (\hlfunctioncall{exp}(v1) * choice1 + \hlfunctioncall{exp}(v2) * choice2)/(\hlfunctioncall{exp}(v1) + \hlfunctioncall{exp}(v2))
-    
-    \hlfunctioncall{return}(p)
-\}
+    \hlcom{# defining the parameters}
+
+    \hlcom{# using cc var to index the fc vector simplifies the addition/subtraction of}
+    \hlcom{# new parameters}
+    \hlstd{cc} \hlkwb{<-} \hlnum{1}
+    \hlstd{ASC1} \hlkwb{<-} \hlstd{fc[cc]}
+    \hlstd{cc} \hlkwb{<-} \hlstd{cc} \hlopt{+} \hlnum{1}
+    \hlstd{Btime} \hlkwb{<-} \hlstd{fc[cc]}
+    \hlstd{cc} \hlkwb{<-} \hlstd{cc} \hlopt{+} \hlnum{1}
+    \hlstd{Btoll} \hlkwb{<-} \hlstd{fc[cc]}
+    \hlstd{cc} \hlkwb{<-} \hlstd{cc} \hlopt{+} \hlnum{1}
+
+    \hlcom{# utility functions}
+    \hlstd{v1} \hlkwb{<-} \hlstd{ASC1} \hlopt{+} \hlstd{Btime} \hlopt{*} \hlstd{TT1}
+    \hlstd{v2} \hlkwb{<-} \hlstd{Btime} \hlopt{*} \hlstd{TT2} \hlopt{+} \hlstd{Btoll} \hlopt{*} \hlstd{TOLL2}
+
+    \hlcom{# mnl probability statement}
+    \hlstd{p} \hlkwb{<-} \hlstd{(}\hlkwd{exp}\hlstd{(v1)} \hlopt{*} \hlstd{choice1} \hlopt{+} \hlkwd{exp}\hlstd{(v2)} \hlopt{*} \hlstd{choice2)}\hlopt{/}\hlstd{(}\hlkwd{exp}\hlstd{(v1)} \hlopt{+} \hlkwd{exp}\hlstd{(v2))}
+
+    \hlkwd{return}\hlstd{(p)}
+\hlstd{\}}
 \end{alltt}
 \end{kframe}
 \end{knitrout}
@@ -280,10 +270,9 @@ The \emph{\_F} file contains the set of fixed (non-random) coefficients for each
 \begin{knitrout}
 \definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
 \begin{alltt}
+\hlkwd{data}\hlstd{(Example1_F)}
 
-\hlfunctioncall{data}(Example1_F)
-
-\hlfunctioncall{head}(Example1_F)
+\hlkwd{head}\hlstd{(Example1_F)}
 \end{alltt}
 \begin{verbatim}
 ##   iteration  ASC1   BTime   BCost
@@ -311,16 +300,15 @@ The setup and data preparation are very similar to the first model.
 \begin{knitrout}
 \definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
 \begin{alltt}
+\hlkwd{library}\hlstd{(RSGHB)}
 
-\hlfunctioncall{library}(RSGHB)
+\hlcom{# load example data}
+\hlkwd{data}\hlstd{(choicedata)}
 
-\hlcomment{# load example data}
-\hlfunctioncall{data}(choicedata)
-
-\hlcomment{# We typically work with one one row per choice observations. This isn't}
-\hlcomment{# necessary however but it does lend it self to faster computation of the}
-\hlcomment{# choice likelihoods}
-\hlfunctioncall{head}(choicedata)
+\hlcom{# We typically work with one one row per choice observations. This isn't}
+\hlcom{# necessary however but it does lend it self to faster computation of the}
+\hlcom{# choice likelihoods}
+\hlkwd{head}\hlstd{(choicedata)}
 \end{alltt}
 \begin{verbatim}
 ##     ID thecount tt1 tt2 toll2 asc1 Choice
@@ -332,24 +320,23 @@ The setup and data preparation are very similar to the first model.
 ## 6 8738        6  63  54  0.75    1      1
 \end{verbatim}
 \begin{alltt}
+\hlcom{# We can then specify any variables from the choicedata data.frame that}
+\hlcom{# you'd like to use in the utility equations in the likelihood function}
+\hlcom{# below. These can be any variables within the data or transformations of}
+\hlcom{# those variables. This example comes from transport so each alternative is}
+\hlcom{# defined by travel times and toll costs.}
+\hlstd{TT1} \hlkwb{<-} \hlstd{choicedata}\hlopt{$}\hlstd{tt1}
+\hlstd{TT2} \hlkwb{<-} \hlstd{choicedata}\hlopt{$}\hlstd{tt2}
+\hlstd{TOLL2} \hlkwb{<-} \hlstd{choicedata}\hlopt{$}\hlstd{toll2}
 
-\hlcomment{# We can then specify any variables from the choicedata data.frame that}
-\hlcomment{# you'd like to use in the utility equations in the likelihood function}
-\hlcomment{# below. These can be any variables within the data or transformations of}
-\hlcomment{# those variables. This example comes from transport so each alternative}
-\hlcomment{# is defined by travel times and toll costs.}
-TT1 <- choicedata$tt1
-TT2 <- choicedata$tt2
-TOLL2 <- choicedata$toll2
+\hlcom{# Here we specify the choice vectors. Note in this example there are only}
+\hlcom{# two examples.  Also, dummying coding the choice vector is not necessary}
+\hlcom{# but allows for easier coding of the likelihood.}
+\hlstd{choice1} \hlkwb{<-} \hlstd{(choicedata}\hlopt{$}\hlstd{Choice} \hlopt{==} \hlnum{1}\hlstd{)}
+\hlstd{choice2} \hlkwb{<-} \hlstd{(choicedata}\hlopt{$}\hlstd{Choice} \hlopt{==} \hlnum{2}\hlstd{)}
 
-\hlcomment{# Here we specify the choice vectors. Note in this example there are only}
-\hlcomment{# two examples. Also, dummying coding the choice vector is not necessary}
-\hlcomment{# but allows for easier coding of the likelihood.}
-choice1 <- (choicedata$Choice == 1)
-choice2 <- (choicedata$Choice == 2)
-
-\hlcomment{# Frequency of choice for the first alternative}
-\hlfunctioncall{table}(choice1)
+\hlcom{# Frequency of choice for the first alternative}
+\hlkwd{table}\hlstd{(choice1)}
 \end{alltt}
 \begin{verbatim}
 ## choice1
@@ -357,9 +344,8 @@ choice2 <- (choicedata$Choice == 2)
 ##  3560  6682
 \end{verbatim}
 \begin{alltt}
-
-\hlcomment{# Frequency of choice for the second alternative.}
-\hlfunctioncall{table}(choice2)
+\hlcom{# Frequency of choice for the second alternative.}
+\hlkwd{table}\hlstd{(choice2)}
 \end{alltt}
 \begin{verbatim}
 ## choice2
@@ -381,51 +367,49 @@ To allow for mixing of the parameters, we need to specify a few more controls to
 \begin{knitrout}
 \definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
 \begin{alltt}
+\hlcom{# ------------------ ESTIMATION CONTROL ------------------}
 
-\hlcomment{# ------------------ ESTIMATION CONTROL ------------------}
+\hlcom{# Setting control list for estimation (see ?doHB for more estimation}
+\hlcom{# options)}
 
-\hlcomment{# Setting control list for estimation (see ?doHB for more estimation}
-\hlcomment{# options)}
+\hlcom{# modelname is used for naming the output files}
+\hlstd{modelname} \hlkwb{<-} \hlstr{"MNL"}
 
-\hlcomment{# modelname is used for naming the output files}
-modelname <- \hlstring{"MNL"}
+\hlcom{# gVarNamesNormal provides names for the random parameters}
+\hlstd{gVarNamesNormal} \hlkwb{<-} \hlkwd{c}\hlstd{(}\hlstr{"ASC1"}\hlstd{,} \hlstr{"BTime"}\hlstd{,} \hlstr{"BCost"}\hlstd{)}
 
-\hlcomment{# gVarNamesNormal provides names for the random parameters}
-gVarNamesNormal <- \hlfunctioncall{c}(\hlstring{"ASC1"}, \hlstring{"BTime"}, \hlstring{"BCost"})
+\hlcom{# gDIST specifies the type of continuous distribution to use for the random}
+\hlcom{# parameters.  gDIST must have an entry for each value in gVarNamesNormal}
+\hlcom{# The options are: 1. normal 2. log-nomal 3. negative log-normal 4. normal}
+\hlcom{# with all values below zero massed at zero 5. normal with all values}
+\hlcom{# greater than zero massed at zero 6. Johnson SB with a specified min and}
+\hlcom{# max}
 
-\hlcomment{# gDIST specifies the type of continuous distribution to use for the}
-\hlcomment{# random parameters. gDIST must have an entry for each value in}
-\hlcomment{# gVarNamesNormal The options are: 1. normal 2. log-nomal 3. negative}
-\hlcomment{# log-normal 4. normal with all values below zero massed at zero 5.}
-\hlcomment{# Johnson SB with a specified min and max}
+\hlcom{# In this example, we use normal distributions for all 3 of the parameters.}
+\hlstd{gDIST} \hlkwb{<-} \hlkwd{c}\hlstd{(}\hlnum{1}\hlstd{,} \hlnum{1}\hlstd{,} \hlnum{1}\hlstd{)}
 
-\hlcomment{# In this example, we use normal distributions for all 3 of the}
-\hlcomment{# parameters.}
-gDIST <- \hlfunctioncall{c}(1, 1, 1)
+\hlcom{# svN contains the starting values for the means of the normal distributions}
+\hlcom{# for each of the random parameters}
+\hlstd{svN} \hlkwb{<-} \hlkwd{c}\hlstd{(}\hlnum{0}\hlstd{,} \hlnum{0}\hlstd{,} \hlnum{0}\hlstd{)}
 
-\hlcomment{# svN contains the starting values for the means of the normal}
-\hlcomment{# distributions for each of the random parameters}
-svN <- \hlfunctioncall{c}(0, 0, 0)
+\hlcom{# ITERATION SETTINGS}
 
-\hlcomment{# ITERATION SETTINGS}
+\hlcom{# gNCREP contains the number of iterations to use prior to convergence}
+\hlstd{gNCREP} \hlkwb{<-} \hlnum{30000}
+\hlcom{# gNEREP contains the number of iterations to keep for averaging after}
+\hlcom{# convergence has been reached}
+\hlstd{gNEREP} \hlkwb{<-} \hlnum{20000}
+\hlcom{# gNSKIP contains the number of iterations to do in between retaining draws}
+\hlcom{# for averaging}
+\hlstd{gNSKIP} \hlkwb{<-} \hlnum{1}
+\hlcom{# gINFOSKIP controls how frequently to print info about the iteration}
+\hlcom{# process}
+\hlstd{gINFOSKIP} \hlkwb{<-} \hlnum{250}
 
-\hlcomment{# gNCREP contains the number of iterations to use prior to convergence}
-gNCREP <- 30000
-\hlcomment{# gNEREP contains the number of iterations to keep for averaging after}
-\hlcomment{# convergence has been reached}
-gNEREP <- 20000
-\hlcomment{# gNSKIP contains the number of iterations to do in between retaining}
-\hlcomment{# draws for averaging}
-gNSKIP <- 1
-\hlcomment{# gINFOSKIP controls how frequently to print info about the iteration}
-\hlcomment{# process}
-gINFOSKIP <- 250
-
-\hlcomment{# To simplify the doHB functional call, we put all of the control}
-\hlcomment{# parameters into a single list that can be passed directly to doHB.}
-control <- \hlfunctioncall{list}(modelname = modelname, gVarNamesNormal = gVarNamesNormal, gDIST = gDIST, 
-    svN = svN, gNCREP = gNCREP, gNEREP = gNEREP, gNSKIP = gNSKIP, gINFOSKIP = gINFOSKIP)
-
+\hlcom{# To simplify the doHB functional call, we put all of the control parameters}
+\hlcom{# into a single list that can be passed directly to doHB.}
+\hlstd{control} \hlkwb{<-} \hlkwd{list}\hlstd{(}\hlkwc{modelname} \hlstd{= modelname,} \hlkwc{gVarNamesNormal} \hlstd{= gVarNamesNormal,} \hlkwc{gDIST} \hlstd{= gDIST,}
+    \hlkwc{svN} \hlstd{= svN,} \hlkwc{gNCREP} \hlstd{= gNCREP,} \hlkwc{gNEREP} \hlstd{= gNEREP,} \hlkwc{gNSKIP} \hlstd{= gNSKIP,} \hlkwc{gINFOSKIP} \hlstd{= gINFOSKIP)}
 \end{alltt}
 \end{kframe}
 \end{knitrout}
@@ -438,26 +422,25 @@ To introduce mixing into the model, we switch from using \emph{fc} vector to usi
 \begin{knitrout}
 \definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
 \begin{alltt}
+\hlstd{likelihood} \hlkwb{<-} \hlkwa{function}\hlstd{(}\hlkwc{fc}\hlstd{,} \hlkwc{b}\hlstd{) \{}
 
-likelihood <- \hlfunctioncall{function}(fc, b) \{
-    
-\hlcomment{    # the change from using fc to b is the only change in the likelihood}
-\hlcomment{    # function required to allow for mixing.}
-    cc <- 1
-    ASC1 <- b[, cc]
-    cc <- cc + 1
-    Btime <- b[, cc]
-    cc <- cc + 1
-    Btoll <- b[, cc]
-    cc <- cc + 1
-    
-    v1 <- ASC1 + Btime * TT1
-    v2 <- Btime * TT2 + Btoll * TOLL2
-    
-    p <- (\hlfunctioncall{exp}(v1) * choice1 + \hlfunctioncall{exp}(v2) * choice2)/(\hlfunctioncall{exp}(v1) + \hlfunctioncall{exp}(v2))
-    
-    \hlfunctioncall{return}(p)
-\}
+    \hlcom{# the change from using fc to b is the only change in the likelihood}
+    \hlcom{# function required to allow for mixing.}
+    \hlstd{cc} \hlkwb{<-} \hlnum{1}
+    \hlstd{ASC1} \hlkwb{<-} \hlstd{b[, cc]}
+    \hlstd{cc} \hlkwb{<-} \hlstd{cc} \hlopt{+} \hlnum{1}
+    \hlstd{Btime} \hlkwb{<-} \hlstd{b[, cc]}
+    \hlstd{cc} \hlkwb{<-} \hlstd{cc} \hlopt{+} \hlnum{1}
+    \hlstd{Btoll} \hlkwb{<-} \hlstd{b[, cc]}
+    \hlstd{cc} \hlkwb{<-} \hlstd{cc} \hlopt{+} \hlnum{1}
+
+    \hlstd{v1} \hlkwb{<-} \hlstd{ASC1} \hlopt{+} \hlstd{Btime} \hlopt{*} \hlstd{TT1}
+    \hlstd{v2} \hlkwb{<-} \hlstd{Btime} \hlopt{*} \hlstd{TT2} \hlopt{+} \hlstd{Btoll} \hlopt{*} \hlstd{TOLL2}
+
+    \hlstd{p} \hlkwb{<-} \hlstd{(}\hlkwd{exp}\hlstd{(v1)} \hlopt{*} \hlstd{choice1} \hlopt{+} \hlkwd{exp}\hlstd{(v2)} \hlopt{*} \hlstd{choice2)}\hlopt{/}\hlstd{(}\hlkwd{exp}\hlstd{(v1)} \hlopt{+} \hlkwd{exp}\hlstd{(v2))}
+
+    \hlkwd{return}\hlstd{(p)}
+\hlstd{\}}
 \end{alltt}
 \end{kframe}
 \end{knitrout}
@@ -497,10 +480,9 @@ The \emph{\_A} file contain the sample-level means of the underlying normal at e
 \begin{knitrout}
 \definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
 \begin{alltt}
+\hlkwd{data}\hlstd{(Example2_A)}
 
-\hlfunctioncall{data}(Example2_A)
-
-\hlfunctioncall{head}(Example2_A)
+\hlkwd{head}\hlstd{(Example2_A)}
 \end{alltt}
 \begin{verbatim}
 ##   iteration   ASC1   BTime   BCost
@@ -520,10 +502,9 @@ The \emph{\_B} file contains the average across iterations of the individual lev
 \begin{knitrout}
 \definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
 \begin{alltt}
+\hlkwd{data}\hlstd{(Example2_B)}
 
-\hlfunctioncall{data}(Example2_B)
-
-\hlfunctioncall{head}(Example2_B)
+\hlkwd{head}\hlstd{(Example2_B)}
 \end{alltt}
 \begin{verbatim}
 ##   Respondent   ASC1    BTime   BCost
@@ -535,10 +516,9 @@ The \emph{\_B} file contains the average across iterations of the individual lev
 ## 6       8745 1.0068 -0.29565 -0.5575
 \end{verbatim}
 \begin{alltt}
+\hlkwd{data}\hlstd{(Example2_Bsd)}
 
-\hlfunctioncall{data}(Example2_Bsd)
-
-\hlfunctioncall{head}(Example2_Bsd)
+\hlkwd{head}\hlstd{(Example2_Bsd)}
 \end{alltt}
 \begin{verbatim}
 ##   Respondent   ASC1  BTime  BCost
@@ -558,10 +538,9 @@ The \emph{\_C} file contains the average across iterations of the individual lev
 \begin{knitrout}
 \definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
 \begin{alltt}
+\hlkwd{data}\hlstd{(Example2_C)}
 
-\hlfunctioncall{data}(Example2_C)
-
-\hlfunctioncall{head}(Example2_C)
+\hlkwd{head}\hlstd{(Example2_C)}
 \end{alltt}
 \begin{verbatim}
 ##   Respondent    RLH   ASC1    BTime   BCost
@@ -573,10 +552,9 @@ The \emph{\_C} file contains the average across iterations of the individual lev
 ## 6       8745 0.4920 1.0068 -0.29565 -0.5575
 \end{verbatim}
 \begin{alltt}
+\hlkwd{data}\hlstd{(Example2_Csd)}
 
-\hlfunctioncall{data}(Example2_Csd)
-
-\hlfunctioncall{head}(Example2_Csd)
+\hlkwd{head}\hlstd{(Example2_Csd)}
 \end{alltt}
 \begin{verbatim}
 ##   Respondent   ASC1  BTime  BCost
@@ -597,10 +575,9 @@ The \emph{\_D} file contains a row-based representation of the sample covariance
 \begin{knitrout}
 \definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
 \begin{alltt}
+\hlkwd{data}\hlstd{(Example2_D)}
 
-\hlfunctioncall{data}(Example2_D)
-
-\hlfunctioncall{head}(Example2_D)
+\hlkwd{head}\hlstd{(Example2_D)}
 \end{alltt}
 \begin{verbatim}
 ##   iteration   ASC1 ASC1xBTime ASC1xBCost      BTime BTimexBCost  BCost
@@ -612,15 +589,14 @@ The \emph{\_D} file contains a row-based representation of the sample covariance
 ## 6         6 0.2234   -0.02707    0.07341 -0.0128438     0.03041 0.1791
 \end{verbatim}
 \begin{alltt}
+\hlcom{# building the covariance matrix}
 
-\hlcomment{# building the covariance matrix}
+\hlstd{covMat} \hlkwb{<-} \hlkwd{xpnd}\hlstd{(}\hlkwd{colMeans}\hlstd{(Example2_D[}\hlopt{-}\hlnum{1}\hlstd{]))}
 
-covMat <- \hlfunctioncall{xpnd}(\hlfunctioncall{colMeans}(Example2_D[-1]))
+\hlkwd{rownames}\hlstd{(covMat)} \hlkwb{<-} \hlkwd{c}\hlstd{(}\hlstr{"ASC1"}\hlstd{,} \hlstr{"BTime"}\hlstd{,} \hlstr{"BCost"}\hlstd{)}
+\hlkwd{colnames}\hlstd{(covMat)} \hlkwb{<-} \hlkwd{c}\hlstd{(}\hlstr{"ASC1"}\hlstd{,} \hlstr{"BTime"}\hlstd{,} \hlstr{"BCost"}\hlstd{)}
 
-\hlfunctioncall{rownames}(covMat) <- \hlfunctioncall{c}(\hlstring{"ASC1"}, \hlstring{"BTime"}, \hlstring{"BCost"})
-\hlfunctioncall{colnames}(covMat) <- \hlfunctioncall{c}(\hlstring{"ASC1"}, \hlstring{"BTime"}, \hlstring{"BCost"})
-
-covMat
+\hlstd{covMat}
 \end{alltt}
 \begin{verbatim}
 ##           ASC1    BTime    BCost
@@ -636,7 +612,6 @@ covMat
 
 Here is a list of the user-specified control parameters.
 
-
 \begin{description}
 
 \item[gVarNamesNormal] - A vector of charater-based names for the random parameters. \\
@@ -645,7 +620,7 @@ Default: NULL
 \item[gVarNamesFixed] - A vector of character-based names for the fixed parameters.\\
 Default: NULL
 
-\item[gDIST] - A vector of integers (1-5) which indicate which type of distribution should be applied to the random coefficients - 1 = Normal, 2 = Postive Log-Normal, 3 = Negative Log-Normal, 4 = Censored Normal, 5 = Johnson SB. There should be an element for each name in gVarNamesNormal. \\ Default: NULL
+\item[gDIST] -  A vector of integers (1-6) which indicate which type of distribution should be applied to the random parameters - 1 = Normal, 2 = Postive Log-Normal, 3 = Negative Log-Normal, 4 = Positive Censored Normal, 5 = Negative Censored Normal, 6 = Johnson SB. There should be an element for each name in gVarNamesNormal. \\ Default: NULL
 
 \item[FC] - A vector of starting values for the fixed coefficients. There should be an element for each name in gVarNamesFixed.\\ 
 Default: NULL
@@ -672,6 +647,8 @@ Default: 10
 \item[priorVariance] - The amount of prior variance assumed.\\ 
 Default: 2.0
 
+\item[pvMatrix] - A custom prior covariance matrix can be used in estimation. If specified in the control list, the custom matrix will override the default prior covariance matrix used by RSGHB. The prior covariance matrix needs to be a matrix object and of the correct size - \begin{verbatim}length(gVarNamesNormal) x length(gVarNamesNormal)\end{verbatim}  
+
 \item[degreesOfFreedom] - Additional degrees of freedom for the prior covariance matrix (not including the number of parameters.\\ 
 Default: 5
 
@@ -681,9 +658,15 @@ Default: 0.1
 \item[rhoF] - The proportionality fraction for the jumping distribution for the Metropolis-Hastings algorithm for the fixed parameters. Unlike rho, this value is not adjusted as the markov chain proceeds. \\
 Default: 0.0001
 
+\item[targetAcceptanceNormal] - The target acceptance rate in the Metropolis-Hastings algorithm for the random parameters. \\
+Defaults: 0.3
+
+\item[targetAcceptanceFixed] - The target acceptance rate in the Metropolis-Hastings algorithm for the fixed parameters. \\
+Defaults: 0.3
+
 \item[gFULLCV] - A number that indicates if a full or independent covariance structure should be used for the random parameters. A value of 1 indicated full and 0 for an independent structure.\\ Default: 1
 
-\item[gMINCOEF] - A vector of minimums for the Johnson SB distributions. If Johnson SB is used, each random parameter needs an element but only the elements that correspond to a 5 in gDIST are used. \\ 
+\item[gMINCOEF] - A vector of minimums for the Johnson SB distributions. If Johnson SB is used, each random parameter needs an element but only the elements that correspond to a JSB in gDIST are used. \\ 
 Default: 0
 
 \item[gMAXCOEF] - Like gMINCOEF but for the maximum of the Johnson SB distribution. 
@@ -694,12 +677,38 @@ Default: 0
 \item[gSeed] - The random seed.\\ 
 Default: 0
 
-\item[constraintsNorm] - This is a list of monotonic constraints to be applied during estimation. The structure of the constraints is c(param1number - inequality - param2number). For constraints relative to 0, use 0 instead of the param2number. For the inequality, use 1 for < and 2 for >. Example \begin{verbatim}constraintsNorm <- list(c(5,1,0),c(6,1,5),c(7,1,6),c(8,1,7))\end{verbatim} would constrain the 5th parameter < 0, the 6th parameter < 5th parameter, the 7th parameter < the 6th parameter, etc. \\ Default: NULL
+\item[constraintsNorm] - This is a list of monotonic constraints to be applied during estimation. The structure of the constraints is c(param1number - inequality - param2number). For constraints relative to 0, use 0 instead of the param2number. For the inequality, use 1 for $<$ and 2 for $>$. Example \begin{verbatim}constraintsNorm <- list(c(5,1,0),c(6,1,5),c(7,1,6),c(8,1,7))\end{verbatim} would constrain the 5th parameter < 0, the 6th parameter < 5th parameter, the 7th parameter < the 6th parameter, etc. \\ Default: NULL
 
 \item[nodiagnostics] - If set to TRUE, the diagnostic report will not be reported to the screen with a prompt to continue. This makes batch processing easier to implement.\\ 
 Default: FALSE
 
+\item[fixedA] - This allows the analyst to fix means of the underlying normal distribution of random variables to certain values as opposed to estimating them. This would be important for example in an error components logit model or an integrated choice and latent variable model. The format for this input is a vector of length equal to the number of random parameters. Use NA for variables that should be estimated, example: \begin{verbatim}fixedA = c(NA, NA, NA, NA, NA, NA, NA, 0)\end{verbatim} In this case, the mean of the underlying normal for the 8th random variable would be fixed to 0.
+
+\item[fixedD] - This allows the analyst to fix the variance of the underlying normal distribution of the random variables to certain values as opposed to estimating them. This would be important for example in an integrated choice and latent variable model. The format for this input is a vector of length equal to the number of random parameters. Use NA for variables that should be estimated, example:
+ \begin{verbatim}fixedD = c(NA, NA, NA, NA, NA, NA, NA, 1)\end{verbatim} In this case, the variance of the underlying normal for the 8th random variable would be fixed to 1.
+
 \end{description}     
 
+\section*{RSGHB Output Files}
+
+RSGHB generates a number of output files which can be used to evaluate the model.
+
+\begin{description}
+
+\item[A file] - The A file contain the sample-level means of the underlying normal at each iteration. 
+
+\item[B file, Bsd file] - The B file contains the average across iterations of the individual level draws for the underlying normals for the random parameters. The Bsd file provides the standard deviations of those individual draws. 
+
+\item[C file, Csd file] - The C file contains the average across iterations of the individual level draws for the random parameters including the appropriate transformations. The Csd file provides the standard deviations of those individual draws. These two files are equivalent to the conditional distributions from models estimated using Maximum Simulated Likelihood methods.
+
+\item[D file] - This file contains a row-based representation of the sample covariance for each iteration.
+
+\item[F file] - This file contains the set of fixed (non-random) parameters for each iteration after convergence.
+
+\item[Log file] - This contains some statistics that can be used to understand if model convergence has been reached.
+
+\item[PV Matrix] - This file contains the prior covariance matrix that was assumed during the estimation of the model.
+
+\end{description}  
 
 \end{document}

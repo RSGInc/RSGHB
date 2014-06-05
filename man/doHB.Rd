@@ -7,7 +7,7 @@
 \description{
 The user can initiate the model estimation by calling the \emph{doHB()} function. The function will perform some initial diagnostic tests to look for common errors in specifying the model. Upon completion, the function will write a number of output files with the model parameters and convergence statistics to the user's working directory. 
 
-The flexibility comes in allowing the user to specify the likelihood function directly instead of assuming predetermined model structures. Types of models that can be estimated with this code include the family of discrete choice models (Multinomial Logit, Mixed Logit, Nested Logit, Error Components Logit and Latent Class) as well ordered response models like ordered probit and ordered logit. In addition, the package allows for flexibility in specifying parameters as either fixed (non-varying across individuals) or random with continuous distributions. Parameter distributions supported include normal, positive/negative log-normal, positive/negative censored normal, the Johnson SB distribution, and positive/negative uniform.  
+The flexibility comes in allowing the user to specify the likelihood function directly instead of assuming predetermined model structures. Types of models that can be estimated with this code include the family of discrete choice models (Multinomial Logit, Mixed Logit, Nested Logit, Error Components Logit and Latent Class) as well ordered response models like ordered probit and ordered logit. In addition, the package allows for flexibility in specifying parameters as either fixed (non-varying across individuals) or random with continuous distributions. Parameter distributions supported include normal, positive/negative log-normal, positive/negative censored normal and the Johnson SB distribution.  
 
 Kenneth Train's Matlab and Gauss code for doing hierarchical Bayesian estimation has served as the basis for a few of the functions included in this package. (See references below).
 }
@@ -30,7 +30,7 @@ There are a number of global variables that can be set to control the model esti
 
 \emph{gVarNamesFixed} - A vector of character-based names for the fixed parameters. (Defaults to NULL)
 
-\emph{gDIST} - A vector of integers (1-8) which indicate which type of distribution should be applied to the random parameters - 1 = Normal, 2 = Postive Log-Normal, 3 = Negative Log-Normal, 4 = Positive Censored Normal, 5 = Negative Censored Normal, 6 = Johnson SB, 7 = Positive Uniform, 8 = Negative Uniform. There should be an element for each name in \emph{gVarNamesNormal}. (Defaults to NULL)
+\emph{gDIST} - A vector of integers (1-6) which indicate which type of distribution should be applied to the random parameters - 1 = Normal, 2 = Postive Log-Normal, 3 = Negative Log-Normal, 4 = Positive Censored Normal, 5 = Negative Censored Normal, 6 = Johnson SB. There should be an element for each name in \emph{gVarNamesNormal}. (Defaults to NULL)
 
 \emph{FC} - A vector of starting values for the fixed parameters. There should be an element for each name in \emph{gVarNamesFixed}. (Defaults to NULL)
 
@@ -64,7 +64,7 @@ There are a number of global variables that can be set to control the model esti
           
 \emph{gFULLCV} - A number that indicates if a full or independent covariance structure should be used for the random parameters. A value of 1 indicated full and 0 for an independent structure. (Defaults to 1)
           
-\emph{gMINCOEF} - A vector of minimums for the Johnson SB distributions. If Johnson SB is used, each random coefficent needs an element but only the elements that correspond to a 5 in \emph{gDIST} are used. (Defaults to 0)
+\emph{gMINCOEF} - A vector of minimums for the Johnson SB distributions. If Johnson SB is used, each random coefficent needs an element but only the elements that correspond to a JSB in \emph{gDIST} are used. (Defaults to 0)
 
 \emph{gMAXCOEF} -  Like \emph{gMINCOEF} but for the maximum of the Johnson SB distribution. (Defaults to 0)
      
@@ -85,7 +85,7 @@ There are a number of global variables that can be set to control the model esti
 
 A number of output files will be generated.
 
-\emph{A file} - The _A file contain the sample-level means of the underlying normal at each iteration. 
+\emph{A file} - The A file contain the sample-level means of the underlying normal at each iteration. 
 
 \emph{B file, Bsd file} - The B file contains the average across iterations of the individual level draws for the underlying normals for the random parameters. The Bsd file provides the standard deviations of those individual draws. 
 
@@ -146,7 +146,8 @@ likelihood <- function(fc,b)
      return(p)
 }
 
-doHB(likelihood, choicedata, control)
+# not run
+# doHB(likelihood, choicedata, control)
 
 }
 

@@ -13,9 +13,9 @@
 
 \title{How to use RSGHB}
 \author{Jeffrey Dumont}
-\date{6 April 2013}
+\date{21 May 2014}
 \maketitle
-\abstract{This vignette describes the process for specifying, estimating and analyzing the output of a choice model with RSGHB. The document is structured into two case studies using different model structures. The synthetic choice data used in this document (as well as number of other examples using different model structures) can be downloaded from RSGHB github page - \url{https://github.com/jeffdumont/RSGHB}}
+\abstract{This vignette describes the process for specifying, estimating and analyzing the output of a choice model with RSGHB. The document is structured into two case studies using different model structures. The synthetic choice data used in this document (as well as number of other examples using different model structures) can be downloaded from the RSGHB github page - \url{https://github.com/jeffdumont/RSGHB}}
 
 \begin{center}
 \line(1,0){400}
@@ -45,16 +45,21 @@ library(RSGHB)
 # load example data
 data(choicedata)
 
-# We typically work with one one row per choice observations. This isn't necessary however but it does lend it self to faster computation of the choice likelihoods
+# We typically work with one one row per choice observations. This isn't necessary 
+# however but it does lend it self to faster computation of the choice likelihoods
 head(choicedata)
 
-# We can then specify any variables from the choicedata data.frame that you'd like to use in the
-# utility equations in the likelihood function below. These can be any variables within the data or transformations of those variables. This example comes from transport so each alternative is defined by travel times and toll costs.
+# We can then specify any variables from the choicedata data.frame that you'd like 
+# to use in the utility equations in the likelihood function below. These can be 
+# any variables within the data or transformations of those variables. This example 
+# comes from transport so each alternative is defined by travel times and toll costs.
 TT1     <- choicedata$tt1
 TT2     <- choicedata$tt2
 TOLL2   <- choicedata$toll2
 
-# Here we specify the choice vectors. Note in this example there are only two alternatives. Also, dummying coding the choice vector is not necessary but allows for easier coding of the likelihood.
+# Here we specify the choice vectors. Note in this example there are only two 
+# alternatives. Also, dummying coding the choice vector is not necessary but allows 
+# for easier coding of the likelihood.
 choice1    <- (choicedata$Choice==1)
 choice2    <- (choicedata$Choice==2)
 
@@ -81,7 +86,9 @@ There are number of options for controling the estimation process. Please see th
 # modelname is used for naming the output files
 modelname <- "MNL"          
 
-# gVarNamesFixed contains the names for the fixed (non-random) variables in your model. This will be used in output and also when displaying iteration detail to the screen.
+# gVarNamesFixed contains the names for the fixed (non-random) variables in your 
+# model. This will be used in output and also when displaying iteration detail to 
+# the screen.
 gVarNamesFixed <- c("ASC1","BTime","BCost")
 
 # FC contains the starting values for the fixed coefficients.
@@ -91,14 +98,17 @@ FC <- c(0,0,0)
 
 # gNCREP contains the number of iterations to use prior to convergence
 gNCREP    <- 30000
-# gNEREP contains the number of iterations to keep for averaging after convergence has been reached
+# gNEREP contains the number of iterations to keep for averaging after convergence 
+# has been reached
 gNEREP    <- 20000 	       
-# gNSKIP contains the number of iterations to do in between retaining draws for averaging
+# gNSKIP contains the number of iterations to do in between retaining draws for 
+# averaging
 gNSKIP    <- 1		       
 # gINFOSKIP controls how frequently to print info about the iteration process
 gINFOSKIP <- 250           
 
-# To simplify the doHB functional call, we put all of the control parameters into a single list that can be passed directly to doHB.
+# To simplify the doHB functional call, we put all of the control parameters into 
+# a single list that can be passed directly to doHB.
 control <- list(
      modelname=modelname,
      gVarNamesFixed=gVarNamesFixed,
@@ -129,7 +139,8 @@ likelihood <- function(fc,b)
 
   # defining the parameters          
 
-  # using cc var to index the fc vector simplifies the addition/subtraction of new parameters     
+  # using cc var to index the fc vector simplifies the addition/subtraction of 
+  # new parameters     
   cc <- 1
   ASC1   <- fc[cc];cc <- cc+1
   Btime  <- fc[cc];cc <- cc+1
@@ -205,16 +216,21 @@ library(RSGHB)
 # load example data
 data(choicedata)
 
-# We typically work with one one row per choice observations. This isn't necessary however but it does lend it self to faster computation of the choice likelihoods
+# We typically work with one one row per choice observations. This isn't necessary
+# however but it does lend it self to faster computation of the choice likelihoods
 head(choicedata)
 
-# We can then specify any variables from the choicedata data.frame that you'd like to use in the
-# utility equations in the likelihood function below. These can be any variables within the data or transformations of those variables. This example comes from transport so each alternative is defined by travel times and toll costs.
+# We can then specify any variables from the choicedata data.frame that you'd like 
+# to use in the utility equations in the likelihood function below. These can be 
+# any variables within the data or transformations of those variables. This example 
+# comes from transport so each alternative is defined by travel times and toll costs.
 TT1     <- choicedata$tt1
 TT2     <- choicedata$tt2
 TOLL2   <- choicedata$toll2
 
-# Here we specify the choice vectors. Note in this example there are only two examples. Also, dummying coding the choice vector is not necessary but allows for easier coding of the likelihood.
+# Here we specify the choice vectors. Note in this example there are only two examples. 
+# Also, dummying coding the choice vector is not necessary but allows for easier 
+# coding of the likelihood.
 choice1    <- (choicedata$Choice==1)
 choice2    <- (choicedata$Choice==2)
 
@@ -246,32 +262,38 @@ modelname <- "MNL"
 # gVarNamesNormal provides names for the random parameters
 gVarNamesNormal <- c("ASC1","BTime","BCost")
 
-# gDIST specifies the type of continuous distribution to use for the random parameters. gDIST must have an entry for each value in gVarNamesNormal
+# gDIST specifies the type of continuous distribution to use for the random parameters. 
+# gDIST must have an entry for each value in gVarNamesNormal
 # The options are:
 # 1. normal
 # 2. log-nomal
 # 3. negative log-normal
 # 4. normal with all values below zero massed at zero
-# 5. Johnson SB with a specified min and max
+# 5. normal with all values greater than zero massed at zero
+# 6. Johnson SB with a specified min and max
 
 # In this example, we use normal distributions for all 3 of the parameters.
 gDIST <- c(1,1,1)
 
-# svN contains the starting values for the means of the normal distributions for each of the random parameters
+# svN contains the starting values for the means of the normal distributions for each 
+# of the random parameters
 svN <- c(0,0,0)  
 
 # ITERATION SETTINGS
 
 # gNCREP contains the number of iterations to use prior to convergence
 gNCREP    <- 30000
-# gNEREP contains the number of iterations to keep for averaging after convergence has been reached
+# gNEREP contains the number of iterations to keep for averaging after convergence 
+# has been reached
 gNEREP    <- 20000             
-# gNSKIP contains the number of iterations to do in between retaining draws for averaging
+# gNSKIP contains the number of iterations to do in between retaining draws for 
+# averaging
 gNSKIP    <- 1		       
 # gINFOSKIP controls how frequently to print info about the iteration process
 gINFOSKIP <- 250   
 
-# To simplify the doHB functional call, we put all of the control parameters into a single list that can be passed directly to doHB.
+# To simplify the doHB functional call, we put all of the control parameters into 
+# a single list that can be passed directly to doHB.
 control <- list(
      modelname=modelname,
      gVarNamesNormal=gVarNamesNormal,
@@ -295,7 +317,8 @@ To introduce mixing into the model, we switch from using \emph{fc} vector to usi
 likelihood <- function(fc,b)
 {  
      
-     # the change from using fc to b is the only change in the likelihood function required to allow for mixing.
+     # the change from using fc to b is the only change in the likelihood 
+     # function required to allow for mixing.
      cc     <- 1
      ASC1   <- b[,cc];cc<-cc+1
      Btime  <- b[,cc];cc<-cc+1
@@ -401,7 +424,6 @@ covMat
 
 Here is a list of the user-specified control parameters.
 
-
 \begin{description}
 
 \item[gVarNamesNormal] - A vector of charater-based names for the random parameters. \\
@@ -410,7 +432,7 @@ Default: NULL
 \item[gVarNamesFixed] - A vector of character-based names for the fixed parameters.\\
 Default: NULL
 
-\item[gDIST] - A vector of integers (1-5) which indicate which type of distribution should be applied to the random coefficients - 1 = Normal, 2 = Postive Log-Normal, 3 = Negative Log-Normal, 4 = Censored Normal, 5 = Johnson SB. There should be an element for each name in gVarNamesNormal. \\ Default: NULL
+\item[gDIST] -  A vector of integers (1-6) which indicate which type of distribution should be applied to the random parameters - 1 = Normal, 2 = Postive Log-Normal, 3 = Negative Log-Normal, 4 = Positive Censored Normal, 5 = Negative Censored Normal, 6 = Johnson SB. There should be an element for each name in gVarNamesNormal. \\ Default: NULL
 
 \item[FC] - A vector of starting values for the fixed coefficients. There should be an element for each name in gVarNamesFixed.\\ 
 Default: NULL
@@ -437,6 +459,8 @@ Default: 10
 \item[priorVariance] - The amount of prior variance assumed.\\ 
 Default: 2.0
 
+\item[pvMatrix] - A custom prior covariance matrix can be used in estimation. If specified in the control list, the custom matrix will override the default prior covariance matrix used by RSGHB. The prior covariance matrix needs to be a matrix object and of the correct size - \begin{verbatim}length(gVarNamesNormal) x length(gVarNamesNormal)\end{verbatim}  
+
 \item[degreesOfFreedom] - Additional degrees of freedom for the prior covariance matrix (not including the number of parameters.\\ 
 Default: 5
 
@@ -446,9 +470,15 @@ Default: 0.1
 \item[rhoF] - The proportionality fraction for the jumping distribution for the Metropolis-Hastings algorithm for the fixed parameters. Unlike rho, this value is not adjusted as the markov chain proceeds. \\
 Default: 0.0001
 
+\item[targetAcceptanceNormal] - The target acceptance rate in the Metropolis-Hastings algorithm for the random parameters. \\
+Defaults: 0.3
+
+\item[targetAcceptanceFixed] - The target acceptance rate in the Metropolis-Hastings algorithm for the fixed parameters. \\
+Defaults: 0.3
+
 \item[gFULLCV] - A number that indicates if a full or independent covariance structure should be used for the random parameters. A value of 1 indicated full and 0 for an independent structure.\\ Default: 1
 
-\item[gMINCOEF] - A vector of minimums for the Johnson SB distributions. If Johnson SB is used, each random parameter needs an element but only the elements that correspond to a 5 in gDIST are used. \\ 
+\item[gMINCOEF] - A vector of minimums for the Johnson SB distributions. If Johnson SB is used, each random parameter needs an element but only the elements that correspond to a JSB in gDIST are used. \\ 
 Default: 0
 
 \item[gMAXCOEF] - Like gMINCOEF but for the maximum of the Johnson SB distribution. 
@@ -459,12 +489,38 @@ Default: 0
 \item[gSeed] - The random seed.\\ 
 Default: 0
 
-\item[constraintsNorm] - This is a list of monotonic constraints to be applied during estimation. The structure of the constraints is c(param1number - inequality - param2number). For constraints relative to 0, use 0 instead of the param2number. For the inequality, use 1 for < and 2 for >. Example \begin{verbatim}constraintsNorm <- list(c(5,1,0),c(6,1,5),c(7,1,6),c(8,1,7))\end{verbatim} would constrain the 5th parameter < 0, the 6th parameter < 5th parameter, the 7th parameter < the 6th parameter, etc. \\ Default: NULL
+\item[constraintsNorm] - This is a list of monotonic constraints to be applied during estimation. The structure of the constraints is c(param1number - inequality - param2number). For constraints relative to 0, use 0 instead of the param2number. For the inequality, use 1 for $<$ and 2 for $>$. Example \begin{verbatim}constraintsNorm <- list(c(5,1,0),c(6,1,5),c(7,1,6),c(8,1,7))\end{verbatim} would constrain the 5th parameter < 0, the 6th parameter < 5th parameter, the 7th parameter < the 6th parameter, etc. \\ Default: NULL
 
 \item[nodiagnostics] - If set to TRUE, the diagnostic report will not be reported to the screen with a prompt to continue. This makes batch processing easier to implement.\\ 
 Default: FALSE
 
+\item[fixedA] - This allows the analyst to fix means of the underlying normal distribution of random variables to certain values as opposed to estimating them. This would be important for example in an error components logit model or an integrated choice and latent variable model. The format for this input is a vector of length equal to the number of random parameters. Use NA for variables that should be estimated, example: \begin{verbatim}fixedA = c(NA, NA, NA, NA, NA, NA, NA, 0)\end{verbatim} In this case, the mean of the underlying normal for the 8th random variable would be fixed to 0.
+
+\item[fixedD] - This allows the analyst to fix the variance of the underlying normal distribution of the random variables to certain values as opposed to estimating them. This would be important for example in an integrated choice and latent variable model. The format for this input is a vector of length equal to the number of random parameters. Use NA for variables that should be estimated, example:
+ \begin{verbatim}fixedD = c(NA, NA, NA, NA, NA, NA, NA, 1)\end{verbatim} In this case, the variance of the underlying normal for the 8th random variable would be fixed to 1.
+
 \end{description}     
 
+\section*{RSGHB Output Files}
+
+RSGHB generates a number of output files which can be used to evaluate the model.
+
+\begin{description}
+
+\item[A file] - The A file contain the sample-level means of the underlying normal at each iteration. 
+
+\item[B file, Bsd file] - The B file contains the average across iterations of the individual level draws for the underlying normals for the random parameters. The Bsd file provides the standard deviations of those individual draws. 
+
+\item[C file, Csd file] - The C file contains the average across iterations of the individual level draws for the random parameters including the appropriate transformations. The Csd file provides the standard deviations of those individual draws. These two files are equivalent to the conditional distributions from models estimated using Maximum Simulated Likelihood methods.
+
+\item[D file] - This file contains a row-based representation of the sample covariance for each iteration.
+
+\item[F file] - This file contains the set of fixed (non-random) parameters for each iteration after convergence.
+
+\item[Log file] - This contains some statistics that can be used to understand if model convergence has been reached.
+
+\item[PV Matrix] - This file contains the prior covariance matrix that was assumed during the estimation of the model.
+
+\end{description}  
 
 \end{document}

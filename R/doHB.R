@@ -339,8 +339,8 @@ doHB <- function(likelihood_user,choicedata,control=list())
           
      starttime     <- Sys.time()    # used to calculate seconds per iteration
      
-     distNames     <- c("N","LN+","LN-","CN+","CN-","JSB","U+","U-")  # short names for the distributions
-                      # Normal, Postive Log-Normal, Negative Log-Normal, Positive Censored Normal, Negative Censored Normal, Johnson SB, Positive Uniform, Negative Uniform
+     distNames     <- c("N","LN+","LN-","CN+","CN-","JSB")  # short names for the distributions
+                      # Normal, Postive Log-Normal, Negative Log-Normal, Positive Censored Normal, Negative Censored Normal, Johnson SB
      constraintLabels <- c("<",">")     
      
      # acceptance rate calculations

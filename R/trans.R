@@ -29,17 +29,7 @@ trans <- function(b,env)
           {	
                C[,k] <- exp(b[,k]) / (1 + exp(b[,k]))
                C[,k] <- (C[,k] * ( gMAXCOEF[k] - gMINCOEF[k] ) ) + gMINCOEF[k]    	
-          }   
-          if( gDIST[k] == 7 )      # positive uniform
-          {
-               C[,k] <- pnorm(b[,k],env$A[k],sqrt(env$B[k,k]))
           }             
-          if( gDIST[k] == 8 )      # negative uniform
-          {
-               C[,k] <- -1*pnorm(b[,k],env$A[k],sqrt(env$B[k,k]))
-          } 
-          k <- k + 1
-          
      }
      
      return(C)
