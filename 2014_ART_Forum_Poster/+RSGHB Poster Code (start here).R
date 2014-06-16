@@ -1,5 +1,7 @@
+### Built with R 3.1.0
+
 ### Set the working directory on your machine
-setwd("//i-rsg.com/PROJECTS/Resources/Knowledge/ART Forum/2014/RSGHB Poster")
+setwd("C:/users/jeff.keller/desktop/")
 
 library(RSGHB)
 
@@ -335,41 +337,48 @@ doHB(likelihoods2, data.frame(ID = design[,"ID"]), control)
 
 
 ### Model Comparisons
-
-actual <- aggregate(x = design[,c("U.price", "U.brand2", "U.brand3", "U.ff2", "U.ff3", "U.feat2", "U.feat3")], by = list(design[,"ID"]), FUN = mean)[,-1]
-actual[,"U.price"] <- -exp(actual[,"U.price"] + tau * design[seq(1, N*J, J), "lv"])
-actual.mean <- colMeans(actual)
+actual.mean <- c(price = -exp(-1/8+3097/9600/2), # mean of a log normal is exp(mu + var/2)
+                 brand2 = 1,
+                 brand3 = -0.8,
+                 ff2 = 0.25,
+                 ff3 = 0.60,
+                 feat2 = 1,
+                 feat3 = 1.5)
 
 
 ### Model 1
-C1 <- read.table(file = "Model1_C.csv", sep = ",", header = TRUE)[,-c(1:2)]
+A1 <- read.table(file = "Model1_A.csv", sep = ",", header = TRUE)[,-1]
+A1.mean <- colMeans(A1)
 
 # RMSE
-RMSE1 <- sqrt(mean((actual - C1)^2))
+RMSE1 <- sqrt(mean((actual.mean - A1.mean)^2))
 
-# Parameter Comparison
-C1.mean <- colMeans(C1)
-
-plot(unlist(actual), unlist(C1), main = "Model 1 Parameters", xlab = "Actual", ylab = "Estimated", xlim = c(-7,7), ylim = c(-7,7))
-lines(c(-10,10), c(-10,10), col = "red")
-
-plot(actual.mean, C1.mean, xlim = c(-2,2), ylim = c(-2,2), xlab = "True", ylab = "Estimated")
+# Plot
+plot(actual.mean, A1.mean, xlim = c(-2,2), ylim = c(-2,2), xlab = "True", ylab = "Estimated")
 lines(c(-10,10), c(-10,10), col = "#F68B1F")
 
 
 ### Model 2
-C2 <- read.table(file = "Model2_C.csv", sep = ",", header = TRUE)[,-c(1:2)]
-F2 <- colMeans(read.table(file = "Model2_F.csv", sep = ",", header = TRUE)[,-1])
+A2 <- read.table(file = "Model2_A.csv", sep = ",", header = TRUE)[,-1]
+F2 <- read.table(file = "Model2_F.csv", sep = ",", header = TRUE)[,-1]
+F2.mean <- colMeans(F2)
+A2.mean <- colMeans(A2)
 
-C2[,"price"] <- -exp(C2[,"price"] + F2["tau"] * (F2["gamma1"] * design[seq(1, N*J, J), "demo1"] + F2["gamma2"] * design[seq(1, N*J, J), "demo2"] + C2[,"LV_disturbance"]))
-C2.mean <- colMeans(C2)
+# Calculate mean of underlying normal
+price.mean <- A2.mean["price"] + F2.mean["tau"]*(F2.mean["gamma1"] * 2 + F2.mean["gamma2"] * 2 + 0)
+
+# Calculate variance of underlying normal
+model2.var <- read.table(file = "Model2_D.csv", sep = ",", header = TRUE)
+price.var <- mean(model2.var[,2])
+price.var <- (1)^2*price.var + (F2.mean["tau"]*F2.mean["gamma1"])^2*2/3 + (F2.mean["tau"]*F2.mean["gamma2"])^2*2/3 + (F2.mean["tau"])^2*1
+A2.mean["price"] <- -exp(price.mean + price.var/2)
 
 # RMSE
-RMSE2 <- sqrt(mean((actual - C2[,-8])^2))
+RMSE2 <- sqrt(mean((actual.mean - A2.mean[-8])^2))
 
-plot(actual.mean, C1.mean, xlim = c(-2,3), ylim = c(-2,3), col = "#48484A", pch = 19,
+plot(actual.mean, A1.mean, xlim = c(-2,3), ylim = c(-2,3), col = "#48484A", pch = 19,
      xlab = "True", ylab = "Estimated", main = "Model 1 and Model 2 Parameter Estimate Means")
-points(actual.mean, C2.mean[-8], col = "#F68B1F", pch = 19)
+points(actual.mean, A2.mean[-8], col = "#F68B1F", pch = 19)
 lines(c(-10,10), c(-10,10), col = "#BA1222")
 
 ### Estimate Model 1 in CBCHB
@@ -397,17 +406,18 @@ cbchb <- cbchb[,c("ID", "task", "alternative", "price", "brand", "ff", "feat", "
 write.csv(cbchb, file = "synthetic poster data.csv", row.names = FALSE)
 
 # Read in the CBCHB results and compare
-cbchb.results <- read.csv("synthetic poster data_utilities.csv", col.names = c("ID", "RLH", "price", "brand1", "brand2", "brand3", "ff1", "ff2", "ff3", "feat1", "feat2", "feat3"))
+cbchb.A <- read.csv("synthetic poster data_alpha.csv", col.names = c("ID", "price", "brand1", "brand2", "brand3", "ff1", "ff2", "ff3", "feat1", "feat2", "feat3"))
+cbchb.A <- cbchb.A[25001:50000,]
 
 # Zero base the first level rather than the last
-cbchb.results[,c("brand1", "brand2", "brand3")] <- cbchb.results[,c("brand1", "brand2", "brand3")] - cbchb.results[,"brand1"]
-cbchb.results[,c("ff1", "ff2", "ff3")] <- cbchb.results[,c("ff1", "ff2", "ff3")] - cbchb.results[,"ff1"]
-cbchb.results[,c("feat1", "feat2", "feat3")] <- cbchb.results[,c("feat1", "feat2", "feat3")] - cbchb.results[,"feat1"]
+cbchb.A[,c("brand1", "brand2", "brand3")] <- cbchb.A[,c("brand1", "brand2", "brand3")] - cbchb.A[,"brand1"]
+cbchb.A[,c("ff1", "ff2", "ff3")] <- cbchb.A[,c("ff1", "ff2", "ff3")] - cbchb.A[,"ff1"]
+cbchb.A[,c("feat1", "feat2", "feat3")] <- cbchb.A[,c("feat1", "feat2", "feat3")] - cbchb.A[,"feat1"]
 
 # RMSE
-RMSE.cbchb <- sqrt(mean((actual - cbchb.results[,-c(1,2,4,7,10)])^2))
+RMSE.cbchb <- sqrt(mean((actual.mean - colMeans(cbchb.A[,-c(1,3,6,9)]))^2))
 
-plot(actual.mean, colMeans(cbchb.results[,c("price", "brand2", "brand3", "ff2", "ff3", "feat2", "feat3")]))
+plot(actual.mean, colMeans(cbchb.A[,c("price", "brand2", "brand3", "ff2", "ff3", "feat2", "feat3")]))
 lines(c(-10,10), c(-10,10), col = "red")
 
 
@@ -460,6 +470,7 @@ Prior <- list(ncomp = 1)
 Mcmc <- list(R = 25000, keep = 2)
 Data <- list(p = k, lgtdata = lgtdata, Z = NULL)
 
+# This can take a long time to run!
 set.seed(1987)
 model1 <- rhierMnlRwMixture(Data = Data, Prior = Prior, Mcmc = Mcmc)
 
@@ -472,15 +483,15 @@ bayesm.results <- data.frame(price = rowMeans(model1$betadraw[,1,]),
                              brand3 = rowMeans(model1$betadraw[,3,],),
                              ff2 = rowMeans(model1$betadraw[,4,],),
                              ff3 = rowMeans(model1$betadraw[,5,],),
-                             feat1 = rowMeans(model1$betadraw[,6,],),
-                             feat2 = rowMeans(model1$betadraw[,7,],))
+                             feat2 = rowMeans(model1$betadraw[,6,],),
+                             feat3 = rowMeans(model1$betadraw[,7,],))
+
+colMeans(bayesm.results)
 
 # RMSE
-RMSE.bayesm <- sqrt(mean((actual - bayesm.results)^2))
+RMSE.bayesm <- sqrt(mean((actual.mean - colMeans(bayesm.results))^2))
 
 save(model1, file = "bayesM_model1.RData")
-
-
 
 
 
