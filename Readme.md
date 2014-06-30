@@ -7,3 +7,7 @@ Train's original Gauss and Matlab code can be found here: http://elsa.berkeley.e
 See Train's chapter on HB in Discrete Choice with Simulation here: http://elsa.berkeley.edu/books/choice2.html; 
 
 and his paper on using HB with non-normal distributions here: http://elsa.berkeley.edu/~train/trainsonnier.pdf
+
+RSGHB and all its example files are covered by the GPL 3 license. 
+
+See: https://github.com/jeffdumont/RSGHB/blob/master/License
