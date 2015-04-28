@@ -83,7 +83,7 @@ For example \code{constraintsNorm = list(c(5,1,0), c(6,1,5), c(7,1,6), c(8,1,7))
 
 \emph{verbose} - Whether estimation information should be printed/plotting during the iteration process. (Defaults to \code{TRUE})
  
-\emph{write.files} - Indicates whether the model results should be written to the working directory upon estimation completion. (Defaults to \code{FALSE}, see \code{\link{writeModel}})
+\emph{writeModel} - Indicates whether the model results should be written as a series of CSV files to the working directory upon estimation completion. (Defaults to \code{FALSE}, see \code{\link{writeModel}})
 
 }
 \value{
