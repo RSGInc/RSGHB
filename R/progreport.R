@@ -52,7 +52,7 @@ progreport <- function(r, p, a, b, d, f, env)
           }
           
           # outputs to the screen time estimate of completion
-          if(r > 0)
+          if(r > 1)
           {
                cat("-----------------------------------------------------------","\n")
                
