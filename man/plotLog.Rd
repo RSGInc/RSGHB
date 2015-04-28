@@ -1,20 +1,28 @@
 \name{plotLog}
 \alias{plotLog}
 \title{
- Plots statistics contained in a model's the log file
+Plot Model Log Statistics
 }
 \description{
- This function reads the log file and plots the log-likelihood, RLH and Parameter RMS for a given model.
+Creates a faceted plot of an \code{RSGHB} model object's iteration detail (statistics log).
 }
 \usage{
-plotLog(model)
+plotLog(object)
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{
-  \item{model}{A string that corresponds to the model's name commonly stored in modelname. This the characters to the left of .log in the file name (eg. model.log)}
+  \item{object}{An \code{RSGHB} model object.}
 }
 \author{
- Jeffrey Dumont, RSG, Inc.
+ Jeffrey Dumont <jeff.dumont@rsginc.com>, Jeff Keller <jeff.keller@rsginc.com>
+}
+\seealso{
+\code{\link{doHB}}, \code{\link{plotA}}, \code{\link{plotC}}, \code{\link{plotF}}
+}
+\examples{
+data(example_MNL)
+
+plotLog(example_MNL)
 }
 \keyword{ ~kwd1 }
 \keyword{ ~kwd2 }% __ONLY ONE__ keyword per line

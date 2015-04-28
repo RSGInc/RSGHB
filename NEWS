@@ -1,0 +1,19 @@
+RSGHB 1.1.0
+* doHB now defaults to normal distribution assumptions, if not specified
+* doHB now defaults to starting values of 0, if not specified
+* RSGHB has been made R oriented rather than CSV-file oriented
+* Primarily affects how users interact with model outputs
+* doHB now returns a model object of class 'RSGHB'
+* Save results to disk by setting the 'save.results' argument in doHB to TRUE, or by using the new 'writeModel' function on an 'RSGHB' object
+* Improved documentation and examples
+* General code improvements
+
+RSGHB 1.0.2
+* Added ability to fix the mean and variance of random parameters
+* plotC function added to plot the posterior means
+
+RSGHB 1.0.1
+* General updates and bug fixes
+
+RSGHB 1.0.0
+* Functions for estimating Hierarchical Bayesian models

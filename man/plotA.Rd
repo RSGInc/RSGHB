@@ -1,21 +1,29 @@
 \name{plotA}
 \alias{plotA}
 \title{
- Plots the content of the A file
+ Plot Population Means
 }
 \description{
- This function reads and plots the means of the content of the A file. The A file contains the means of the underlying normal distributions for the random parameters.
+This function plots the population means of the underlying normal distributions for the random parameters of an \code{RSGHB} model object.
 }
 \usage{
-plotA(model,columns=0)
+plotA(object, columns = NULL)
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{
-  \item{model}{A string that corresponds to the model's name commonly stored in modelname. This the characters to the left of the _ in the A file name (model_A.csv)}
-  \item{columns}{A vector of particular columns to plot. A default of 0 plots all columns.}
+  \item{object}{An \code{RSGHB} model object.}
+  \item{columns}{A vector of particular columns to plot. If \code{NULL}, plots all columns. (Defaults to \code{NULL})}
 }
 \author{
- Jeffrey Dumont, RSG, Inc.
+ Jeffrey Dumont <jeff.dumont@rsginc.com>, Jeff Keller <jeff.keller@rsginc.com>
+}
+\seealso{
+\code{\link{doHB}}, \code{\link{plotC}}, \code{\link{plotF}}, \code{\link{plotLog}}
+}
+\examples{
+data(example_MNL)
+
+# plotA(example_MNL)
 }
 \keyword{ ~kwd1 }
 \keyword{ ~kwd2 }% __ONLY ONE__ keyword per line

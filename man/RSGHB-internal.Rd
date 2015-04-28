@@ -7,8 +7,10 @@
 \alias{nextDind}
 \alias{nextF}
 \alias{prepareModel}
+\alias{progreport}
 \alias{trans}
-\alias{writeLog}
+\alias{vech}
+\alias{xpnd}
 \title{
  Internal RSGHB Functions
 }
@@ -19,6 +21,6 @@
  These are not to be called by the user.
 }
 \author{
-Jeffrey Dumont, RSG, Inc.
+Jeffrey Dumont <jeff.dumont@rsginc.com>, Jeff Keller <jeff.keller>
 }
 \keyword{ internal }

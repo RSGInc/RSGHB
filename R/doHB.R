@@ -1,29 +1,22 @@
-doHB <- function(likelihood_user,choicedata,control=list())
+doHB <- function(likelihood_user, choicedata, control = list())
 {          
      
-     # turns the user specified likelihood function into something RSGHB
-     # can use
-     likelihood <- function(fc,b,env)
+     # turns the user specified likelihood function into something RSGHB can use
+     likelihood <- function(fc, b, env)
      {
-          if(env$gNIV>0)
+          if (env$gNIV > 0)
           {
                gIDS <- env$gIDS 
-               C    <- trans(b,env)
+               C    <- trans(b, env)
                
-               if(env$gNIV > 1)
-               {
-                    C    <- C[gIDS,]
-               }
+               if (env$gNIV > 1) C <- C[gIDS, ]
                
-               if(env$gNIV==1)
-               {                    
-                    C    <- matrix(C[gIDS],ncol=env$gNIV)
-               }
+               if (env$gNIV == 1) C <- matrix(C[gIDS], ncol = env$gNIV)
           }
 
-          p <- likelihood_user(fc,C)
+          p <- likelihood_user(fc, C)
           
-          p <- replace(p,is.na(p),1e-323)
+          p <- replace(p, is.na(p), 1e-323)
           
           p0 <- rep(1,env$gNP)
 
@@ -36,7 +29,7 @@ doHB <- function(likelihood_user,choicedata,control=list())
              as.double(p0)
           )[[6]]
           
-          p0 <- replace(p0,p0<1e-323,1e-323)
+          p0 <- replace(p0, p0 < 1e-323, 1e-323)
                
           return(p0)
      }
@@ -47,7 +40,7 @@ doHB <- function(likelihood_user,choicedata,control=list())
      # entries in the control list
      if(is.null(control[["modelname"]]))
      {
-          modelname <- paste("HBModel",round(runif(1)*10000000,0),sep="")
+          modelname <- paste("HBModel", round(runif(1) * 10000000, 0), sep = "")
      } else
      {
           modelname <- control[["modelname"]]
@@ -71,7 +64,7 @@ doHB <- function(likelihood_user,choicedata,control=list())
      
      if(is.null(control[["gDIST"]]))
      {
-          gDIST <- c()
+          gDIST <- rep(1, length(gVarNamesNormal))
      } else
      {
           gDIST <- control[["gDIST"]]
@@ -79,7 +72,7 @@ doHB <- function(likelihood_user,choicedata,control=list())
      
      if(is.null(control[["FC"]]))
      {
-          FC <- c()
+          FC <- rep(0, length(gVarNamesFixed))
      } else
      {
           FC <- control[["FC"]]
@@ -87,7 +80,7 @@ doHB <- function(likelihood_user,choicedata,control=list())
      
      if(is.null(control[["svN"]]))
      {
-          svN <- c()
+          svN <- rep(0, length(gVarNamesNormal))
      } else
      {
           svN <- control[["svN"]]
@@ -183,7 +176,7 @@ doHB <- function(likelihood_user,choicedata,control=list())
      # sawtooth defaults to 5
      if(is.null(control[["degreesOfFreedom"]]))
      {
-          degreesOfFreedom    <- 5 
+          degreesOfFreedom <- 5 
      } else
      {
           degreesOfFreedom <- control[["degreesOfFreedom"]]
@@ -216,7 +209,7 @@ doHB <- function(likelihood_user,choicedata,control=list())
      # Set FULLCV=1 for full cov matrix, FULLCV=0 for diagonal matrix.
      if(is.null(control[["gFULLCV"]]))
      {
-          gFULLCV <- 1
+          gFULLCV <- TRUE
      } else
      {
           gFULLCV <- control[["gFULLCV"]]
@@ -281,7 +274,23 @@ doHB <- function(likelihood_user,choicedata,control=list())
      } else
      {
           targetAcceptanceFixed <- control[["targetAcceptanceFixed"]]
-     } 
+     }
+     
+     if(is.null(control[["writeModel"]]))
+     {
+          writeModel <- FALSE
+     } else
+     {
+          writeModel <- control[["writeModel"]]
+     }
+     
+     if(is.null(control[["verbose"]]))
+     {
+          verbose <- TRUE
+     } else
+     {
+          verbose <- control[["verbose"]]
+     }
      
      # End user-specified GLOBAL VARIABLEs     
      
@@ -304,44 +313,25 @@ doHB <- function(likelihood_user,choicedata,control=list())
      gNIV          <- length(gVarNamesNormal)         # Number of random normal coefficients
      gFIV          <- length(gVarNamesFixed)         # Number of fixed (non-random) coefficients
      
-     # Make sure the output files don't already exist
-     # if they do, append ~1 to the model name.
-     orig <- modelname
-     i <- 1     
-     while(any(file.exists(paste0(modelname, c(".log", "_A.csv", "_B.csv", "_Bsd.csv", "_C.csv", "_Csd.csv", "_D.csv", "_F.csv")))))
-     {
-          modelname <- paste0(orig,"~",i)
-          i <- i + 1
-     }
-     
-     if(is.null(pvMatrix))
-     {
-          pvMatrix <- priorVariance * diag(gNIV)
-     }
+     if (is.null(pvMatrix) & gNIV > 0) pvMatrix <- priorVariance * diag(gNIV)
 
-     # need to make sure the pvMatrix is a matrix.
-     if(!is.matrix(pvMatrix))
-     {
-          stop("\npvMatrix is not a matrix. Make sure that your prior covariance matrix is ",gNIV," by ",gNIV,".")          
-     }
+     # need to make sure the pvMatrix is a matrix
+     if (!is.matrix(pvMatrix) & gNIV > 0) stop("\npvMatrix is not a matrix. Make sure that your prior covariance matrix is ",gNIV," by ",gNIV,".")
      
      # need to fail if pvMatrix is of the wrong size
-     if(nrow(pvMatrix)!= gNIV|ncol(pvMatrix)!= gNIV)
-     {
-          stop("\nThe prior covariance matrix is of the wrong size. This can occur only when the user specifies a custom prior covariance matrix. Make sure that your prior covariance matrix is ",gNIV," by ",gNIV,".")          
+     if (!is.null(pvMatrix) & gNIV > 0) {
+          if (nrow(pvMatrix) != gNIV | ncol(pvMatrix) != gNIV) stop("\nThe prior covariance matrix is of the wrong size. Make sure that your prior covariance matrix is ",gNIV," by ",gNIV,".")
      }
      
-
-     
-     # writing out the custom prior covariance matrix
+     # prior covariance matrix labels
      rownames(pvMatrix) <- colnames(pvMatrix) <- gVarNamesNormal
-     write.table(pvMatrix,paste0(modelname,"_pvMatrix.csv"),sep=",",row.names=TRUE,col.names=TRUE)
-          
+     
+     begintime     <- Sys.time()    # used to calculate overall estimation time
      starttime     <- Sys.time()    # used to calculate seconds per iteration
      
-     distNames     <- c("N","LN+","LN-","CN+","CN-","JSB")  # short names for the distributions
+     distNames     <- c("N", "LN+", "LN-", "CN+", "CN-", "JSB")  # short names for the distributions
                       # Normal, Postive Log-Normal, Negative Log-Normal, Positive Censored Normal, Negative Censored Normal, Johnson SB
-     constraintLabels <- c("<",">")     
+     constraintLabels <- c("<", ">")     
      
      # acceptance rate calculations
      acceptanceRatePerc  <- 0
@@ -350,91 +340,110 @@ doHB <- function(likelihood_user,choicedata,control=list())
      
      rhoFadj         <- 1e-5
      
-     if(checkModel(nodiagnostics))
+     if (checkModel(nodiagnostics = nodiagnostics, verbose = verbose))
      {     
           r <- 1
           # Post Burn-in iterations          
-          ma <- matrix(0,nrow=gNIV,ncol=gNEREP)
-          md <- matrix(0,nrow=gNIV*(gNIV+1)/2,ncol=gNEREP)
-          mb <- matrix(0,nrow=gNP,ncol=gNIV)
-          mb.squared <- matrix(0,nrow=gNP,ncol=gNIV)
-          mp <- matrix(0,nrow=gNP,ncol=gNEREP)
-          mf <- matrix(0,nrow=gFIV,ncol=gNEREP)
-          mc <- matrix(0,nrow=gNP,ncol=gNIV)
-          mc.squared <- matrix(0,nrow=gNP,ncol=gNIV)      # variance calculation     
+          ma <- matrix(0, nrow = gNIV, ncol = gNEREP)
+          md <- array(0, dim = c(gNIV, gNIV, floor(gNEREP / gNSKIP)), dimnames = list(NULL, NULL, 1:floor(gNEREP / gNSKIP)))
+          mb <- matrix(0, nrow = gNP, ncol = gNIV)
+          mb.squared <- matrix(0, nrow = gNP, ncol = gNIV)
+          mp <- matrix(0, nrow = gNP, ncol = gNEREP)
+          mf <- matrix(0, nrow = gFIV, ncol = gNEREP)
+          mc <- matrix(0, nrow = gNP, ncol = gNIV)
+          mc.squared <- matrix(0, nrow = gNP, ncol = gNIV)      # variance calculation     
           storedDraws <- list()
+          
+          # object to store the model results and settings
+          results <- list(modelname = modelname,
+                          starttime = begintime,
+                          params.fixed = gVarNamesFixed,
+                          params.vary = gVarNamesNormal,
+                          distributions = distNames[gDIST],
+                          pv = pvMatrix,
+                          df = degreesOfFreedom,
+                          gSIGDIG = gSIGDIG,
+                          gNP = gNP,
+                          gNOBS = gNOBS,
+                          gNCREP = gNCREP,
+                          gNEREP = gNEREP,
+                          gSeed = gSeed,
+                          constraints = constraintsNorm,
+                          iter.detail = data.frame(Iteration = NA,
+                                                   `Log-Likelihood` = NA,
+                                                   RLH = NA,
+                                                   `Parameter RMS` = NA,
+                                                   `Avg. Variance` = NA,
+                                                   `Acceptance Rate (Fixed)` = NA,
+                                                   `Acceptance Rate (Normal)` = NA,
+                                                   check.names = FALSE)
+          )
           
           hb(A, B, Dmat, FC)
           
+          endtime <- Sys.time()
+          
           if(gNIV > 0)
           {
-               ma   <- cbind(iteration=1:gNEREP,t(ma))
-               md   <- cbind(iteration=1:gNEREP,t(md))
+               ma   <- cbind(iteration = 1:gNEREP, t(ma))
                
-               # for labeling the D matrix
-               labelmatrix <-  matrix(1:(gNIV^2),gNIV,gNIV)
-               rownames(labelmatrix) <- colnames(labelmatrix) <- gVarNamesNormal
-               dlabels <- paste0(rownames(labelmatrix)[vech(row(labelmatrix))]," x ",colnames(labelmatrix)[vech(col(labelmatrix))])
-               colnames(md) <- c("iteration",dlabels)
+               mcsd <- cbind(id = respIDs, sqrt((mc.squared - mc^2/gNEREP)/gNEREP))
+               mc   <- cbind(id = respIDs, RLH = rowMeans(mp), mc/gNEREP)
                
-               mcsd <- cbind(id=respIDs,sqrt((mc.squared-mc^2/gNEREP)/gNEREP))
-               mc   <- cbind(id=respIDs,RLH=rowMeans(mp),mc/gNEREP)
+               mbsd <- cbind(id = respIDs, sqrt((mb.squared - mb^2/gNEREP)/gNEREP))
+               mb   <- cbind(id = respIDs, mb/gNEREP)
+               colnames(mc) <- c("Respondent", "RLH", gVarNamesNormal)
+               colnames(ma) <- c("iteration", gVarNamesNormal)
                
-               mbsd <- cbind(id=respIDs,sqrt((mb.squared-mb^2/gNEREP)/gNEREP))
-               mb   <- cbind(id=respIDs,mb/gNEREP)
-               colnames(mc) <- c("Respondent","RLH",gVarNamesNormal)
-               colnames(ma) <- c("iteration",gVarNamesNormal)
+               colnames(mcsd) <- c("Respondent", gVarNamesNormal)
+               colnames(mb)   <- c("Respondent", gVarNamesNormal)
+               colnames(mbsd) <- c("Respondent", gVarNamesNormal)
                
-               colnames(mcsd) <- c("Respondent",gVarNamesNormal)
-               colnames(mb)   <- c("Respondent",gVarNamesNormal)
-               colnames(mbsd) <- c("Respondent",gVarNamesNormal)               
+               results$A   <- ma
+               results$B   <- mb
+               results$Bsd <- mbsd
+               results$C   <- mc
+               results$Csd <- mcsd
+               results$D   <- md
           }
-          if(gFIV>0)
+          
+          if (gFIV > 0)
           {   
-               mf  <- cbind(iteration=1:gNEREP,t(mf))
-               colnames(mf) <- c("iteration",gVarNamesFixed)
+               mf  <- cbind(iteration = 1:gNEREP, t(mf))
+               colnames(mf) <- c("iteration", gVarNamesFixed)
+               results$F <- mf
           }          
           
-          cat("Creating output files. Please be patient.","\n")
-          
-	     dev.copy(png,paste(modelname,"_markovChains.png",sep=""))
-	     dev.off()
-     
-          if(gNIV > 0)
-          {    
-               fma <- paste0(modelname,"_A.csv")
-               fmd <- paste0(modelname,"_D.csv")
-               fmb <- paste0(modelname,"_B.csv")
-               fmbsd <- paste0(modelname,"_Bsd.csv")
-               fmc <- paste0(modelname,"_C.csv")
-               fmcsd <- paste0(modelname, "_Csd.csv")
-               
-               write.table(signif(ma,gSIGDIG),  fma    ,sep=",",row.names=FALSE)
-               write.table(signif(md,gSIGDIG),  fmd    ,sep=",",row.names=FALSE)
-               write.table(signif(mb,gSIGDIG),  fmb    ,sep=",",row.names=FALSE)
-               write.table(signif(mbsd,gSIGDIG),fmbsd  ,sep=",",row.names=FALSE)
-               write.table(signif(mc,gSIGDIG),  fmc    ,sep=",",row.names=FALSE)
-               write.table(signif(mcsd,gSIGDIG),fmcsd  ,sep=",",row.names=FALSE)
-          }
-               
-          if(gFIV>0)
+          if (gStoreDraws)
           {
-               mfName <- paste0(modelname,"_F.csv")
-               write.table(signif(mf,gSIGDIG),mfName,sep=",",row.names=FALSE)
-          }
-     
-          if(gStoreDraws)
-          {
-               cat("Creating individual draw files.","\n")     
-               for(i in 1:gNP)
-               {
-                    fn <- paste0("Draws_",respIDs[i],".csv") 
-                    
-                    write.table(signif(storedDraws[[i]], gSIGDIG),fn,sep=",",row.names=FALSE,col.names=TRUE)
-                    
-               }
+               results$Draws <- storedDraws
+               names(results$Draws) <- respIDs
+               
           }
           
-          cat("Output creation finished.","\n")
+          # store choice data, final probabilities, and other information
+          results$choices <- Choice
+          results$p <- likelihood_user(fc = if (is.null(results[["F"]])) {NULL} else {colMeans(as.matrix(results[["F"]][, -1]))},
+                                       b = if (is.null(results[["C"]])) {NULL} else {as.matrix(results[["C"]][gIDS, -c(1:2)])})
+          results$ll0 <- sum(log(likelihood_user(fc = FC, b = matrix(svN, ncol = length(svN), nrow = length(gIDS), byrow = TRUE))))
+          results$llf <- sum(log(results[["p"]]))
+          results$endtime <- endtime
+          results$duration = endtime - begintime
+          results[["iter.detail"]] <- results[["iter.detail"]][-1, ]
+          
+          if (verbose) cat("Estimation complete.", "\n")
+          
+          class(results) <- "RSGHB"
+          
+          if (writeModel) {
+               if (verbose) cat("Creating output files. Please be patient.","\n")
+               writeModel(results)
+               if (verbose) cat("Output files finished writing to working directory.","\n")
+          }
+          
+     } else {
+       results <- NULL
      }
+
+     return(results)
 }

@@ -5,13 +5,9 @@
 # 
 # Jeff Dumont
 #
-# Requires
-# data.table package
 # ------------------
 
 library(RSGHB)
-
-setwd("C:\\Work\\Code\\HB\\RSGHB.git\\Examples\\Advanced Example - Nested Logit")     		    # working directory
 
 
 
@@ -20,7 +16,7 @@ setwd("C:\\Work\\Code\\HB\\RSGHB.git\\Examples\\Advanced Example - Nested Logit"
 # ------------------
 # assumes that respondents are identified with a ID column
 # also assumes that the data is sorted by respondent then experiment
-choicedata <- read.table("Data_simulated.csv",sep=",",header=T)
+choicedata <- read.table("Data_simulated.csv", sep = ",", header = TRUE)
 
 # Specify any variables here that you'd like to use in the
 # utility equations in the likelihood function below
@@ -39,10 +35,10 @@ y4 <- choicedata$y4
 # Dummying coding the choice vector allows for easier coding of the 
 # the likelihood calculations. So we will have one column for each 
 # alternative in the design
-choice1    <- (choicedata$choice==1)
-choice2    <- (choicedata$choice==2)
-choice3    <- (choicedata$choice==3)
-choice4    <- (choicedata$choice==4)
+choice1    <- (choicedata$choice == 1)
+choice2    <- (choicedata$choice == 2)
+choice3    <- (choicedata$choice == 3)
+choice4    <- (choicedata$choice == 4)
 
 # ------------------
 # ESTIMATION CONTROL
@@ -52,7 +48,7 @@ choice4    <- (choicedata$choice==4)
 modelname <- "Nested_Logit"     	# used for output
 
 # Names for the normal variables
-gVarNamesNormal <- c("Bx","By")
+gVarNamesNormal <- c("Bx", "By")
 
 # For each variable, specify the distribution for its coefficient
 # The options are:
@@ -63,14 +59,14 @@ gVarNamesNormal <- c("Bx","By")
 # 5. Johnson SB with a specified min and max
 # gDIST must have an entry for each value in gVarNamesNormal
 
-gDIST <- c(1,1)
+gDIST <- c(1, 1)
 
 # Names for the fixed variables
-gVarNamesFixed <- c("lambda1","lambda2")
+gVarNamesFixed <- c("lambda1", "lambda2")
 
 # STARTING VALUES
-svN <- c(0,0)                 # for the random coefficients
-FC  <- c(0.5,0.5)             # for the fixed coefficients
+svN <- c(0, 0)                 # for the random coefficients
+FC  <- c(0.5, 0.5)             # for the fixed coefficients
 
 # ITERATION SETTINGS
 gNCREP    <- 10000  	  # Number of iterations to use prior to convergence
@@ -79,16 +75,20 @@ gNSKIP    <- 1			  # Number of iterations to do in between retaining draws for a
 gINFOSKIP <- 250           # How frequently to print info about the iteration process
 
 control <- list(
-     modelname=modelname,
-     gVarNamesNormal=gVarNamesNormal,
-     gVarNamesFixed=gVarNamesFixed,
-     svN=svN,
-     FC=FC,
-     gDIST=gDIST,
-     gNCREP=gNCREP,
-     gNEREP=gNEREP,
-     gNSKIP=gNSKIP,
-     gINFOSKIP=gINFOSKIP
+     modelname = modelname,
+     gVarNamesNormal = gVarNamesNormal,
+     gVarNamesFixed = gVarNamesFixed,
+     svN = svN,
+     FC = FC,
+     gDIST = gDIST,
+     gNCREP = gNCREP,
+     gNEREP = gNEREP,
+     gNSKIP = gNSKIP,
+     gINFOSKIP = gINFOSKIP,
+     write.results = TRUE,
+     gSeed = 1987,
+     nodiagnostics = TRUE, # Set this to FALSE to see initial model diagnostics
+     verbose = FALSE       # Set this to TRUE to see real-time progress printed and plotted
 )
 
 # ------------------
@@ -98,15 +98,15 @@ control <- list(
 # NOTES:   This is where the bulk of the computation resides so coding this efficiently
 #          is essential to reducing run time.
 # ------------------
-likelihood <- function(fc,b)
+likelihood <- function(fc, b)
 {
 
   cc <- 1
-  Bx <- b[,cc];cc <- cc + 1
-  By <- b[,cc];
+  Bx <- b[, cc]; cc <- cc + 1
+  By <- b[, cc];
   
   cc <- 1
-  lambda1 <- fc[cc];cc <- cc + 1
+  lambda1 <- fc[cc]; cc <- cc + 1
   lambda2 <- fc[cc];
   
   v1 <- Bx * x1 + By * y1
@@ -122,7 +122,7 @@ likelihood <- function(fc,b)
 
   prob.nest <- (exp(lambda1 * logsum1) * (choice1 + choice2) + exp(lambda2 * logsum2) * (choice3 + choice4))/(exp(lambda1 * logsum1) + exp(lambda2 * logsum2))
 
-  prob.withinnest <- (choice1 * exp(v1/lambda1) + choice2 * exp(v2/lambda1))/(exp(v1/lambda1)+exp(v2/lambda1)) + (choice3 * exp(v3/lambda2) + choice4 * exp(v4/lambda2))/(exp(v3/lambda2)+exp(v4/lambda2))
+  prob.withinnest <- (choice1 * exp(v1/lambda1) + choice2 * exp(v2/lambda1))/(exp(v1/lambda1)+exp(v2/lambda1)) + (choice3 * exp(v3/lambda2) + choice4 * exp(v4/lambda2))/(exp(v3/lambda2) + exp(v4/lambda2))
   
   p <- prob.nest * prob.withinnest
 	
@@ -130,4 +130,5 @@ likelihood <- function(fc,b)
 }
 
 # Estimate the model
-doHB(likelihood, choicedata, control)
+model <- doHB(likelihood, choicedata, control)
+save(model, file = paste0(model$modelname, ".RData"))

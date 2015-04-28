@@ -1,24 +1,29 @@
 \name{plotC}
 \alias{plotC}
 \title{
- Plots the content of the C file
+Plot Random Parameters
 }
 \description{
-This function reads and plots the means of the content of the C file. The C file contains the average across iterations of the individual level draws for the random parameters including the appropriate transformations.
+Plots the random parameters in an \code{RSGHB} model object. The \code{"C"} object contains the average across iterations for each set of individual level draws for the random parameters including the appropriate transformations.
 }
 \usage{
-plotC(model, columns = NULL)
+plotC(object, columns = NULL)
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{
-  \item{model}{A string that corresponds to the model's name commonly stored in \code{modelname}. These are the characters to the left of the \code{"_"} in the C file name (model_C.csv)}
-  \item{columns}{A vector of particular columns to plot. A value of \code{NULL} plots all columns. (defaults to \code{NULL})}
+  \item{object}{An \code{RSGHB} model object.}
+  \item{columns}{A vector of particular columns to plot. If \code{NULL}, plots all columns. (Defaults to \code{NULL})}
 }
 \author{
- Jeff Keller, RSG, Inc.
+ Jeff Keller <jeff.keller@rsginc.com>
 }
 \seealso{
-\code{\link{doHB}}
+\code{\link{doHB}}, \code{\link{plotA}}, \code{\link{plotF}}, \code{\link{plotLog}}
+}
+\examples{
+data(example_MNL)
+
+# plotC(example_MNL)
 }
 \keyword{ ~kwd1 }
 \keyword{ ~kwd2 }% __ONLY ONE__ keyword per line

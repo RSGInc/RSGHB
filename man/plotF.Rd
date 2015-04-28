@@ -1,20 +1,28 @@
 \name{plotF}
 \alias{plotF}
 \title{
- Plots the content of the F file
+ Plot Fixed Parameters
 }
 \description{
- This function reads and plots the means of the content of the F file. The F file contains the fixed (non-random) parameters.
+Plots the fixed parameters in an \code{RSGHB} model object.
 }
 \usage{
-plotF(model, columns=0)
+plotF(object, columns = NULL)
 }
 \arguments{
-  \item{model}{A string that corresponds to the model's name commonly stored in modelname. This the characters to the left of the _ in the F file name (model_F.csv)}
-  \item{columns}{A vector of particular columns to plot. A default of 0 plots all columns.}
+  \item{object}{An \code{RSGHB} model object.}
+  \item{columns}{A vector of particular columns to plot. If \code{NULL}, plots all columns. (Defaults to \code{NULL})}
 }
 \author{
- Jeffrey Dumont, RSG, Inc.
+ Jeffrey Dumont <jeff.dumont@rsginc.com>, Jeff Keller <jeff.keller@rsginc.com>
+}
+\seealso{
+\code{\link{doHB}}, \code{\link{plotA}}, \code{\link{plotC}}, \code{\link{plotLog}}
+}
+\examples{
+data(example_MNL)
+
+# plotF(example_MNL)
 }
 \keyword{ ~kwd1 }
 \keyword{ ~kwd2 }% __ONLY ONE__ keyword per line
