@@ -15,54 +15,53 @@ progreport <- function(r, p, a, b, d, f, env)
      # Some printing progress to the screen
      if (env$verbose) {
           cat(rep("\n", 128))
-          cat("-----------------------------------------------------------","\n")
+          cat("-----------------------------------------------------------\n")
           cat("Iteration: ", r, "\n",sep="\t")
-          cat("-----------------------------------------------------------","\n")
+          cat("-----------------------------------------------------------\n")
           # Model Statistics
-          mstats <- data.frame(` ` = rep(NA, 8), check.names = FALSE,
-                               row.names = c("             RHO (Fixed):",
-                                             " Acceptance Rate (Fixed):",
-                                             "            RHO (Normal):",
-                                             "Acceptance Rate (Normal):",
-                                             "           Parameter RMS:",
-                                             "           Avg. Variance:",
-                                             "          Log-Likelihood:",
-                                             "                     RLH:"))
+          mstats <- data.frame(` ` = c("RHO (Fixed):",
+                                       " Acceptance Rate (Fixed):",
+                                       "RHO (Normal):",
+                                       "Acceptance Rate (Normal):",
+                                       "Parameter RMS:",
+                                       "Avg. Variance:",
+                                       "Log-Likelihood:",
+                                       "RLH:"),
+                               ` ` = as.character(NA), check.names = FALSE, stringsAsFactors = FALSE)
           
           if(env$gFIV > 0) {  
-               mstats["             RHO (Fixed):", ] <- signif(env$rhoF, env$gSIGDIG)
-               mstats[" Acceptance Rate (Fixed):", ] <- signif(env$acceptanceRateFPerc, env$gSIGDIG)
+               mstats["RHO (Fixed):", ] <- signif(env$rhoF, env$gSIGDIG)
+               mstats["Acceptance Rate (Fixed):", ] <- signif(env$acceptanceRateFPerc, env$gSIGDIG)
           }
           
           if(env$gNIV > 0) {
-               mstats["            RHO (Normal):", ] <- signif(env$rho, env$gSIGDIG)
+               mstats["RHO (Normal):", ] <- signif(env$rho, env$gSIGDIG)
                mstats["Acceptance Rate (Normal):", ] <- signif(env$acceptanceRatePerc, env$gSIGDIG)
-               mstats["           Parameter RMS:", ] <- signif(paramRMS, env$gSIGDIG)
-               mstats["           Avg. Variance:", ] <- signif(avgVariance, env$gSIGDIG)
+               mstats["Parameter RMS:", ] <- signif(paramRMS, env$gSIGDIG)
+               mstats["Avg. Variance:", ] <- signif(avgVariance, env$gSIGDIG)
           }
 
-          mstats["          Log-Likelihood:", ] <- signif(sum(log(p)), env$gSIGDIG)
-          mstats["                     RLH:", ] <- signif(mean(p^(1/env$TIMES)), env$gSIGDIG)
-          print(mstats[complete.cases(mstats), , drop = FALSE])
+          mstats["Log-Likelihood:", ] <- signif(sum(log(p)), env$gSIGDIG)
+          mstats["RLH:", ] <- signif(mean(p^(1/env$TIMES)), env$gSIGDIG)
+          print(mstats[complete.cases(mstats), , drop = FALSE], right = TRUE)
           
-          cat("-----------------------------------------------------------","\n")
+          cat("\n-----------------------------------------------------------\n")
           
           # fixed coefficients
           if(env$gFIV > 0)
           {
-               cat("\nCurrent values for fixed coefficients\n")
-               print(data.frame(` ` = signif(f, env$gSIGDIG), check.names = FALSE, row.names = paste0(env$gVarNamesFixed, ":")))
+               print(data.frame(`Fixed Parameters` = paste0(env$gVarNamesFixed, ":"), Estimate = signif(f, env$gSIGDIG), check.names = FALSE), row.names = FALSE)
+               cat("\n\n-----------------------------------------------------------\n")
           }
           
           # Normal Coefficients
           if(env$gNIV > 0)
           {
-               cat("\nCurrent values for the population means of the underlying normals\n")
-               print(data.frame(` ` = signif(a, env$gSIGDIG), check.names = FALSE, row.names = paste0(env$gVarNamesNormal, ":")))
+               print(data.frame(`Random Parameters` = paste0(env$gVarNamesNormal, ":"), Estimate = signif(a, env$gSIGDIG), check.names = FALSE), row.names = FALSE)
+               cat("\n\n-----------------------------------------------------------\n")
           }
           
-          # outputs to the screen time estimate of completion
-          cat("\n-----------------------------------------------------------\n")
+          # Estimated time to completion
           if(r > 1)
           {               
                tpi <- (Sys.time() - env$starttime)/env$gINFOSKIP
@@ -80,7 +79,7 @@ progreport <- function(r, p, a, b, d, f, env)
                cat("Time to completion: Calculating...")
                cat("\n")
           }
-          cat("-----------------------------------------------------------","\n")
+          cat("-----------------------------------------------------------\n")
           
           # plotting of the normals  to the screen
           if (env$gNIV > 0 & env$gFIV > 0) {

@@ -105,45 +105,61 @@ checkModel <- function(nodiagnostics = FALSE, verbose = TRUE, env = parent.frame
      {
           
           cat(rep("\n", 128))
-          cat("Diagnostic checks passed. ")
-          cat("Please review before proceeding", "\n\n")
-          cat("Number of Individuals: ", env$gNP, "\n", sep = "\t")
-          cat("Number of Observations: ", env$gNOBS, "\n", sep = "\t")
+          cat("Diagnostic checks passed. Please review before proceeding\n")
+          diagnostics <- data.frame(` ` = c("Number of Individuals:",
+                                            "Number of Observations:",
+                                            "Custom Prior Matrix Used:",
+                                            "Prior variance:",
+                                            "Target Acceptance (Fixed):",
+                                            "Target Acceptance (Normal):",
+                                            "Degrees of Freedom:",
+                                            "Avg. Number of Observations per Individual:",
+                                            "Initial Log-Likelihood:"),
+                                    ` ` = as.character(rep(NA, 9)),
+                                    check.names = FALSE, stringsAsFactors = FALSE)
           
-          if (env$useCustomPVMatrix)
-          {
-               cat("Custom Prior Matrix Used: ", TRUE, "\n", sep = "\t")
+          diagnostics[1,2] <- env$gNP
+          diagnostics[2,2] <- env$gNOBS
+          if (env$useCustomPVMatrix) {
+               diagnostics[3,2] <- TRUE
           } else {
-               cat("Prior variance: ", env$priorVariance, "\n", sep = "\t")
+               diagnostics[4,2] <- signif(env$priorVariance, env$gSIGDIG)
           }
-          
-          if (env$gNIV > 0) cat("Target Acceptance (Normal): ", env$targetAcceptanceNormal, "\n", sep = "\t")
-          if (env$gFIV > 0) cat("Target Acceptance (Fixed): ", env$targetAcceptanceFixed, "\n", sep = "\t")
-          
-          cat("Degrees of Freedom: ", env$degreesOfFreedom, "\n", sep = "\t")
-          cat("Avg. Number of Observations per Individual: ", env$gNOBS / env$gNP, "\n", sep = "\t")
-          cat("Initial Log-Likelihood: ", sum(log(env$likelihood(env$FC, env$B, env))), "\n", sep = "\t")
+          if (env$gFIV > 0) diagnostics[5,2]  <- signif(env$targetAcceptanceFixed, env$gSIGDIG)
+          if (env$gNIV > 0) diagnostics[6,2] <- signif(env$targetAcceptanceNormal, env$gSIGDIG)
+          diagnostics[7,2] <- signif(env$degreesOfFreedom, env$gSIGDIG)
+          diagnostics[8,2] <- signif(env$gNOBS / env$gNP, env$gSIGDIG)
+          diagnostics[9,2] <- signif(sum(log(env$likelihood(env$FC, env$B, env))), env$gSIGDIG)
+          cat("-----------------------------------------------------------\n")
+          print(diagnostics[complete.cases(diagnostics), , drop = FALSE], row.names = FALSE)
+          cat("\n-----------------------------------------------------------\n\n")
           
    	     if (env$gFIV > 0)
 	     {
-	  	     cat("Fixed parameters estimated - start value:", "\n")
-	 	     for (i in 1:env$gFIV) cat(env$gVarNamesFixed[i], " -", env$FC[i], "\n")
+               print(data.frame(`Fixed Parameters` = env$gVarNamesFixed, Start = env$FC, check.names = FALSE), row.names = FALSE)
+	  	     cat("\n-----------------------------------------------------------\n\n")
 	     }
           
 	     if (env$gNIV > 0)
 	     {
-		     cat("Random Parameters estimated (Distribution) - start value:", "\n")
-               for (i in 1:env$gNIV) cat(env$gVarNamesNormal[i], "(", env$distNames[env$gDIST[i]], ") -", env$svN[i], "\n")
+	          print(data.frame(`Random Parameters` = env$gVarNamesNormal, Start = env$svN, `Dist.` = env$distNames[env$gDIST], check.names = FALSE), row.names = FALSE)
+               cat("\n-----------------------------------------------------------\n\n")
           }
           
           if (!is.null(env$constraintsNorm))
           {
-               cat("Constraints applied to random parameters (param1 - inequality - param2):", "\n")
-               for (i in 1:length(env$constraintsNorm))
-               {
-                    if (env$constraintsNorm[[i]][3] == 0) cat(env$gVarNamesNormal[env$constraintsNorm[[i]][1]], env$constraintLabels[env$constraintsNorm[[i]][2]], 0, "\n")
-                    if (env$constraintsNorm[[i]][3] != 0) cat(env$gVarNamesNormal[env$constraintsNorm[[i]][1]], env$constraintLabels[env$constraintsNorm[[i]][2]], env$gVarNamesNormal[env$constraintsNorm[[i]][3]], "\n")
-               }
+               cat("Constraints applied to random parameters:\n")
+               
+               diagconstraints <- data.frame(` ` = unlist(lapply(env$constraintsNorm, FUN = `[`, 1)),
+                                             ` ` = unlist(lapply(env$constraintsNorm, FUN = `[`, 2)),
+                                             ` ` = unlist(lapply(env$constraintsNorm, FUN = `[`, 3)),
+                                             check.names = FALSE)
+               
+               diagconstraints[, 1] <- env$gVarNamesNormal[diagconstraints[, 1]]
+               diagconstraints[, 2] <- env$constraintLabels[diagconstraints[, 2]]
+               diagconstraints[diagconstraints[, 3] != 0, 3] <- env$gVarNamesNormal[diagconstraints[diagconstraints[, 3] != 0, 3]]
+               print(diagconstraints, row.names = FALSE, right = FALSE)
+               cat("\n-----------------------------------------------------------")
           }
           
           if (!is.null(env$Choice))
@@ -158,8 +174,8 @@ checkModel <- function(nodiagnostics = FALSE, verbose = TRUE, env = parent.frame
           cat("\n\n\n")
           if (!nodiagnostics & verbose)
           {
-               rl <- readline("Enter 1 to Estimate Model, 2 to Stop Model")
-               if(rl != 1) passChecks <- FALSE
+               rl <- readline("Estimate Model? (Y/N): ")
+               if(rl != "Y" & rl != "y") passChecks <- FALSE
           }
      }
      return(passChecks)
