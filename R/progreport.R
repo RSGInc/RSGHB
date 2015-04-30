@@ -20,7 +20,7 @@ progreport <- function(r, p, a, b, d, f, env)
           cat("-----------------------------------------------------------\n")
           # Model Statistics
           mstats <- data.frame(` ` = c("RHO (Fixed):",
-                                       " Acceptance Rate (Fixed):",
+                                       "Acceptance Rate (Fixed):",
                                        "RHO (Normal):",
                                        "Acceptance Rate (Normal):",
                                        "Parameter RMS:",
@@ -30,35 +30,35 @@ progreport <- function(r, p, a, b, d, f, env)
                                ` ` = as.character(NA), check.names = FALSE, stringsAsFactors = FALSE)
           
           if(env$gFIV > 0) {  
-               mstats["RHO (Fixed):", ] <- signif(env$rhoF, env$gSIGDIG)
-               mstats["Acceptance Rate (Fixed):", ] <- signif(env$acceptanceRateFPerc, env$gSIGDIG)
+               mstats[1, 2] <- signif(env$rhoF, env$gSIGDIG)
+               mstats[2, 2] <- signif(env$acceptanceRateFPerc, env$gSIGDIG)
           }
           
           if(env$gNIV > 0) {
-               mstats["RHO (Normal):", ] <- signif(env$rho, env$gSIGDIG)
-               mstats["Acceptance Rate (Normal):", ] <- signif(env$acceptanceRatePerc, env$gSIGDIG)
-               mstats["Parameter RMS:", ] <- signif(paramRMS, env$gSIGDIG)
-               mstats["Avg. Variance:", ] <- signif(avgVariance, env$gSIGDIG)
+               mstats[3, 2] <- signif(env$rho, env$gSIGDIG)
+               mstats[4, 2] <- signif(env$acceptanceRatePerc, env$gSIGDIG)
+               mstats[5, 2] <- signif(paramRMS, env$gSIGDIG)
+               mstats[6, 2] <- signif(avgVariance, env$gSIGDIG)
           }
 
-          mstats["Log-Likelihood:", ] <- signif(sum(log(p)), env$gSIGDIG)
-          mstats["RLH:", ] <- signif(mean(p^(1/env$TIMES)), env$gSIGDIG)
-          print(mstats[complete.cases(mstats), , drop = FALSE], right = TRUE)
+          mstats[7, 2] <- signif(sum(log(p)), env$gSIGDIG)
+          mstats[8, 2] <- signif(mean(p^(1/env$TIMES)), env$gSIGDIG)
+          print(mstats[complete.cases(mstats), , drop = FALSE], right = TRUE, row.names = FALSE)
           
-          cat("\n-----------------------------------------------------------\n")
+          cat("\n-----------------------------------------------------------\n\n")
           
           # fixed coefficients
           if(env$gFIV > 0)
           {
                print(data.frame(`Fixed Parameters` = paste0(env$gVarNamesFixed, ":"), Estimate = signif(f, env$gSIGDIG), check.names = FALSE), row.names = FALSE)
-               cat("\n\n-----------------------------------------------------------\n")
+               cat("\n-----------------------------------------------------------\n\n")
           }
           
           # Normal Coefficients
           if(env$gNIV > 0)
           {
                print(data.frame(`Random Parameters` = paste0(env$gVarNamesNormal, ":"), Estimate = signif(a, env$gSIGDIG), check.names = FALSE), row.names = FALSE)
-               cat("\n\n-----------------------------------------------------------\n")
+               cat("\n-----------------------------------------------------------\n")
           }
           
           # Estimated time to completion
