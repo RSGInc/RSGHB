@@ -138,41 +138,44 @@ Train, K. Original Gauss and Matlab code: http://elsa.berkeley.edu/Software/abst
 }
 \examples{
 
+# Organize choicedata for modeling
 data(choicedata)
-
 tt1 <- choicedata$tt1
 tt2 <- choicedata$tt2
 toll2 <- choicedata$toll2
-
 choice1 <- (choicedata$Choice==1)
 choice2 <- (choicedata$Choice==2)
 
-control <- list(
-     modelname = "MNL_WTPSpace",
-     gVarNamesNormal = c("WTP", "Price"),
-     gNCREP = 10000,
-     gNEREP = 10000
-)
-
-likelihood <- function(fc, b)
-{  
+# The model likelihood function
+likelihood <- function(fc, b) {  
      
-     # random parameters
+     # Assign Beta vectors to named parameters for convenience
      cc    <- 1
      wtp1  <- b[, cc]; cc <- cc + 1
      price <- b[, cc]; cc <- cc + 1
      
-     # discrete choice model in WTP-space
+     # Discrete choice utility in WTP-space
      v1 <-                 price * wtp1 * tt1
      v2 <- price * toll2 + price * wtp1 * tt2
      
+     # Return the probability of choice
      p  <- (exp(v1)*choice1 + exp(v2)*choice2) / (exp(v1) + exp(v2))
-     
      return(p)
 }
 
-# not run
-# doHB(likelihood, choicedata, control)
+# Estimation controls/settings
+control <- list(
+     modelname = "MNL_WTPSpace",
+     gVarNamesNormal = c("WTP", "Price"),
+     gNCREP = 500,
+     gNEREP = 500,
+     gINFOSKIP = 10,
+     nodiagnostics = TRUE,
+     gSeed = 1987
+)
+
+# Estimate the model
+model <- doHB(likelihood, choicedata, control)
 
 }
 % Add one or more standard keywords, see file 'KEYWORDS' in the
