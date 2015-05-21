@@ -431,14 +431,14 @@ doHB <- function(likelihood_user, choicedata, control = list())
           results$duration = endtime - begintime
           results[["iter.detail"]] <- results[["iter.detail"]][-1, ]
           
-          if (verbose) cat("Estimation complete.", "\n")
+          if (verbose) cat("Estimation complete.\n")
           
           class(results) <- "RSGHB"
           
           if (writeModel) {
-               if (verbose) cat("Creating output files. Please be patient.","\n")
+               if (verbose) cat("Creating output files. Please be patient.\n")
                writeModel(results)
-               if (verbose) cat("Output files finished writing to working directory.","\n")
+               if (verbose) cat("Output files finished writing to working directory.\n")
           }
           
      } else {
