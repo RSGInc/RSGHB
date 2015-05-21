@@ -21,9 +21,6 @@ plotA(object, columns = NULL)
 \code{\link{doHB}}, \code{\link{plotC}}, \code{\link{plotF}}, \code{\link{plotLog}}
 }
 \examples{
-data(example_MNL)
-
-# plotA(example_MNL)
 }
 \keyword{ ~kwd1 }
 \keyword{ ~kwd2 }% __ONLY ONE__ keyword per line

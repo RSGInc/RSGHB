@@ -20,9 +20,6 @@ plotF(object, columns = NULL)
 \code{\link{doHB}}, \code{\link{plotA}}, \code{\link{plotC}}, \code{\link{plotLog}}
 }
 \examples{
-data(example_MNL)
-
-# plotF(example_MNL)
 }
 \keyword{ ~kwd1 }
 \keyword{ ~kwd2 }% __ONLY ONE__ keyword per line
