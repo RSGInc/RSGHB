@@ -1,4 +1,4 @@
-writeModel <- function(object, writeDraws = TRUE, path = getwd()) {
+writeModel <- function(object, writeDraws = FALSE, path = getwd()) {
      
      # Disk location
      orig.path <- getwd()
@@ -43,7 +43,7 @@ writeModel <- function(object, writeDraws = TRUE, path = getwd()) {
      
      if (length(object[["params.fixed"]]) > 0)
      {
-          cat("Fixed parameters estimated:", "\n")
+          cat("Fixed parameters estimated:\n")
           cat(paste0(object[["params.fixed"]], "\n", collapse = ""))
      }
      cat("\n")
@@ -56,7 +56,7 @@ writeModel <- function(object, writeDraws = TRUE, path = getwd()) {
      if (!is.null(object[["constraints"]]))
      {
           cond <- c("<", ">")
-          cat("Constraints applied to random parameters (param1 - inequality - param2):", "\n")
+          cat("Constraints applied to random parameters (param1 - inequality - param2):\n")
           for(i in 1:length(object[["constraints"]]))
           {
                if(object[["constraints"]][[i]][3] == 0) cat(object[["params.vary"]][i], cond[object[["constraints"]][[i]][2]], 0, "\n")
@@ -110,7 +110,7 @@ writeModel <- function(object, writeDraws = TRUE, path = getwd()) {
      
      # individual draws
      if (!is.null(object[["Draws"]]) & writeDraws) {
-          cat("Creating individual draw files, this may take a few minutes.","\n")     
+          cat("Creating individual draw files, this may take a few minutes.\n")     
           for(i in 1:length(object[["Draws"]]))
           {
                
