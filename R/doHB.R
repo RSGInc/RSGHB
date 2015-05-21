@@ -356,7 +356,6 @@ doHB <- function(likelihood_user, choicedata, control = list())
           
           # object to store the model results and settings
           results <- list(modelname = modelname,
-                          starttime = begintime,
                           params.fixed = gVarNamesFixed,
                           params.vary = gVarNamesNormal,
                           distributions = distNames[gDIST],
@@ -380,8 +379,6 @@ doHB <- function(likelihood_user, choicedata, control = list())
           )
           
           hb(A, B, Dmat, FC)
-          
-          endtime <- Sys.time()
           
           if(gNIV > 0)
           {
@@ -427,8 +424,6 @@ doHB <- function(likelihood_user, choicedata, control = list())
                                        b = if (is.null(results[["C"]])) {NULL} else {as.matrix(results[["C"]][gIDS, -c(1:2)])})
           results$ll0 <- sum(log(likelihood_user(fc = FC, b = matrix(svN, ncol = length(svN), nrow = length(gIDS), byrow = TRUE))))
           results$llf <- sum(log(results[["p"]]))
-          results$endtime <- endtime
-          results$duration = endtime - begintime
           results[["iter.detail"]] <- results[["iter.detail"]][-1, ]
           
           if (verbose) cat("Estimation complete.\n")
