@@ -1,15 +1,15 @@
 
-plot.RSGHB <- function(x, y = NULL, type = "A") {
+plot.RSGHB <- function(x, y = NULL, type = "A") { # add column argument?
      
      # Store old graphical parameters for later
      old.par <- par(no.readonly = TRUE)
      
      # Plot means
-     if (type == "A") {
+     if (type == "A") { # or type F
           A <- x[["A"]]
           p <- ncol(A) - 1
           
-          par(oma = c(0, 0, 2, 0))
+          par(oma = c(0, 0, 2, 0)) # can the margins be tightened further?
           if (p < 4) {
                par(mfrow = c(1, p))
           } else {
