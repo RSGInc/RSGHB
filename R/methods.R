@@ -1,3 +1,42 @@
+
+plot.RSGHB <- function(x, y = NULL, type = "A") {
+     
+     # Store old graphical parameters for later
+     old.par <- par(no.readonly = TRUE)
+     
+     # Plot means
+     if (type == "A") {
+          A <- x[["A"]]
+          p <- ncol(A) - 1
+          
+          par(oma = c(0, 0, 2, 0))
+          if (p < 4) {
+               par(mfrow = c(1, p))
+          } else {
+               r <- ceiling(sqrt(p))
+               if (r * (r - 1) >= p) {c <- r - 1} else {c <- r}               
+               par(mfrow = c(r, c))
+          }
+          
+          for (i in 1:p) plot(x = A[, 1], y = A[, 1 + i], type = "l", xlab = "Iteration", ylab = "Estimate", main = colnames(A)[1 + i])
+          mtext("Markov Chains", outer = TRUE, cex = 1.5)          
+          
+     } else if (type == "B") {
+          
+     } else if (type == "C") {
+          
+     } else if (type == "F") {
+          
+     } else if (type == "Log") {
+          
+     }
+     
+     # Restore old graphical parameters
+     par(old.par)
+     
+}
+
+
 # print.RSGHB <- function(model, conf.level = 0.95) {
 #      
 #      alpha <- (1 - conf.level)/2
