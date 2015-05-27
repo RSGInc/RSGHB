@@ -1,5 +1,8 @@
 writeModel <- function(object, writeDraws = FALSE, path = getwd()) {
      
+     # Error check
+     if (!"RSGHB" %in% class(object)) stop("'object' is not of class RSGHB")
+     
      # Disk location
      orig.path <- getwd()
      setwd(path)
