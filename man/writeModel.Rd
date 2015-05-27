@@ -55,10 +55,7 @@ Jeff Keller <jeff.keller@rsginc.com>
 \code{\link{plotLog}}
 }
 \examples{
-     data(example_MNL)
-     class(example_MNL)
-     
-     # writeModel(example_MNL)
+# writeModel(model)
 }
 % Add one or more standard keywords, see file 'KEYWORDS' in the
 % R documentation directory.
