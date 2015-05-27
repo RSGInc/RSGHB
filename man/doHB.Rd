@@ -16,18 +16,22 @@ doHB(likelihood_user, choicedata, control = list())
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{
-     \item{likelihood_user}{A function that returns likelihood values for each observation in your dataset. This function takes the current values, individual parameters (\code{b}) and the set of fixed parameters (\code{fc}) and computes the likelihood of observing the data given those values.}
+     \item{likelihood_user}{A function that returns likelihood values for each observation in your data set. This function must accept arguments \code{fc} and \code{b}, representing the fixed parameters and individual parameters, respectively, and computes the likelihood of observing the data given those values.}
      \item{choicedata}{A data.frame of choice data to be used in estimation. Minimally requires an 'ID' column associated with the vector of likelihoods returned by \code{likelihood_user}.}
      \item{control}{A list of estimation controls. See below for more details.}
      }
 \details{
+The \code{fc} argument to the \code{likelihood_user} function is a numeric vector of length \code{length(gVarNamesFixed)}. It is \code{NULL} if \code{gVarNamesFixed} is \code{NULL}.
+
+The \code{b} argument to the \code{likelihood_user} function is a numeric matrix with \code{length(gVarNamesNormal)} columns and \code{length(likelihood_user(...))} rows. In other words, one column per random parameter and one row per choice task. It is \code{NULL} if \code{gVarNamesNormal} is \code{NULL}.
+
 There are a number of global variables that can be set to control the model estimation. Some need to be specified directly in the model control list while others have default values that can be adjusted by the analyst if something other than the default is desired.
 
 \bold{User-specified controls}
 
-\emph{constraintsNorm} - This is a list of monotonic constraints to be applied during estimation. The structure of the constraints is \code{c(param1number, inequality, param2number)}. For constraints relative to \code{0}, use \code{0} instead of \code{param2number}. For \code{inequality}, use \code{1} for \code{<} and \code{2} for \code{>}.
+\emph{constraintsNorm} - A list of monotonic constraints to be applied during estimation. The structure of the constraints is \code{c(param1number, inequality, param2number)}. For constraints relative to \code{0}, use \code{0} instead of \code{param2number}. For \code{inequality}, use \code{1} for \code{<} and \code{2} for \code{>}.
 
-For example \code{constraintsNorm = list(c(5,1,0), c(6,1,5), c(7,1,6), c(8,1,7))} would constrain the 5th parameter < 0, the 6th parameter < 5th parameter, the 7th parameter < the 6th parameter, etc. If \code{NULL}, no constraints are used. (Defaults to \code{NULL})
+For example \code{constraintsNorm = list(c(5,1,0), c(6,1,5), c(7,1,6))} would constrain the 5th parameter < 0, the 6th parameter < 5th parameter, and the 7th parameter < the 6th parameter. If \code{NULL}, no constraints are used. (Defaults to \code{NULL})
 
 \emph{degreesOfFreedom} - Additional degrees of freedom for the prior variance-covariance matrix, not including the number of parameters. (Defaults to \code{5}) 
 
@@ -41,7 +45,7 @@ For example \code{constraintsNorm = list(c(5,1,0), c(6,1,5), c(7,1,6), c(8,1,7))
 
 \emph{gFULLCV} - Indicates whether a full variance-covariance structure should be used for the random parameters. (Defaults to \code{TRUE})
 
-\emph{gINFOSKIP} - Number of iterations between printing/plotting information about the iteration process. Ingored if \code{verbose} is \code{FALSE}. (Defaults to \code{250})
+\emph{gINFOSKIP} - Number of iterations between printing/plotting information about the iteration process. (Defaults to \code{250})
 
 \emph{gMAXCOEF} - A vector of maximums for the Johnson SB distributions. If Johnson SB is used, each random coefficent needs an element but only the elements that correspond to a JSB in \code{gDIST} are used. (Defaults to \code{0})
 
@@ -63,7 +67,7 @@ For example \code{constraintsNorm = list(c(5,1,0), c(6,1,5), c(7,1,6), c(8,1,7))
      
 \emph{gStoreDraws} - Whether to store the draws for the individual level parameters. Doing so can dramatically increase the memory usage of the model if there are a large number of individuals or draws. (Defaults to \code{FALSE})
 
-\emph{modelname} - The model name which is used for creating output files. (Defaults to \code{paste("HBModel", round(runif(1) * 10000000, 0), sep = "")})
+\emph{modelname} - The model name which is used for creating output files. (Defaults to \code{"HBModel"})
 
 \emph{nodiagnostics} - If \code{TRUE}, an initial diagnostic report and prompt is not reported to the screen. This makes batch processing more seamless. (Defaults to \code{FALSE})
 
@@ -81,7 +85,7 @@ For example \code{constraintsNorm = list(c(5,1,0), c(6,1,5), c(7,1,6), c(8,1,7))
 
 \emph{targetAcceptanceNormal} - The target acceptance rate in the Metropolis-Hastings algorithm for the random parameters. (Defaults to \code{0.3})
 
-\emph{verbose} - Whether estimation information should be printed/plotting during the iteration process. (Defaults to \code{TRUE})
+\emph{verbose} - Whether estimation information should be printed/plotted during the iteration process. (Defaults to \code{TRUE})
  
 \emph{writeModel} - Indicates whether the model results should be written as a series of CSV files to the working directory upon estimation completion. (Defaults to \code{FALSE}, see \code{\link{writeModel}})
 
@@ -90,7 +94,6 @@ For example \code{constraintsNorm = list(c(5,1,0), c(6,1,5), c(7,1,6), c(8,1,7))
 a model object of class \code{RSGHB}. Contains:
 
   \item{modelname}{A character string identifying the model.}
-  \item{startime}{A POSIXct date indicating the time at which the model estimation began.}
   \item{params.fixed}{A character vector naming the estimated fixed parameters.}
   \item{params.vary}{A character vector naming the estimated random parameters.}
   \item{distributions}{A character vector of assumed distributions for each random parameter.}
@@ -107,14 +110,12 @@ a model object of class \code{RSGHB}. Contains:
   \item{A}{A matrix containing the sample-level means of the underlying normals at each iteration. Is \code{NULL} if no random parameters were estimated.}
   \item{B, Bsd}{A matrix containing the mean individual-level draws across iterations for the underlying normals. The \code{Bsd} object provides the standard deviations of these individual draws. Is \code{NULL} if no random parameters were estimated.}
   \item{C, Csd}{A matrix containing the mean individual-level draws across iterations for the underlying normals while including the appropriate distribution transformations. The \code{Csd} object provides the standard deviations of these individual draws. Is \code{NULL} if no random parameters were estimated.}
-  \item{D}{An array of the sample variance-covariance matrix for each iteration.}
-  \item{F}{A matrix containing the set of fixed (non-random) parameters at each iteration.}
+  \item{D}{An array of the sample variance-covariance matrix for each iteration. Is \code{NULL} if no random parameters were estimated.}
+  \item{F}{A matrix containing the set of fixed (non-random) parameters at each iteration. Is \code{NULL} if no fixed parameters were estimated.}
   \item{choices}{A vector of choices if provided.}
-  \item{p}{A vector of probabilities at the mean values of \code{B} and \code{F}.}
+  \item{p}{A vector of probabilities at the mean values of \code{C} and \code{F}.}
   \item{ll0}{The initial log-likelihood given the starting values of \code{sVN} and \code{FC}.}
-  \item{llf}{The final log-likelihood at the mean values of \code{B} and \code{F}.}
-  \item{endtime}{A POSIXct date indicating when the model estimation concluded.}
-  \item{duration}{The model estimation duration.}
+  \item{llf}{The final log-likelihood at the mean values of \code{C} and \code{F}.}
 }
 \references{
 
@@ -134,7 +135,7 @@ Train, K. Original Gauss and Matlab code: http://elsa.berkeley.edu/Software/abst
 %% ~Make other sections like Warning with \section{Warning }{....} ~
 
 \seealso{
-\code{\link{plotA}}, \code{\link{plotC}}, \code{\link{plotF}}, \code{\link{plotLog}}
+\code{\link{plot.RSGHB}}
 }
 \examples{
 
