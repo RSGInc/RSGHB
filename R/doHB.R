@@ -40,7 +40,7 @@ doHB <- function(likelihood_user, choicedata, control = list())
      # entries in the control list
      if(is.null(control[["modelname"]]))
      {
-          modelname <- paste("HBModel", round(runif(1) * 10000000, 0), sep = "")
+          modelname <- "HBModel"
      } else
      {
           modelname <- control[["modelname"]]
