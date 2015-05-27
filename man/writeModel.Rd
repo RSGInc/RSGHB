@@ -51,8 +51,7 @@ Jeff Keller <jeff.keller@rsginc.com>
 %% ~Make other sections like Warning with \section{Warning }{....} ~
 
 \seealso{
-\code{\link{doHB}},
-\code{\link{plotLog}}
+\code{\link{doHB}}
 }
 \examples{
 # writeModel(model)
