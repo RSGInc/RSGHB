@@ -4,7 +4,11 @@ plot.RSGHB <- function(x, ...) { # add column argument?
      # Store old graphical parameters for later
      old.par <- par(no.readonly = TRUE)
      
-     type <- "A"
+     if (is.null(as.list(match.call())$type)) {
+          type <- "A"
+     } else {
+          type <- as.list(match.call())$type
+     }
      
      # Plot means
      if (type == "A" | type == "F") {

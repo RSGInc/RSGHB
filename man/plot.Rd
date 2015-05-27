@@ -1,5 +1,6 @@
 \name{plot.RSGHB}
 \alias{plot}
+\alias{plot.RSGHB}
 \title{
  Plot RSGHB Model Object Components
 }
@@ -14,9 +15,10 @@ plot(x, ...)
   \item{x}{An \code{RSGHB} model object.}
   \item{...}{Additional arguments.}
 }
-\details{A \code{type} argument can be passed to control which component is plotted. If \code{type} is \code{"A"} (the default), then the population means of the underlying normal distributions are plotted. If \code{type} is \code{"F"}, then the fixed parameters are plotted. If \code{type} is \code{"Log"}, then the model statistics at every \code{gINFOSKIP}th iteration are plotted.}
+\details{A \code{type} argument can be passed to control which component is plotted. If \code{type} is \code{"A"} (the default), then the population means of the underlying normal distributions are plotted. If \code{type} is \code{"F"}, then the fixed parameters are plotted. If \code{type} is \code{"Log"}, then the model statistics at every \code{gINFOSKIP}th iteration are plotted.
 
 An error is returned if the \code{type} component is not found in \code{x}.
+}
 \author{
  Jeff Keller <jeff.keller@rsginc.com>, Jeffrey Dumont <jeff.dumont@rsginc.com>
 }
