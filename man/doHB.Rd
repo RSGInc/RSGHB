@@ -135,7 +135,7 @@ Train, K. Original Gauss and Matlab code: http://elsa.berkeley.edu/Software/abst
 %% ~Make other sections like Warning with \section{Warning }{....} ~
 
 \seealso{
-\code{\link{plot.RSGHB}}
+\code{\link{plot.RSGHB}, \link{writeModel}}
 }
 \examples{
 
