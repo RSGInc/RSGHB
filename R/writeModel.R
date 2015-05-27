@@ -28,9 +28,6 @@ writeModel <- function(object, writeDraws = FALSE, path = getwd()) {
      options(width = 1000)
      
      # log file
-     png(paste0(object[["modelname"]], "_logPlot.png"))
-     plotLog(object)
-     dev.off()
      sink(paste0(object[["modelname"]], ".log"))
      cat("Model Name:", object[["modelname"]], "\n", sep = "\t")
      cat("Number of individuals:", object[["gNP"]], "\n", sep = "\t")
