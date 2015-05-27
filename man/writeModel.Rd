@@ -8,7 +8,7 @@ Write an RSGHB Model Object as Series of CSVs
 Function for writing an RSGHB model object as a series of CSV files to the disk. Files are written in Sawtooth's CBC HB format to allow for easier integration with analysis processes built around that software.
 }
 \usage{
-writeModel(object, writeDraws = TRUE, path = getwd())
+writeModel(object, writeDraws = FALSE, path = getwd())
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{
