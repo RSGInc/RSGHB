@@ -5,10 +5,14 @@ plot.RSGHB <- function(x, y = NULL, type = "A") { # add column argument?
      old.par <- par(no.readonly = TRUE)
      
      # Plot means
-     if (type == "A") { # or type F
-          A <- x[["A"]]
+     if (type == "A" | type == "F") {
+          A <- x[[type]]
+          
+          if (is.null(A)) stop(paste0("model object does not contain component ", type))
+          
           p <- ncol(A) - 1
           
+          # Arrange plots in a roughly square grid
           par(oma = c(0, 0, 2, 0)) # can the margins be tightened further?
           if (p < 4) {
                par(mfrow = c(1, p))
@@ -18,6 +22,7 @@ plot.RSGHB <- function(x, y = NULL, type = "A") { # add column argument?
                par(mfrow = c(r, c))
           }
           
+          # Plot
           for (i in 1:p) plot(x = A[, 1], y = A[, 1 + i], type = "l", xlab = "Iteration", ylab = "Estimate", main = colnames(A)[1 + i])
           mtext("Markov Chains", outer = TRUE, cex = 1.5)          
           
@@ -25,10 +30,22 @@ plot.RSGHB <- function(x, y = NULL, type = "A") { # add column argument?
           
      } else if (type == "C") {
           
-     } else if (type == "F") {
-          
      } else if (type == "Log") {
           
+          logStats <- x[["iter.detail"]]
+          
+          # Get valid columns
+          stats <- names(logStats)[-1]
+          valid.stats <- c()
+          for (stat in stats) {
+               if (!is.null(logStats[, stat]) & !all(is.na(logStats[, stat]))) valid.stats <- c(valid.stats, stat)
+          }
+          
+          # Plot
+          par(mfrow = c(length(valid.stats), 1), mar = c(4.1, 4.1, 2.1, 2.1))
+          for (stat in valid.stats) {
+               plot(x = logStats[, "Iteration"], logStats[, stat], type = "l", xlab = "Iteration", ylab = stat)
+          }
      }
      
      # Restore old graphical parameters
@@ -92,19 +109,3 @@ plot.RSGHB <- function(x, y = NULL, type = "A") { # add column argument?
 # # 3.	The statistics should reflect the Bayesian-ness of the model - for example, std error = std dev. 
 # # 4.	Use the Bayesian equivalent of p-values and t-tests.
 # # 5.	I would like to see the bayes factor relative to a null model.
-# 
-# plot.RSGHB <- function(x, type = "A", ...) {
-#      
-#      if (type == "A") {
-#           chains <- x[["A"]][, -1, drop = FALSE]
-#      } else if (type == "F") {
-#           chains <- x[["F"]][, -1, drop = FALSE]
-#      } else {
-#           stop("Invalid 'type' argument")
-#      }
-#      
-#      iter <- 1:nrow(chains)
-#      
-#      
-# }
-# 
