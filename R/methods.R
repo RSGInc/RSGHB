@@ -1,8 +1,10 @@
 
-plot.RSGHB <- function(x, y = NULL, type = "A") { # add column argument?
+plot.RSGHB <- function(x, ...) { # add column argument?
      
      # Store old graphical parameters for later
      old.par <- par(no.readonly = TRUE)
+     
+     type <- "A"
      
      # Plot means
      if (type == "A" | type == "F") {
@@ -26,9 +28,9 @@ plot.RSGHB <- function(x, y = NULL, type = "A") { # add column argument?
           for (i in 1:p) plot(x = A[, 1], y = A[, 1 + i], type = "l", xlab = "Iteration", ylab = "Estimate", main = colnames(A)[1 + i])
           mtext("Markov Chains", outer = TRUE, cex = 1.5)          
           
-     } else if (type == "B") {
-          
-     } else if (type == "C") {
+#      } else if (type == "B") {
+#           
+#      } else if (type == "C") {
           
      } else if (type == "Log") {
           
@@ -46,6 +48,10 @@ plot.RSGHB <- function(x, y = NULL, type = "A") { # add column argument?
           for (stat in valid.stats) {
                plot(x = logStats[, "Iteration"], logStats[, stat], type = "l", xlab = "Iteration", ylab = stat)
           }
+     } else {
+          
+          stop("Invalid 'type' argument")
+          
      }
      
      # Restore old graphical parameters
