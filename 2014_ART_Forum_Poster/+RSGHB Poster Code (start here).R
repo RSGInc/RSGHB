@@ -1,4 +1,4 @@
-### Built with R 3.1.0
+### Built with R 3.1.0 and RSGHB 1.0.2
 
 ### Set the working directory on your machine
 setwd("C:/users/jeff.keller/desktop/")
