@@ -5,7 +5,7 @@ plot.RSGHB <- function(x, ...) { # add column argument?
      old.par <- par(no.readonly = TRUE)
      
      if (is.null(as.list(match.call())$type)) {
-          type <- "A"
+          type <- "Log"
      } else {
           type <- as.list(match.call())$type
      }
@@ -21,7 +21,7 @@ plot.RSGHB <- function(x, ...) { # add column argument?
           # Arrange plots in a roughly square grid
           par(oma = c(0, 0, 2, 0)) # can the margins be tightened further?
           if (p < 4) {
-               par(mfrow = c(1, p))
+               par(mfrow = c(p, 1))
           } else {
                r <- ceiling(sqrt(p))
                if (r * (r - 1) >= p) {c <- r - 1} else {c <- r}               
