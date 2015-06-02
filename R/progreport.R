@@ -121,8 +121,8 @@ progreport <- function(r, p, a, b, d, f, env)
                  signif(mean(p^(1/env$TIMES)), env$gSIGDIG),
                  signif(paramRMS, env$gSIGDIG),
                  signif(avgVariance, env$gSIGDIG),
-                 signif(env$acceptanceRateFPerc, env$gSIGDIG),
-                 signif(env$acceptanceRatePerc, env$gSIGDIG))
+                 if (env$gFIV > 0) {signif(env$acceptanceRateFPerc, env$gSIGDIG)} else {NA},
+                 if (env$gNIV > 0) {signif(env$acceptanceRatePerc, env$gSIGDIG)} else {NA})
      
      env$results[["iter.detail"]] <- rbind(env$results[["iter.detail"]], detail)
      
