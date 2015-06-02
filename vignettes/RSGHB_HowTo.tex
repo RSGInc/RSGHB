@@ -1,4 +1,4 @@
-\documentclass{article}\usepackage[]{graphicx}\usepackage[]{color}
+ \documentclass{article}\usepackage[]{graphicx}\usepackage[]{color}
 %% maxwidth is the original width if it is less than linewidth
 %% otherwise use linewidth (to make sure the graphics do not exceed the margin)
 \makeatletter
@@ -58,33 +58,35 @@
 \makeatother
 \urlstyle{leo}
 \IfFileExists{upquote.sty}{\usepackage{upquote}}{}
-
 \begin{document}
 
 \title{How to use RSGHB}
-\author{Jeffrey Dumont}
-\date{21 May 2014}
+\author{Jeffrey Dumont, Jeff Keller}
+\date{June 2015}
 \maketitle
-\abstract{This vignette describes the process for specifying, estimating and analyzing the output of a choice model with RSGHB. The document is structured into two case studies using different model structures. The synthetic choice data used in this document (as well as number of other examples using different model structures) can be downloaded from the RSGHB github page - \url{https://github.com/jeffdumont/RSGHB}}
+\abstract{This vignette describes the process for specifying, estimating and analyzing the output of a choice model with RSGHB. Two case studies with different model structures are used as examples. The synthetic choice data set \emph{choicedata} used in this document is included in the RSGHB package or can be downloaded from the RSGHB github page: \url{https://github.com/jeffdumont/RSGHB}}
 
 \begin{center}
 \line(1,0){400}
 \end{center}
 
-\section*{RSGHB modeling file structure}
+\section*{RSGHB Code Structure}
 
-The typical RSGHB model file has the following 4 main sections. We will walk through each of these 4 sections in the examples that follow.
+The code typically needed for running an RSGHB model can be broken into five main sections and the examples that follow are organized in this manner.
 
 \begin{enumerate}
-     \item Setup and data preparation
-     \item Setting the controls for model estimation
-     \item Defining the likelihood function
-     \item Calling the doHB function to start the estimation process
+     \item Setup and Data Preparation
+     \item Defining the Likelihood Function
+     \item Model Controls and Settings
+     \item Model Estimation
+     \item The Output
 \end{enumerate}
+
+Previous versions of RSGHB produced a series of CSV files as output. Newer versions of RSGHB produce a model object of class \emph{RSGHB} that can be operated on directly. However, the old behavior can be restored by using the \emph{writeModel} function or by setting the \emph{writeModel} argument in \emph{doHB} to \emph{TRUE}.
 
 \section*{EXAMPLE 1: MNL Model with Fixed Parameters}
 
-In this section, the code for estimating a multinomial logit model with fixed (non-random) parameters is explained. In this example, synthetic respondents were presented with a choice between two travel alternatives - one that is toll free but slower and one that was priced but faster. Each respondent was presented with a panel of 8 choice tasks.
+In this section, the code for estimating a multinomial logit (MNL) model with fixed (non-random) parameters is explained. The data set for this example is composed of synthetic individuals that were presented with a choice between two travel alternatives - one that is toll-free and one that had a toll but also had a faster travel time. Each of 1,138 individuals was presented with a panel of 9 choice tasks.
 
 \subsection*{Setup and Data Preparation}
 
@@ -93,12 +95,11 @@ In this section, the code for estimating a multinomial logit model with fixed (n
 \begin{alltt}
 \hlkwd{library}\hlstd{(RSGHB)}
 
-\hlcom{# load example data}
+\hlcom{# Load example data}
 \hlkwd{data}\hlstd{(choicedata)}
 
-\hlcom{# We typically work with one one row per choice observations. This isn't}
-\hlcom{# necessary however but it does lend it self to faster computation of the}
-\hlcom{# choice likelihoods}
+\hlcom{# This data set is organized as one row per choice observation. This isn't necessary }
+\hlcom{# but it does make writing the likelihood function straightforward.}
 \hlkwd{head}\hlstd{(choicedata)}
 \end{alltt}
 \begin{verbatim}
@@ -111,604 +112,436 @@ In this section, the code for estimating a multinomial logit model with fixed (n
 ## 6 8738        6  63  54  0.75    1      1
 \end{verbatim}
 \begin{alltt}
-\hlcom{# We can then specify any variables from the choicedata data.frame that}
-\hlcom{# you'd like to use in the utility equations in the likelihood function}
-\hlcom{# below. These can be any variables within the data or transformations of}
-\hlcom{# those variables. This example comes from transport so each alternative is}
+\hlcom{# Any variables or transformations of variables from the choicedata data.frame that are}
+\hlcom{# needed for evaluating the likelihood function can be extracted as a series of vectors}
+\hlcom{# for convenience (e.g., TT1, TT2, TOLL2). Alternatively, the likelihood function could}
+\hlcom{# refer to the choicedata data.frame directly. In this example, each alternative is}
 \hlcom{# defined by travel times and toll costs.}
-\hlstd{TT1} \hlkwb{<-} \hlstd{choicedata}\hlopt{$}\hlstd{tt1}
-\hlstd{TT2} \hlkwb{<-} \hlstd{choicedata}\hlopt{$}\hlstd{tt2}
+\hlstd{TT1}   \hlkwb{<-} \hlstd{choicedata}\hlopt{$}\hlstd{tt1}
+\hlstd{TT2}   \hlkwb{<-} \hlstd{choicedata}\hlopt{$}\hlstd{tt2}
 \hlstd{TOLL2} \hlkwb{<-} \hlstd{choicedata}\hlopt{$}\hlstd{toll2}
 
-\hlcom{# Here we specify the choice vectors. Note in this example there are only}
-\hlcom{# two alternatives. Also, dummying coding the choice vector is not necessary}
-\hlcom{# but allows for easier coding of the likelihood.}
-\hlstd{choice1} \hlkwb{<-} \hlstd{(choicedata}\hlopt{$}\hlstd{Choice} \hlopt{==} \hlnum{1}\hlstd{)}
-\hlstd{choice2} \hlkwb{<-} \hlstd{(choicedata}\hlopt{$}\hlstd{Choice} \hlopt{==} \hlnum{2}\hlstd{)}
+\hlcom{# Similarly for the vectors of choices. Note that in this example, there are only two }
+\hlcom{# alternatives. Dummying coding the choice vector is not necessary but again makes}
+\hlcom{# writing the likelihood function straightforward.}
+\hlstd{choice1} \hlkwb{<-} \hlstd{(choicedata}\hlopt{$}\hlstd{Choice}\hlopt{==}\hlnum{1}\hlstd{)}
+\hlstd{choice2} \hlkwb{<-} \hlstd{(choicedata}\hlopt{$}\hlstd{Choice}\hlopt{==}\hlnum{2}\hlstd{)}
 
-\hlcom{# Frequency of choice for the first alternative}
-\hlkwd{table}\hlstd{(choice1)}
+\hlcom{# Frequency of choices}
+\hlkwd{table}\hlstd{(choicedata}\hlopt{$}\hlstd{Choice)}
 \end{alltt}
 \begin{verbatim}
-## choice1
-## FALSE  TRUE 
-##  3560  6682
-\end{verbatim}
-\begin{alltt}
-\hlcom{# Frequency of choice for the second alternative.}
-\hlkwd{table}\hlstd{(choice2)}
-\end{alltt}
-\begin{verbatim}
-## choice2
-## FALSE  TRUE 
-##  6682  3560
+## 
+##    1    2 
+## 6682 3560
 \end{verbatim}
 \end{kframe}
 \end{knitrout}
 
+\subsection*{Defining the Likelihood Function}
 
-\subsection*{Controling the Estimation Process}
+The estimation routine expects a user-specified \emph{likelihood} function that accepts two arguments, \emph{fc} and \emph{b}, that, in concert with the choice data, returns a vector of probabilities of length equal to the number of total choice tasks across all respondents. With 1,138 respondents and 9 choice tasks each, the \emph{likelihood} function should return a vector of length 1,138*9=10,242 in this case.
 
-There are number of options for controling the estimation process. Please see the help file for doHB or the final section of this document for more details. Note that a number of controls have default values and do not need to be directly specified if the default is acceptable.
+The \emph{fc} argument is a vector of fixed coefficients (they do not vary across individuals). The \emph{b} argument is a matrix of individual coefficients which are generated from the random coefficients in the model. The \emph{b} matrix is discussed in more detail in Example 2.
 
-\begin{knitrout}
-\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
-\begin{alltt}
-\hlcom{# ------------------ ESTIMATION CONTROL ------------------}
-
-\hlcom{# Setting control list for estimation (see ?doHB for more estimation}
-\hlcom{# options)}
-
-\hlcom{# modelname is used for naming the output files}
-\hlstd{modelname} \hlkwb{<-} \hlstr{"MNL"}
-
-\hlcom{# gVarNamesFixed contains the names for the fixed (non-random) variables in}
-\hlcom{# your model. This will be used in output and also when displaying iteration}
-\hlcom{# detail to the screen.}
-\hlstd{gVarNamesFixed} \hlkwb{<-} \hlkwd{c}\hlstd{(}\hlstr{"ASC1"}\hlstd{,} \hlstr{"BTime"}\hlstd{,} \hlstr{"BCost"}\hlstd{)}
-
-\hlcom{# FC contains the starting values for the fixed coefficients.}
-\hlstd{FC} \hlkwb{<-} \hlkwd{c}\hlstd{(}\hlnum{0}\hlstd{,} \hlnum{0}\hlstd{,} \hlnum{0}\hlstd{)}
-
-\hlcom{# ITERATION SETTINGS}
-
-\hlcom{# gNCREP contains the number of iterations to use prior to convergence}
-\hlstd{gNCREP} \hlkwb{<-} \hlnum{30000}
-\hlcom{# gNEREP contains the number of iterations to keep for averaging after}
-\hlcom{# convergence has been reached}
-\hlstd{gNEREP} \hlkwb{<-} \hlnum{20000}
-\hlcom{# gNSKIP contains the number of iterations to do in between retaining draws}
-\hlcom{# for averaging}
-\hlstd{gNSKIP} \hlkwb{<-} \hlnum{1}
-\hlcom{# gINFOSKIP controls how frequently to print info about the iteration}
-\hlcom{# process}
-\hlstd{gINFOSKIP} \hlkwb{<-} \hlnum{250}
-
-\hlcom{# To simplify the doHB functional call, we put all of the control parameters}
-\hlcom{# into a single list that can be passed directly to doHB.}
-\hlstd{control} \hlkwb{<-} \hlkwd{list}\hlstd{(}\hlkwc{modelname} \hlstd{= modelname,} \hlkwc{gVarNamesFixed} \hlstd{= gVarNamesFixed,} \hlkwc{FC} \hlstd{= FC,}
-    \hlkwc{gNCREP} \hlstd{= gNCREP,} \hlkwc{gNEREP} \hlstd{= gNEREP,} \hlkwc{gNSKIP} \hlstd{= gNSKIP,} \hlkwc{gINFOSKIP} \hlstd{= gINFOSKIP)}
-\end{alltt}
-\end{kframe}
-\end{knitrout}
-
-
-\subsection*{Writing the likelihood function}
-
-RSGHB is expecting the user-specificed likelihood function to take the parameters \emph{fc} and \emph{b} (even if they are not used within the function calculate the likelihood). The \emph{fc} parameter is a vector of fixed coefficients (they do not vary across individuals in your data). The \emph{b} parameter is a matrix of individual coefficients which are generated from the random coefficients in the model. In this example, we only focus on the \emph{fc} vector.
-
-It is important to note that the computation of the likelihood is the most computational taxing part of the estimation process. So coding the likelihood efficiently is essential to reduce run time of the model.
-
+It is important to note that the structure of the \emph{likelihood} function and choice data set is arbitrary, and completely up to the user, so long as the \emph{likelihood} function accepts \emph{fc} and \emph{b} as arguments and returns a vector of probabilities of appropriate length. However, the \emph{likelihood} function is the most computationally taxing part of the estimation process, so coding this function efficiently is essential to reducing the run time of the model.
 
 \begin{knitrout}
 \definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
 \begin{alltt}
-\hlcom{# ------------------ likelihood ------------------}
-
+\hlcom{# The likelihood function}
 \hlstd{likelihood} \hlkwb{<-} \hlkwa{function}\hlstd{(}\hlkwc{fc}\hlstd{,} \hlkwc{b}\hlstd{) \{}
 
-    \hlcom{# defining the parameters}
+  \hlcom{# Assign fixed parameters to named variables for convenience    }
+  \hlstd{cc} \hlkwb{<-} \hlnum{1}
+  \hlstd{ASC1}  \hlkwb{<-} \hlstd{fc[cc]; cc} \hlkwb{<-} \hlstd{cc} \hlopt{+} \hlnum{1}
+  \hlstd{Btime} \hlkwb{<-} \hlstd{fc[cc]; cc} \hlkwb{<-} \hlstd{cc} \hlopt{+} \hlnum{1}
+  \hlstd{Btoll} \hlkwb{<-} \hlstd{fc[cc]; cc} \hlkwb{<-} \hlstd{cc} \hlopt{+} \hlnum{1}
 
-    \hlcom{# using cc var to index the fc vector simplifies the addition/subtraction of}
-    \hlcom{# new parameters}
-    \hlstd{cc} \hlkwb{<-} \hlnum{1}
-    \hlstd{ASC1} \hlkwb{<-} \hlstd{fc[cc]}
-    \hlstd{cc} \hlkwb{<-} \hlstd{cc} \hlopt{+} \hlnum{1}
-    \hlstd{Btime} \hlkwb{<-} \hlstd{fc[cc]}
-    \hlstd{cc} \hlkwb{<-} \hlstd{cc} \hlopt{+} \hlnum{1}
-    \hlstd{Btoll} \hlkwb{<-} \hlstd{fc[cc]}
-    \hlstd{cc} \hlkwb{<-} \hlstd{cc} \hlopt{+} \hlnum{1}
+  \hlcom{# Utility functions}
+  \hlstd{v1} \hlkwb{<-} \hlstd{ASC1} \hlopt{+} \hlstd{Btime} \hlopt{*} \hlstd{TT1}
+  \hlstd{v2} \hlkwb{<-}        \hlstd{Btime} \hlopt{*} \hlstd{TT2} \hlopt{+} \hlstd{Btoll} \hlopt{*} \hlstd{TOLL2}
 
-    \hlcom{# utility functions}
-    \hlstd{v1} \hlkwb{<-} \hlstd{ASC1} \hlopt{+} \hlstd{Btime} \hlopt{*} \hlstd{TT1}
-    \hlstd{v2} \hlkwb{<-} \hlstd{Btime} \hlopt{*} \hlstd{TT2} \hlopt{+} \hlstd{Btoll} \hlopt{*} \hlstd{TOLL2}
+  \hlcom{# MNL probability statement}
+  \hlstd{p}  \hlkwb{<-} \hlstd{(}\hlkwd{exp}\hlstd{(v1)} \hlopt{*} \hlstd{choice1} \hlopt{+} \hlkwd{exp}\hlstd{(v2)} \hlopt{*} \hlstd{choice2)} \hlopt{/} \hlstd{(}\hlkwd{exp}\hlstd{(v1)} \hlopt{+} \hlkwd{exp}\hlstd{(v2))}
 
-    \hlcom{# mnl probability statement}
-    \hlstd{p} \hlkwb{<-} \hlstd{(}\hlkwd{exp}\hlstd{(v1)} \hlopt{*} \hlstd{choice1} \hlopt{+} \hlkwd{exp}\hlstd{(v2)} \hlopt{*} \hlstd{choice2)}\hlopt{/}\hlstd{(}\hlkwd{exp}\hlstd{(v1)} \hlopt{+} \hlkwd{exp}\hlstd{(v2))}
-
-    \hlkwd{return}\hlstd{(p)}
+  \hlkwd{return}\hlstd{(p)}
 \hlstd{\}}
 \end{alltt}
 \end{kframe}
 \end{knitrout}
 
+\subsection*{Model Controls and Settings}
 
-\subsection*{Estimating the model}
+There are a number of options and settings for controlling the model estimation process. Please see the help file for \emph{doHB} for more details. Note that most controls have default values and do not need to be directly specified if the default is acceptable.
 
-To start the model estimation process, the analyst needs to call the \emph{doHB} function passing in the \emph{likelihood} function, the \emph{choicedata} data.frame and the \emph{control} list. 
+\begin{knitrout}
+\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
+\begin{alltt}
+\hlcom{### Setting control list for estimation (see ?doHB for more estimation options)}
+
+\hlcom{# The model name/description}
+\hlstd{modelname} \hlkwb{<-} \hlstr{"MNL"}
+
+\hlcom{# gVarNamesFixed contains the names for the fixed (non-random) variables in the model}
+\hlcom{# These will be used in the output and also when displaying iteration detail to }
+\hlcom{# the screen}
+\hlstd{gVarNamesFixed} \hlkwb{<-} \hlkwd{c}\hlstd{(}\hlstr{"ASC1"}\hlstd{,} \hlstr{"BTime"}\hlstd{,} \hlstr{"BCost"}\hlstd{)}
+
+\hlcom{# FC contains the starting values for the fixed coefficients}
+\hlstd{FC} \hlkwb{<-} \hlkwd{c}\hlstd{(}\hlnum{0}\hlstd{,} \hlnum{0}\hlstd{,} \hlnum{0}\hlstd{)}
+
+\hlcom{# gNCREP contains the number of iterations to use prior to convergence}
+\hlstd{gNCREP} \hlkwb{<-} \hlnum{2500}
+\hlcom{# gNEREP contains the number of iterations to keep for averaging after convergence }
+\hlcom{# has been reached}
+\hlstd{gNEREP} \hlkwb{<-} \hlnum{2500}
+\hlcom{# gNSKIP contains the number of iterations between retaining draws for averaging}
+\hlstd{gNSKIP} \hlkwb{<-} \hlnum{1}
+\hlcom{# gINFOSKIP controls how frequently to print info about the iteration process}
+\hlstd{gINFOSKIP} \hlkwb{<-} \hlnum{10}
+\hlcom{# gSeed ensures reproducible results}
+\hlstd{gSeed} \hlkwb{<-} \hlnum{1987}
+
+\hlcom{# To simplify the doHB function call, all of the control arguments are placed in }
+\hlcom{# a single list that can be passed directly to doHB}
+\hlstd{control} \hlkwb{<-} \hlkwd{list}\hlstd{(}\hlkwc{modelname} \hlstd{= modelname,}
+                \hlkwc{gVarNamesFixed} \hlstd{= gVarNamesFixed,}
+                \hlkwc{FC} \hlstd{= FC,}
+                \hlkwc{gNCREP} \hlstd{= gNCREP,}
+                \hlkwc{gNEREP} \hlstd{= gNEREP,}
+                \hlkwc{gNSKIP} \hlstd{= gNSKIP,}
+                \hlkwc{gINFOSKIP} \hlstd{= gINFOSKIP,}
+                \hlkwc{gSeed} \hlstd{= gSeed)}
+\end{alltt}
+\end{kframe}
+\end{knitrout}
+
+\subsection*{Model Estimation}
+
+To start the model estimation process, the analyst passes the \emph{likelihood} function, \emph{choicedata} data.frame, and the \emph{control} list to the \emph{doHB} function.
 
 \begin{verbatim}
-doHB(likelihood, choicedata, control)
+model <- doHB(likelihood, choicedata, control)
 \end{verbatim}
 
-RSGHB will first perform a series of diagnostics on your model to catch common errors in model setup. In addition, it will provide you with some basice summary statistics on your choice data and model. Before estimation begins, RSGHB will present you with a confirmation prompt allowing you to cancel the model estimation.
+
+
+Note that the only requirement of the \emph{choicedata} data.frame is that it contains a column \emph{ID} which identifies the individuals associated with the vector of probabilities returned by the \emph{likelihood} function.
+
+The \emph{doHB} function will perform a series of diagnostic tests on the model inputs to catch common errors in model setup. It also provides basic summary statistics of the choice data and model. Before estimation begins, an optional confirmation prompt allows the user to cancel the model estimation if needed.
 
 \begin{figure}
 \caption{Plotting of the Markov Chains during estimation}
-\includegraphics[scale=0.50]{MNL_markovChains.png}
+\centering
+\includegraphics[scale=0.50]{MNL_MarkovChains.png}
 \label{MarkovChain}
 \end{figure}
 
-During the estimation, current estimates of the markov chains will be plotted to the screen. This plot is updated based on the control parameter \emph{gINFOSKIP} (see figure \ref{MarkovChain}). In addition, it will provide numerical iteration details in the R Console.
+During estimation, current estimates of the Markov Chains will be plotted to the screen. This plot is updated based on the control parameter \emph{gINFOSKIP} (Figure \ref{MarkovChain}). In addition, numerical iteration details are provided in the R Console. Printing and plotting during model estimation takes time, so increasing \emph{gINFOSKIP} will reduce estimation time.
 
+\subsection*{The Output}
 
+The \emph{doHB} function returns a model object of class \emph{RSGHB}. See \emph{?doHB} for a detailed description of the components of an \emph{RSGHB} class model object.
 
-\subsection*{Evaluating the output}
-
-There are two main output files for this particular model - \emph{log} file and the \emph{\_F} file. RSGHB comes with some basic tools for plotting the contents of these files.
-
-The \emph{.log} file contains some statistics that can be used to understand if model convergence has been reached. Because this model contains only fixed coefficents, the log file contains just the root likelihood (RLH) and log-likelihood at each iteration defined by \emph{gINFOSKIP} - see figure \ref{logfile1}.
-
-\begin{figure}
-\caption{Plotting of the Log file}
-\includegraphics[scale=0.50]{MNL_logPlot1.png}
-\label{logfile1}
-\end{figure}
-
-The \emph{\_F} file contains the set of fixed (non-random) coefficients for each iteration after convergence of the markov chain.
+In addition to the modeling controls and settings, the model object includes an \emph{iter.detail} component that contains model statistics at every \emph{gINFOSKIP}th iteration. These can be used to assess whether the model has converged. This model has only fixed parameters, so only the Log-Likelihood, Root-Likelihood (RLH), and Acceptance Rate for the fixed parameters are meaningful.
 
 \begin{knitrout}
 \definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
 \begin{alltt}
-\hlkwd{data}\hlstd{(Example1_F)}
-
-\hlkwd{head}\hlstd{(Example1_F)}
+\hlcom{# Model iteration details}
+\hlkwd{head}\hlstd{(model[[}\hlstr{"iter.detail"}\hlstd{]])}
 \end{alltt}
 \begin{verbatim}
-##   iteration  ASC1   BTime   BCost
-## 1         1 1.030 -0.1460 -0.6586
-## 2         2 1.030 -0.1460 -0.6586
-## 3         3 1.030 -0.1460 -0.6586
-## 4         4 1.030 -0.1460 -0.6586
-## 5         5 1.030 -0.1460 -0.6586
-## 6         6 1.027 -0.1451 -0.6579
+##   Iteration Log-Likelihood       RLH Parameter RMS Avg. Variance
+## 2         1      -7099.213 0.5000000            NA            NA
+## 3        10      -6973.993 0.5062999            NA            NA
+## 4        20      -6834.960 0.5148242            NA            NA
+## 5        30      -6798.906 0.5166043            NA            NA
+## 6        40      -6787.540 0.5174368            NA            NA
+## 7        50      -6760.764 0.5187301            NA            NA
+##   Acceptance Rate (Fixed) Acceptance Rate (Normal)
+## 2                       0                       NA
+## 3                       0                       NA
+## 4                       0                       NA
+## 5                       0                       NA
+## 6                       0                       NA
+## 7                       0                       NA
 \end{verbatim}
 \end{kframe}
 \end{knitrout}
 
+The RSGHB plot method visualizes these model statistics conveniently.
 
+\begin{knitrout}
+\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
+\begin{alltt}
+\hlcom{# Plot model statistics}
+\hlkwd{plot}\hlstd{(model)}
+\end{alltt}
+\end{kframe}
+\includegraphics[width=\maxwidth]{figure/unnamed-chunk-6-1} 
 
+\end{knitrout}
+
+Similarly, supplying the \emph{type} argument to the plot method will plot the fixed parameter estimates, which are contained in the \emph{F} component of the model object.
+
+\begin{knitrout}
+\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
+\begin{alltt}
+\hlcom{# Plot parameter estimates (see ?plot.RSGHB for more uses)}
+\hlkwd{plot}\hlstd{(model,} \hlkwc{type} \hlstd{=} \hlstr{"F"}\hlstd{)}
+\end{alltt}
+\end{kframe}
+\includegraphics[width=\maxwidth]{figure/unnamed-chunk-7-1} 
+
+\end{knitrout}
 
 \section*{EXAMPLE 2: MNL Model with Random Coefficients}
 
-In this section, we expand on the model estimated in EXAMPLE 1 by allowing the coefficients to vary across the individuals in our dataset. This type of model is referred to by many names - Random Coefficients Logit, Random Parameters Logit or Mixed Logit. 
+In this section, we expand on the model estimated in Example 1 by allowing the coefficients to vary across the individuals in our dataset. This type of model is referred to by many names - Random Coefficients Logit, Random Parameters Logit or Mixed Logit. 
 
 \subsection*{Setup and Data Preparation}
 
-The setup and data preparation are very similar to the first model.
+The setup and data preparation are identical to Example 1.
 
-\begin{knitrout}
-\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
-\begin{alltt}
-\hlkwd{library}\hlstd{(RSGHB)}
+\subsection*{Defining the Likelihood Function}
 
-\hlcom{# load example data}
-\hlkwd{data}\hlstd{(choicedata)}
-
-\hlcom{# We typically work with one one row per choice observations. This isn't}
-\hlcom{# necessary however but it does lend it self to faster computation of the}
-\hlcom{# choice likelihoods}
-\hlkwd{head}\hlstd{(choicedata)}
-\end{alltt}
-\begin{verbatim}
-##     ID thecount tt1 tt2 toll2 asc1 Choice
-## 1 8738        1  60  51  1.25    1      1
-## 2 8738        2  60  51  0.75    1      1
-## 3 8738        3  63  59  0.50    1      2
-## 4 8738        4  60  54  0.75    1      1
-## 5 8738        5  60  54  0.50    1      2
-## 6 8738        6  63  54  0.75    1      1
-\end{verbatim}
-\begin{alltt}
-\hlcom{# We can then specify any variables from the choicedata data.frame that}
-\hlcom{# you'd like to use in the utility equations in the likelihood function}
-\hlcom{# below. These can be any variables within the data or transformations of}
-\hlcom{# those variables. This example comes from transport so each alternative is}
-\hlcom{# defined by travel times and toll costs.}
-\hlstd{TT1} \hlkwb{<-} \hlstd{choicedata}\hlopt{$}\hlstd{tt1}
-\hlstd{TT2} \hlkwb{<-} \hlstd{choicedata}\hlopt{$}\hlstd{tt2}
-\hlstd{TOLL2} \hlkwb{<-} \hlstd{choicedata}\hlopt{$}\hlstd{toll2}
-
-\hlcom{# Here we specify the choice vectors. Note in this example there are only}
-\hlcom{# two examples.  Also, dummying coding the choice vector is not necessary}
-\hlcom{# but allows for easier coding of the likelihood.}
-\hlstd{choice1} \hlkwb{<-} \hlstd{(choicedata}\hlopt{$}\hlstd{Choice} \hlopt{==} \hlnum{1}\hlstd{)}
-\hlstd{choice2} \hlkwb{<-} \hlstd{(choicedata}\hlopt{$}\hlstd{Choice} \hlopt{==} \hlnum{2}\hlstd{)}
-
-\hlcom{# Frequency of choice for the first alternative}
-\hlkwd{table}\hlstd{(choice1)}
-\end{alltt}
-\begin{verbatim}
-## choice1
-## FALSE  TRUE 
-##  3560  6682
-\end{verbatim}
-\begin{alltt}
-\hlcom{# Frequency of choice for the second alternative.}
-\hlkwd{table}\hlstd{(choice2)}
-\end{alltt}
-\begin{verbatim}
-## choice2
-## FALSE  TRUE 
-##  6682  3560
-\end{verbatim}
-\begin{alltt}
-
-\end{alltt}
-\end{kframe}
-\end{knitrout}
-
-
-
-\subsection*{Controling the Estimation Process}
-
-To allow for mixing of the parameters, we need to specify a few more controls to pass into the \emph{doHB} function.
-
-\begin{knitrout}
-\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
-\begin{alltt}
-\hlcom{# ------------------ ESTIMATION CONTROL ------------------}
-
-\hlcom{# Setting control list for estimation (see ?doHB for more estimation}
-\hlcom{# options)}
-
-\hlcom{# modelname is used for naming the output files}
-\hlstd{modelname} \hlkwb{<-} \hlstr{"MNL"}
-
-\hlcom{# gVarNamesNormal provides names for the random parameters}
-\hlstd{gVarNamesNormal} \hlkwb{<-} \hlkwd{c}\hlstd{(}\hlstr{"ASC1"}\hlstd{,} \hlstr{"BTime"}\hlstd{,} \hlstr{"BCost"}\hlstd{)}
-
-\hlcom{# gDIST specifies the type of continuous distribution to use for the random}
-\hlcom{# parameters.  gDIST must have an entry for each value in gVarNamesNormal}
-\hlcom{# The options are: 1. normal 2. log-nomal 3. negative log-normal 4. normal}
-\hlcom{# with all values below zero massed at zero 5. normal with all values}
-\hlcom{# greater than zero massed at zero 6. Johnson SB with a specified min and}
-\hlcom{# max}
-
-\hlcom{# In this example, we use normal distributions for all 3 of the parameters.}
-\hlstd{gDIST} \hlkwb{<-} \hlkwd{c}\hlstd{(}\hlnum{1}\hlstd{,} \hlnum{1}\hlstd{,} \hlnum{1}\hlstd{)}
-
-\hlcom{# svN contains the starting values for the means of the normal distributions}
-\hlcom{# for each of the random parameters}
-\hlstd{svN} \hlkwb{<-} \hlkwd{c}\hlstd{(}\hlnum{0}\hlstd{,} \hlnum{0}\hlstd{,} \hlnum{0}\hlstd{)}
-
-\hlcom{# ITERATION SETTINGS}
-
-\hlcom{# gNCREP contains the number of iterations to use prior to convergence}
-\hlstd{gNCREP} \hlkwb{<-} \hlnum{30000}
-\hlcom{# gNEREP contains the number of iterations to keep for averaging after}
-\hlcom{# convergence has been reached}
-\hlstd{gNEREP} \hlkwb{<-} \hlnum{20000}
-\hlcom{# gNSKIP contains the number of iterations to do in between retaining draws}
-\hlcom{# for averaging}
-\hlstd{gNSKIP} \hlkwb{<-} \hlnum{1}
-\hlcom{# gINFOSKIP controls how frequently to print info about the iteration}
-\hlcom{# process}
-\hlstd{gINFOSKIP} \hlkwb{<-} \hlnum{250}
-
-\hlcom{# To simplify the doHB functional call, we put all of the control parameters}
-\hlcom{# into a single list that can be passed directly to doHB.}
-\hlstd{control} \hlkwb{<-} \hlkwd{list}\hlstd{(}\hlkwc{modelname} \hlstd{= modelname,} \hlkwc{gVarNamesNormal} \hlstd{= gVarNamesNormal,} \hlkwc{gDIST} \hlstd{= gDIST,}
-    \hlkwc{svN} \hlstd{= svN,} \hlkwc{gNCREP} \hlstd{= gNCREP,} \hlkwc{gNEREP} \hlstd{= gNEREP,} \hlkwc{gNSKIP} \hlstd{= gNSKIP,} \hlkwc{gINFOSKIP} \hlstd{= gINFOSKIP)}
-\end{alltt}
-\end{kframe}
-\end{knitrout}
-
-
-\subsection*{Writing the likelihood function}
-
-To introduce mixing into the model, we switch from using \emph{fc} vector to using the \emph{b} matrix in the coding of the likelihood. The \emph{b} matrix contains the individual conditionals for the sample-level random coefficients. The matrix \emph{b} has one row per observation (an individual's coefficients are repeated across their choice observations automatically by RSGHB) and one column for each of the random parameters.
+To introduce random effects into the model, the \emph{b} matrix is used in place of the \emph{fc} vector in the coding of the \emph{likelihood} function. The \emph{b} matrix contains the individual conditionals for the sample-level random coefficients. The matrix \emph{b} has one row per choice task (associated with the vector of probabilities returned by the \emph{likelihood} function) and one column for each of the random parameters.
 
 \begin{knitrout}
 \definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
 \begin{alltt}
 \hlstd{likelihood} \hlkwb{<-} \hlkwa{function}\hlstd{(}\hlkwc{fc}\hlstd{,} \hlkwc{b}\hlstd{) \{}
 
-    \hlcom{# the change from using fc to b is the only change in the likelihood}
-    \hlcom{# function required to allow for mixing.}
-    \hlstd{cc} \hlkwb{<-} \hlnum{1}
-    \hlstd{ASC1} \hlkwb{<-} \hlstd{b[, cc]}
-    \hlstd{cc} \hlkwb{<-} \hlstd{cc} \hlopt{+} \hlnum{1}
-    \hlstd{Btime} \hlkwb{<-} \hlstd{b[, cc]}
-    \hlstd{cc} \hlkwb{<-} \hlstd{cc} \hlopt{+} \hlnum{1}
-    \hlstd{Btoll} \hlkwb{<-} \hlstd{b[, cc]}
-    \hlstd{cc} \hlkwb{<-} \hlstd{cc} \hlopt{+} \hlnum{1}
+     \hlcom{# Note that the fc argument is still supplied, but is unused}
 
-    \hlstd{v1} \hlkwb{<-} \hlstd{ASC1} \hlopt{+} \hlstd{Btime} \hlopt{*} \hlstd{TT1}
-    \hlstd{v2} \hlkwb{<-} \hlstd{Btime} \hlopt{*} \hlstd{TT2} \hlopt{+} \hlstd{Btoll} \hlopt{*} \hlstd{TOLL2}
+     \hlcom{# Using b instead of fc is the only change}
+     \hlstd{cc}     \hlkwb{<-} \hlnum{1}
+     \hlstd{ASC1}   \hlkwb{<-} \hlstd{b[, cc]; cc} \hlkwb{<-} \hlstd{cc} \hlopt{+} \hlnum{1}
+     \hlstd{Btime}  \hlkwb{<-} \hlstd{b[, cc]; cc} \hlkwb{<-} \hlstd{cc} \hlopt{+} \hlnum{1}
+     \hlstd{Btoll}  \hlkwb{<-} \hlstd{b[, cc]; cc} \hlkwb{<-} \hlstd{cc} \hlopt{+} \hlnum{1}
 
-    \hlstd{p} \hlkwb{<-} \hlstd{(}\hlkwd{exp}\hlstd{(v1)} \hlopt{*} \hlstd{choice1} \hlopt{+} \hlkwd{exp}\hlstd{(v2)} \hlopt{*} \hlstd{choice2)}\hlopt{/}\hlstd{(}\hlkwd{exp}\hlstd{(v1)} \hlopt{+} \hlkwd{exp}\hlstd{(v2))}
+     \hlcom{# Utility functions}
+     \hlstd{v1} \hlkwb{<-} \hlstd{ASC1} \hlopt{+} \hlstd{Btime} \hlopt{*} \hlstd{TT1}
+     \hlstd{v2} \hlkwb{<-}        \hlstd{Btime} \hlopt{*} \hlstd{TT2} \hlopt{+} \hlstd{Btoll} \hlopt{*} \hlstd{TOLL2}
 
-    \hlkwd{return}\hlstd{(p)}
+     \hlcom{# MNL probability statement}
+     \hlstd{p}  \hlkwb{<-} \hlstd{(}\hlkwd{exp}\hlstd{(v1)} \hlopt{*} \hlstd{choice1} \hlopt{+} \hlkwd{exp}\hlstd{(v2)} \hlopt{*} \hlstd{choice2)} \hlopt{/} \hlstd{(}\hlkwd{exp}\hlstd{(v1)} \hlopt{+} \hlkwd{exp}\hlstd{(v2))}
+
+     \hlkwd{return}\hlstd{(p)}
 \hlstd{\}}
 \end{alltt}
 \end{kframe}
 \end{knitrout}
 
+\subsection*{Model Controls and Settings}
 
-\subsection*{Section 4: Estimating the model}
+A few more controls can be supplied to the \emph{doHB} function when random parameters are to be estimated.
 
-Again, to start the model estimation process, the analyst needs to call the \emph{doHB} function passing in the \emph{likelihood} function, the \emph{choicedata} data.frame and the \emph{control} list. 
+\begin{knitrout}
+\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
+\begin{alltt}
+\hlcom{### Setting control list for estimation (see ?doHB for more estimation options)}
+
+\hlcom{# The model name/description}
+\hlstd{modelname} \hlkwb{<-} \hlstr{"MMNL"}
+
+\hlcom{# gVarNamesNormal provides names for the random parameters in the same way}
+\hlcom{# gVarNamesFixed does for the fixed parameters}
+\hlstd{gVarNamesNormal} \hlkwb{<-} \hlkwd{c}\hlstd{(}\hlstr{"ASC1"}\hlstd{,}\hlstr{"BTime"}\hlstd{,}\hlstr{"BCost"}\hlstd{)}
+
+\hlcom{# svN contains the starting values for the means of the normal distributions for each }
+\hlcom{# of the random parameters}
+\hlstd{svN} \hlkwb{<-} \hlkwd{c}\hlstd{(}\hlnum{0}\hlstd{,} \hlnum{0}\hlstd{,} \hlnum{0}\hlstd{)}
+
+\hlcom{# gDIST specifies the type of continuous distribution to use for the random parameters}
+\hlcom{# gDIST must have an entry for each value in gVarNamesNormal}
+\hlcom{# The options are:}
+\hlcom{# 1. normal}
+\hlcom{# 2. log-nomal}
+\hlcom{# 3. negative log-normal}
+\hlcom{# 4. normal with all values below zero massed at zero}
+\hlcom{# 5. normal with all values greater than zero massed at zero}
+\hlcom{# 6. Johnson SB with a specified min and max}
+
+\hlcom{# In this example, normal distributions are used for all 3 parameters}
+\hlstd{gDIST} \hlkwb{<-} \hlkwd{c}\hlstd{(}\hlnum{1}\hlstd{,} \hlnum{1}\hlstd{,} \hlnum{1}\hlstd{)}
+
+\hlcom{# gNCREP contains the number of iterations to use prior to convergence}
+\hlstd{gNCREP} \hlkwb{<-} \hlnum{2500}
+\hlcom{# gNEREP contains the number of iterations to keep for averaging after convergence }
+\hlcom{# has been reached}
+\hlstd{gNEREP} \hlkwb{<-} \hlnum{2500}
+\hlcom{# gNSKIP contains the number of iterations between retaining draws for averaging}
+\hlstd{gNSKIP} \hlkwb{<-} \hlnum{1}
+\hlcom{# gINFOSKIP controls how frequently to print info about the iteration process}
+\hlstd{gINFOSKIP} \hlkwb{<-} \hlnum{10}
+\hlcom{# gSeed ensures reproducible results}
+\hlstd{gSeed} \hlkwb{<-} \hlnum{1987}
+
+\hlcom{# To simplify the doHB function call, all of the control parameters are placed in}
+\hlcom{# a single list that can be passed directly to doHB}
+\hlstd{control} \hlkwb{<-} \hlkwd{list}\hlstd{(}\hlkwc{modelname} \hlstd{= modelname,}
+                \hlkwc{gVarNamesNormal} \hlstd{= gVarNamesNormal,}
+                \hlkwc{gDIST} \hlstd{= gDIST,}
+                \hlkwc{svN} \hlstd{= svN,}
+                \hlkwc{gNCREP} \hlstd{= gNCREP,}
+                \hlkwc{gNEREP} \hlstd{= gNEREP,}
+                \hlkwc{gNSKIP} \hlstd{= gNSKIP,}
+                \hlkwc{gINFOSKIP} \hlstd{= gINFOSKIP,}
+                \hlkwc{gSeed} \hlstd{= gSeed)}
+\end{alltt}
+\end{kframe}
+\end{knitrout}
+
+\subsection*{Model Estimation}
+
+As in Example 1, the model estimation process is initiated with the analyst supplying the \emph{likelihood} function, \emph{choicedata} data.frame, and the \emph{control} list to the \emph{doHB} function.
 
 \begin{verbatim}
-doHB(likelihood, choicedata, control)
+model <- doHB(likelihood, choicedata, control)
 \end{verbatim}
+
+
+
+In this model, the Markov Chain values plotted represent the means of the underlying normals for the random parameters (Figure \ref{MarkovChain2}).
 
 \begin{figure}
 \caption{Plotting of the Markov Chains during estimation}
-\includegraphics[scale=0.50]{MNL_markovChains2.png}
+\centering
+\includegraphics[scale=0.50]{MMNL_MarkovChains.png}
 \label{MarkovChain2}
 \end{figure}
 
+\subsection*{The Output}
 
-\subsection*{Evaluating the output}
+The \emph{RSGHB} model object has more components in the case of a random or mixed effects model.
 
-As in the first example, current estimates of the markov chains will be plotted to the screen - see figure \ref{MarkovChain2}. In this model, these represent the means of the underlying normals for the random parameters.
-
-There are more output files for this model. RSGHB comes with some basic tools for plotting the contents of these files.
-
-The \emph{.log} file contains some statistics that can be used to understand if model convergence has been reached. Because this model includes random coefficients, the log file now contains the average variance and parameter root mean square (RMS) at each iteration - see figure \ref{logfile2}. 
-
-\begin{figure}
-\caption{Plotting of the Log file}
-\includegraphics[scale=0.50]{MNL_logPlot2.png}
-\label{logfile2}
-\end{figure}
-
-The \emph{\_A} file contain the sample-level means of the underlying normal at each iteration.
+The \emph{iter.detail} component now contains the additional model statistics: Parameter Root Mean Square (RMS) and Average Variance at each stored iteration.
 
 \begin{knitrout}
 \definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
 \begin{alltt}
-\hlkwd{data}\hlstd{(Example2_A)}
-
-\hlkwd{head}\hlstd{(Example2_A)}
+\hlcom{# Model iteration details}
+\hlkwd{head}\hlstd{(model[[}\hlstr{"iter.detail"}\hlstd{]])}
 \end{alltt}
 \begin{verbatim}
-##   iteration   ASC1   BTime   BCost
-## 1         1 0.9502 -0.1249 -0.5975
-## 2         2 0.9192 -0.1345 -0.6017
-## 3         3 0.9334 -0.1276 -0.5895
-## 4         4 0.9543 -0.1386 -0.5932
-## 5         5 0.9488 -0.1187 -0.5895
-## 6         6 0.9399 -0.1178 -0.5912
+##   Iteration Log-Likelihood       RLH Parameter RMS Avg. Variance
+## 2         1      -6875.096 0.5138458     0.1922419    0.03770582
+## 3        10      -6530.749 0.5339567     0.2072798    0.04383990
+## 4        20      -6408.916 0.5408803     0.2142815    0.04904044
+## 5        30      -6348.262 0.5436143     0.2219182    0.05375706
+## 6        40      -6286.665 0.5465279     0.2487251    0.07010541
+## 7        50      -6294.444 0.5462534     0.2610000    0.07945012
+##   Acceptance Rate (Fixed) Acceptance Rate (Normal)
+## 2                      NA                0.2390158
+## 3                      NA                0.6485062
+## 4                      NA                0.4753954
+## 5                      NA                0.3014060
+## 6                      NA                0.2970123
+## 7                      NA                0.2943761
+\end{verbatim}
+\end{kframe}
+\end{knitrout}
+
+The \emph{A} component contains the sample-level means of the underlying normal. These can be plotted with the plot method.
+
+\begin{knitrout}
+\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
+\begin{alltt}
+\hlcom{# Sample-level means}
+\hlkwd{head}\hlstd{(model[[}\hlstr{"A"}\hlstd{]])}
+\end{alltt}
+\begin{verbatim}
+##      iteration      ASC1      BTime      BCost
+## [1,]      2501 0.9621848 -0.1545391 -0.8139106
+## [2,]      2502 0.9545125 -0.1551021 -0.8220994
+## [3,]      2503 0.9609168 -0.1579467 -0.8365826
+## [4,]      2504 0.9566381 -0.1483454 -0.8112167
+## [5,]      2505 0.9680402 -0.1513544 -0.7950746
+## [6,]      2506 0.9622336 -0.1548498 -0.8074830
+\end{verbatim}
+\begin{alltt}
+\hlcom{# Plot sample-level means}
+\hlkwd{plot}\hlstd{(model,} \hlkwc{type} \hlstd{=} \hlstr{"A"}\hlstd{)}
+\end{alltt}
+\end{kframe}
+\includegraphics[width=\maxwidth]{figure/unnamed-chunk-12-1} 
+
+\end{knitrout}
+
+The \emph{B} component contains the average, across iterations, of the individual level draws for the underlying normals for the random parameters. The \emph{Bsd} component provides the standard deviations of those individual draws.
+
+\begin{knitrout}
+\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
+\begin{alltt}
+\hlcom{# Average individual-level draws}
+\hlkwd{head}\hlstd{(model[[}\hlstr{"B"}\hlstd{]])}
+\end{alltt}
+\begin{verbatim}
+##      Respondent      ASC1       BTime      BCost
+## [1,]       8738 1.0119798 -0.09908077 -0.7448113
+## [2,]       8740 0.9533854 -0.23637974 -0.7373689
+## [3,]       8741 0.7781766 -0.19232956 -0.6846307
+## [4,]       8742 1.0318069 -0.16275203 -0.7602587
+## [5,]       8744 0.8773973 -0.19977816 -0.8263802
+## [6,]       8745 1.0682132 -0.16297200 -0.8633892
+\end{verbatim}
+\begin{alltt}
+\hlcom{# Standard deviations of individual-level draws}
+\hlkwd{head}\hlstd{(model[[}\hlstr{"Bsd"}\hlstd{]])}
+\end{alltt}
+\begin{verbatim}
+##      Respondent      ASC1      BTime     BCost
+## [1,]       8738 0.3858823 0.09542189 0.3982313
+## [2,]       8740 0.3906552 0.09246645 0.3686650
+## [3,]       8741 0.4204022 0.09383012 0.3722527
+## [4,]       8742 0.3975120 0.09215175 0.3908000
+## [5,]       8744 0.3915224 0.08800749 0.3856704
+## [6,]       8745 0.4238465 0.10291285 0.4093861
+\end{verbatim}
+\end{kframe}
+\end{knitrout}
+
+The \emph{C} component contains the average across iterations of the individual level draws for the random parameters including the appropriate distribution transformations (if applicable). The \emph{C} component also contains the Root-Likelihood (RLH), an individual-specific measure of model fit. The \emph{Csd} component provides the standard deviations of those individual draws.
+
+These two components are equivalent to the conditional distributions from models estimated using Maximum Simulated Likelihood methods.
+
+\begin{knitrout}
+\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
+\begin{alltt}
+\hlcom{# Average individual-level draws (transformed; if applicable)}
+\hlkwd{head}\hlstd{(model[[}\hlstr{"C"}\hlstd{]])}
+\end{alltt}
+\begin{verbatim}
+##      Respondent       RLH      ASC1       BTime      BCost
+## [1,]       8738 0.5839822 1.0119798 -0.09908077 -0.7448113
+## [2,]       8740 0.4944426 0.9533854 -0.23637974 -0.7373689
+## [3,]       8741 0.4454440 0.7781766 -0.19232956 -0.6846307
+## [4,]       8742 0.5096863 1.0318069 -0.16275203 -0.7602587
+## [5,]       8744 0.4763954 0.8773973 -0.19977816 -0.8263802
+## [6,]       8745 0.5950816 1.0682132 -0.16297200 -0.8633892
+\end{verbatim}
+\begin{alltt}
+\hlcom{# Standard deviations of individual-level draws (transformed; if applicable)}
+\hlkwd{head}\hlstd{(model[[}\hlstr{"Csd"}\hlstd{]])}
+\end{alltt}
+\begin{verbatim}
+##      Respondent      ASC1      BTime     BCost
+## [1,]       8738 0.3858823 0.09542189 0.3982313
+## [2,]       8740 0.3906552 0.09246645 0.3686650
+## [3,]       8741 0.4204022 0.09383012 0.3722527
+## [4,]       8742 0.3975120 0.09215175 0.3908000
+## [5,]       8744 0.3915224 0.08800749 0.3856704
+## [6,]       8745 0.4238465 0.10291285 0.4093861
 \end{verbatim}
 \end{kframe}
 \end{knitrout}
 
 
-The \emph{\_B} file contains the average across iterations of the individual level draws for the underlying normals for the random parameters. The \emph{\_Bsd} file provides the standard deviations of those individual draws.
+The \emph{D} component contains a three-dimensional \emph{p} by \emph{p} by \emph{gNEREP} array containing the sample covariance at each iteration, where \emph{p} is the number of random parameters.   
 
-\begin{knitrout}
-\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
-\begin{alltt}
-\hlkwd{data}\hlstd{(Example2_B)}
-
-\hlkwd{head}\hlstd{(Example2_B)}
-\end{alltt}
-\begin{verbatim}
-##   Respondent   ASC1    BTime   BCost
-## 1       8738 1.2066 -0.01700 -0.6707
-## 2       8740 1.1857 -0.01575 -0.5232
-## 3       8741 0.7790 -0.57719 -0.4940
-## 4       8742 1.1593 -0.27220 -0.6376
-## 5       8744 0.5109 -0.02025 -0.5083
-## 6       8745 1.0068 -0.29565 -0.5575
-\end{verbatim}
-\begin{alltt}
-\hlkwd{data}\hlstd{(Example2_Bsd)}
-
-\hlkwd{head}\hlstd{(Example2_Bsd)}
-\end{alltt}
-\begin{verbatim}
-##   Respondent   ASC1  BTime  BCost
-## 1       8738 0.6501 0.1616 0.4068
-## 2       8740 0.6821 0.1693 0.4069
-## 3       8741 0.6917 0.2080 0.4230
-## 4       8742 0.6381 0.1567 0.4002
-## 5       8744 0.7009 0.1650 0.4296
-## 6       8745 0.6260 0.1676 0.4018
-\end{verbatim}
-\end{kframe}
-\end{knitrout}
-
-
-The \emph{\_C} file contains the average across iterations of the individual level draws for the random parameters including the appropriate transformations. The \emph{\_C} file also contains individual-specific measures of model fit (Root Likelihoods). The \emph{\_Csd} file provides the standard deviations of those individual draws. These two files are equivalent to the conditional distributions from models estimated using Maximum Simulated Likelihood methods.
-
-\begin{knitrout}
-\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
-\begin{alltt}
-\hlkwd{data}\hlstd{(Example2_C)}
-
-\hlkwd{head}\hlstd{(Example2_C)}
-\end{alltt}
-\begin{verbatim}
-##   Respondent    RLH   ASC1    BTime   BCost
-## 1       8738 0.6762 1.2066 -0.01700 -0.6707
-## 2       8740 0.6326 1.1857 -0.01575 -0.5232
-## 3       8741 0.8420 0.7790 -0.57719 -0.4940
-## 4       8742 0.5145 1.1593 -0.27220 -0.6376
-## 5       8744 0.4781 0.5109 -0.02025 -0.5083
-## 6       8745 0.4920 1.0068 -0.29565 -0.5575
-\end{verbatim}
-\begin{alltt}
-\hlkwd{data}\hlstd{(Example2_Csd)}
-
-\hlkwd{head}\hlstd{(Example2_Csd)}
-\end{alltt}
-\begin{verbatim}
-##   Respondent   ASC1  BTime  BCost
-## 1       8738 0.6501 0.1616 0.4068
-## 2       8740 0.6821 0.1693 0.4069
-## 3       8741 0.6917 0.2080 0.4230
-## 4       8742 0.6381 0.1567 0.4002
-## 5       8744 0.7009 0.1650 0.4296
-## 6       8745 0.6260 0.1676 0.4018
-\end{verbatim}
-\end{kframe}
-\end{knitrout}
-
-
-
-The \emph{\_D} file contains a row-based representation of the sample covariance for each iteration. Note the use below of the xpnd function to convert to a matrix representation of the sample covariance.
-
-\begin{knitrout}
-\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
-\begin{alltt}
-\hlkwd{data}\hlstd{(Example2_D)}
-
-\hlkwd{head}\hlstd{(Example2_D)}
-\end{alltt}
-\begin{verbatim}
-##   iteration   ASC1 ASC1xBTime ASC1xBCost      BTime BTimexBCost  BCost
-## 1         1 0.1996   -0.02085    0.06611 -0.0122684     0.03471 0.1830
-## 2         2 0.2068   -0.02099    0.06575 -0.0053138     0.03063 0.1854
-## 3         3 0.2206   -0.01673    0.06778 -0.0008272     0.03580 0.1873
-## 4         4 0.2136   -0.02086    0.06905  0.0055351     0.03120 0.1801
-## 5         5 0.2376   -0.01937    0.06593 -0.0054135     0.02932 0.1752
-## 6         6 0.2234   -0.02707    0.07341 -0.0128438     0.03041 0.1791
-\end{verbatim}
-\begin{alltt}
-\hlcom{# building the covariance matrix}
-
-\hlstd{covMat} \hlkwb{<-} \hlkwd{xpnd}\hlstd{(}\hlkwd{colMeans}\hlstd{(Example2_D[}\hlopt{-}\hlnum{1}\hlstd{]))}
-
-\hlkwd{rownames}\hlstd{(covMat)} \hlkwb{<-} \hlkwd{c}\hlstd{(}\hlstr{"ASC1"}\hlstd{,} \hlstr{"BTime"}\hlstd{,} \hlstr{"BCost"}\hlstd{)}
-\hlkwd{colnames}\hlstd{(covMat)} \hlkwb{<-} \hlkwd{c}\hlstd{(}\hlstr{"ASC1"}\hlstd{,} \hlstr{"BTime"}\hlstd{,} \hlstr{"BCost"}\hlstd{)}
-
-\hlstd{covMat}
-\end{alltt}
-\begin{verbatim}
-##           ASC1    BTime    BCost
-## ASC1   0.44636 -0.06659 -0.05475
-## BTime -0.06659  0.07915  0.03123
-## BCost -0.05475  0.03123  0.17248
-\end{verbatim}
-\end{kframe}
-\end{knitrout}
-
-
-\section*{RSGHB Control Parameters}
-
-Here is a list of the user-specified control parameters.
-
-\begin{description}
-
-\item[gVarNamesNormal] - A vector of charater-based names for the random parameters. \\
-Default: NULL
-
-\item[gVarNamesFixed] - A vector of character-based names for the fixed parameters.\\
-Default: NULL
-
-\item[gDIST] -  A vector of integers (1-6) which indicate which type of distribution should be applied to the random parameters - 1 = Normal, 2 = Postive Log-Normal, 3 = Negative Log-Normal, 4 = Positive Censored Normal, 5 = Negative Censored Normal, 6 = Johnson SB. There should be an element for each name in gVarNamesNormal. \\ Default: NULL
-
-\item[FC] - A vector of starting values for the fixed coefficients. There should be an element for each name in gVarNamesFixed.\\ 
-Default: NULL
-
-\item[svN] - A vector of starting values for the means of the underlying normals for the random parameters. There should be an element for each name in gVarNamesNormal.\\ Default: NULL
-
-\item[gNCREP] - Number of burn-in iterations to use prior to convergence.\\ 
-Default: 100000
-
-\item[gNEREP] - Number of iterations to keep for averaging after convergence has been reached.\\ Default: 100000
-
-\item[gNSKIP] - Number of iterations in between retaining draws for averaging.\\ 
-Default: 1
-
-\item[gINFOSKIP] - Number of iterations in between printing/saving information about the iteration process.
-\\ Default: 250
-
-\item[modelname] - The model name which is used for creating output files. 
-\\ Default: paste("HBModel",round(runif(1)*10000000,0),sep=""))
-
-\item[gSIGDIG] - The number of significant digits for reporting purposes.\\ 
-Default: 10
-
-\item[priorVariance] - The amount of prior variance assumed.\\ 
-Default: 2.0
-
-\item[pvMatrix] - A custom prior covariance matrix can be used in estimation. If specified in the control list, the custom matrix will override the default prior covariance matrix used by RSGHB. The prior covariance matrix needs to be a matrix object and of the correct size - \begin{verbatim}length(gVarNamesNormal) x length(gVarNamesNormal)\end{verbatim}  
-
-\item[degreesOfFreedom] - Additional degrees of freedom for the prior covariance matrix (not including the number of parameters.\\ 
-Default: 5
-
-\item[rho] - The initial proportionality fraction for the jumping distribution for the Metropolis-Hastings algorithm for the random parameters. This fraction is adjusted by the program after each iteration to attain an acceptance rate of about 0.3.\\ 
-Default: 0.1
-
-\item[rhoF] - The proportionality fraction for the jumping distribution for the Metropolis-Hastings algorithm for the fixed parameters. Unlike rho, this value is not adjusted as the markov chain proceeds. \\
-Default: 0.0001
-
-\item[targetAcceptanceNormal] - The target acceptance rate in the Metropolis-Hastings algorithm for the random parameters. \\
-Defaults: 0.3
-
-\item[targetAcceptanceFixed] - The target acceptance rate in the Metropolis-Hastings algorithm for the fixed parameters. \\
-Defaults: 0.3
-
-\item[gFULLCV] - A number that indicates if a full or independent covariance structure should be used for the random parameters. A value of 1 indicated full and 0 for an independent structure.\\ Default: 1
-
-\item[gMINCOEF] - A vector of minimums for the Johnson SB distributions. If Johnson SB is used, each random parameter needs an element but only the elements that correspond to a JSB in gDIST are used. \\ 
-Default: 0
-
-\item[gMAXCOEF] - Like gMINCOEF but for the maximum of the Johnson SB distribution. 
-\\ Default: 0
-
-\item[gStoreDraws] - A boolean value to store the draws for the individual level coefficients. \\ Default: F
-
-\item[gSeed] - The random seed.\\ 
-Default: 0
-
-\item[constraintsNorm] - This is a list of monotonic constraints to be applied during estimation. The structure of the constraints is c(param1number - inequality - param2number). For constraints relative to 0, use 0 instead of the param2number. For the inequality, use 1 for $<$ and 2 for $>$. Example \begin{verbatim}constraintsNorm <- list(c(5,1,0),c(6,1,5),c(7,1,6),c(8,1,7))\end{verbatim} would constrain the 5th parameter < 0, the 6th parameter < 5th parameter, the 7th parameter < the 6th parameter, etc. \\ Default: NULL
-
-\item[nodiagnostics] - If set to TRUE, the diagnostic report will not be reported to the screen with a prompt to continue. This makes batch processing easier to implement.\\ 
-Default: FALSE
-
-\item[fixedA] - This allows the analyst to fix means of the underlying normal distribution of random variables to certain values as opposed to estimating them. This would be important for example in an error components logit model or an integrated choice and latent variable model. The format for this input is a vector of length equal to the number of random parameters. Use NA for variables that should be estimated, example: \begin{verbatim}fixedA = c(NA, NA, NA, NA, NA, NA, NA, 0)\end{verbatim} In this case, the mean of the underlying normal for the 8th random variable would be fixed to 0.
-
-\item[fixedD] - This allows the analyst to fix the variance of the underlying normal distribution of the random variables to certain values as opposed to estimating them. This would be important for example in an integrated choice and latent variable model. The format for this input is a vector of length equal to the number of random parameters. Use NA for variables that should be estimated, example:
- \begin{verbatim}fixedD = c(NA, NA, NA, NA, NA, NA, NA, 1)\end{verbatim} In this case, the variance of the underlying normal for the 8th random variable would be fixed to 1.
-
-\end{description}     
-
-\section*{RSGHB Output Files}
-
-RSGHB generates a number of output files which can be used to evaluate the model.
-
-\begin{description}
-
-\item[A file] - The A file contain the sample-level means of the underlying normal at each iteration. 
-
-\item[B file, Bsd file] - The B file contains the average across iterations of the individual level draws for the underlying normals for the random parameters. The Bsd file provides the standard deviations of those individual draws. 
-
-\item[C file, Csd file] - The C file contains the average across iterations of the individual level draws for the random parameters including the appropriate transformations. The Csd file provides the standard deviations of those individual draws. These two files are equivalent to the conditional distributions from models estimated using Maximum Simulated Likelihood methods.
-
-\item[D file] - This file contains a row-based representation of the sample covariance for each iteration.
-
-\item[F file] - This file contains the set of fixed (non-random) parameters for each iteration after convergence.
-
-\item[Log file] - This contains some statistics that can be used to understand if model convergence has been reached.
-
-\item[PV Matrix] - This file contains the prior covariance matrix that was assumed during the estimation of the model.
-
-\end{description}  
+\end{description}
 
 \end{document}
