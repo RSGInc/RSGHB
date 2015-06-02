@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.1415926-2.5-1.40.14 (MiKTeX 2.9) (preloaded format=pdflatex 2015.1.23)  2 JUN 2015 16:08
+This is pdfTeX, Version 3.1415926-2.5-1.40.14 (MiKTeX 2.9) (preloaded format=pdflatex 2015.1.23)  2 JUN 2015 16:31
 entering extended mode
 **RSGHB_HowTo.tex
 (C:\Users\jeff.keller\Desktop\RSGHB\vignettes\RSGHB_HowTo.tex
@@ -217,36 +217,29 @@ Package pdftex.def Info: MNL_MarkovChains.png used on input line 237.
 Package color Info: Redefining color shadecolor on input line 250.
 Package color Info: Redefining color shadecolor on input line 277.
 
-<figure/unnamed-chunk-6-1.pdf, id=22, 505.89pt x 505.89pt>
+<figure/unnamed-chunk-6-1.pdf, id=22, 361.35pt x 361.35pt>
 File: figure/unnamed-chunk-6-1.pdf Graphic file (type pdf)
 
 <use figure/unnamed-chunk-6-1.pdf>
 Package pdftex.def Info: figure/unnamed-chunk-6-1.pdf used on input line 283.
-(pdftex.def)             Requested size: 419.75496pt x 419.76508pt.
-
-Overfull \hbox (13.87491pt too wide) in paragraph at lines 283--284
-[][] 
- []
-
-[4 <C:/Users/jeff.keller/Desktop/RSGHB/vignettes/MNL_MarkovChains.png>]
+(pdftex.def)             Requested size: 361.34912pt x 361.34912pt.
+ [4 <C:/Users/jeff.keller/Desktop/RSGHB/vignettes/MNL_MarkovChains.png>]
 Package color Info: Redefining color shadecolor on input line 290.
 
-<figure/unnamed-chunk-7-1.pdf, id=27, 505.89pt x 505.89pt>
+<figure/unnamed-chunk-7-1.pdf, id=27, 361.35pt x 361.35pt>
 File: figure/unnamed-chunk-7-1.pdf Graphic file (type pdf)
 
 <use figure/unnamed-chunk-7-1.pdf>
 Package pdftex.def Info: figure/unnamed-chunk-7-1.pdf used on input line 296.
-(pdftex.def)             Requested size: 419.75496pt x 419.76508pt.
-
-Overfull \hbox (13.87491pt too wide) in paragraph at lines 296--297
-[][] 
- []
-
-[5 <C:/Users/jeff.keller/Desktop/RSGHB/vignettes/figure/unnamed-chunk-6-1.pdf>]
+(pdftex.def)             Requested size: 361.34912pt x 361.34912pt.
+ [5 <C:/Users/jeff.keller/Desktop/RSGHB/vignettes/figure/unnamed-chunk-6-1.pdf>
+]
 Package color Info: Redefining color shadecolor on input line 313.
-[6 <C:/Users/jeff.keller/Desktop/RSGHB/vignettes/figure/unnamed-chunk-7-1.pdf>]
+ [6 <C:/Users/jeff.keller/Desktop/RSGHB/vignettes/figure/unnamed-chunk-7-1.pdf>
+]
 Package color Info: Redefining color shadecolor on input line 343.
-[7] <MMNL_MarkovChains.png, id=49, 815.045pt x 472.76625pt>
+ [7]
+<MMNL_MarkovChains.png, id=49, 815.045pt x 472.76625pt>
 File: MMNL_MarkovChains.png Graphic file (type png)
 
 <use MMNL_MarkovChains.png>
@@ -254,68 +247,50 @@ Package pdftex.def Info: MMNL_MarkovChains.png used on input line 413.
 (pdftex.def)             Requested size: 407.5215pt x 236.38254pt.
 Package color Info: Redefining color shadecolor on input line 424.
  [8 <C:/Users/jeff.keller/Desktop/RSGHB/vignettes/MMNL_MarkovChains.png>]
-Package color Info: Redefining color shadecolor on input line 451.
+<figure/unnamed-chunk-11-1.pdf, id=54, 361.35pt x 361.35pt>
+File: figure/unnamed-chunk-11-1.pdf Graphic file (type pdf)
 
-<figure/unnamed-chunk-12-1.pdf, id=54, 505.89pt x 505.89pt>
+<use figure/unnamed-chunk-11-1.pdf>
+Package pdftex.def Info: figure/unnamed-chunk-11-1.pdf used on input line 450.
+(pdftex.def)             Requested size: 361.34912pt x 361.34912pt.
+Package color Info: Redefining color shadecolor on input line 457.
+
+<figure/unnamed-chunk-12-1.pdf, id=55, 361.35pt x 361.35pt>
 File: figure/unnamed-chunk-12-1.pdf Graphic file (type pdf)
 
 <use figure/unnamed-chunk-12-1.pdf>
-Package pdftex.def Info: figure/unnamed-chunk-12-1.pdf used on input line 470.
-(pdftex.def)             Requested size: 419.75496pt x 419.76508pt.
-
-Overfull \hbox (13.87491pt too wide) in paragraph at lines 470--471
-[][] 
- []
-
-[9]
-Package color Info: Redefining color shadecolor on input line 477.
+Package pdftex.def Info: figure/unnamed-chunk-12-1.pdf used on input line 476.
+(pdftex.def)             Requested size: 361.34912pt x 361.34912pt.
+ [9 <C:/Users/jeff.keller/Desktop/RSGHB/vignettes/figure/unnamed-chunk-11-1.pdf
+>]
+Package color Info: Redefining color shadecolor on input line 483.
  [10 <C:/Users/jeff.keller/Desktop/RSGHB/vignettes/figure/unnamed-chunk-12-1.pd
 f>]
-Package color Info: Redefining color shadecolor on input line 512.
-
-
-! LaTeX Error: \begin{document} ended by \end{description}.
-
-See the LaTeX manual or LaTeX Companion for explanation.
-Type  H <return>  for immediate help.
- ...                                              
-                                                  
-l.545 \end{description}
-                       
-Your command was ignored.
-Type  I <command> <return>  to replace it with another command,
-or  <return>  to continue without it.
-
-! Extra \endgroup.
-<recently read> \endgroup 
-                          
-l.545 \end{description}
-                       
-Things are pretty mixed up, but I think the worst is over.
-
-[11] (C:\Users\jeff.keller\Desktop\RSGHB\vignettes\RSGHB_HowTo.aux) ) 
+Package color Info: Redefining color shadecolor on input line 518.
+ [11]
+(C:\Users\jeff.keller\Desktop\RSGHB\vignettes\RSGHB_HowTo.aux) ) 
 Here is how much of TeX's memory you used:
- 1899 strings out of 493921
- 26756 string characters out of 3144858
+ 1904 strings out of 493921
+ 26913 string characters out of 3144858
  92782 words of memory out of 3000000
- 5182 multiletter control sequences out of 15000+200000
+ 5186 multiletter control sequences out of 15000+200000
  9487 words of font info for 34 fonts, out of 3000000 for 9000
  841 hyphenation exceptions out of 8191
  27i,7n,32p,516b,289s stack positions out of 5000i,500n,10000p,200000b,50000s
-<C:/Progra
-m Files (x86)/MiKTeX 2.9/fonts/type1/public/amsfonts/cm/cmbx12.pfb><C:/Program 
-Files (x86)/MiKTeX 2.9/fonts/type1/public/amsfonts/cm/cmbx9.pfb><C:/Program Fil
-es (x86)/MiKTeX 2.9/fonts/type1/public/amsfonts/cm/cmitt10.pfb><C:/Program File
-s (x86)/MiKTeX 2.9/fonts/type1/public/amsfonts/cm/cmr10.pfb><C:/Program Files (
-x86)/MiKTeX 2.9/fonts/type1/public/amsfonts/cm/cmr12.pfb><C:/Program Files (x86
-)/MiKTeX 2.9/fonts/type1/public/amsfonts/cm/cmr17.pfb><C:/Program Files (x86)/M
-iKTeX 2.9/fonts/type1/public/amsfonts/cm/cmr9.pfb><C:/Program Files (x86)/MiKTe
-X 2.9/fonts/type1/public/amsfonts/cm/cmsy9.pfb><C:/Program Files (x86)/MiKTeX 2
-.9/fonts/type1/public/amsfonts/cm/cmti9.pfb><C:/Program Files (x86)/MiKTeX 2.9/
-fonts/type1/public/amsfonts/cm/cmtt9.pfb>
-Output written on RSGHB_HowTo.pdf (11 pages, 261647 bytes).
+<C:/Program Fil
+es (x86)/MiKTeX 2.9/fonts/type1/public/amsfonts/cm/cmbx12.pfb><C:/Program Files
+ (x86)/MiKTeX 2.9/fonts/type1/public/amsfonts/cm/cmbx9.pfb><C:/Program Files (x
+86)/MiKTeX 2.9/fonts/type1/public/amsfonts/cm/cmitt10.pfb><C:/Program Files (x8
+6)/MiKTeX 2.9/fonts/type1/public/amsfonts/cm/cmr10.pfb><C:/Program Files (x86)/
+MiKTeX 2.9/fonts/type1/public/amsfonts/cm/cmr12.pfb><C:/Program Files (x86)/MiK
+TeX 2.9/fonts/type1/public/amsfonts/cm/cmr17.pfb><C:/Program Files (x86)/MiKTeX
+ 2.9/fonts/type1/public/amsfonts/cm/cmr9.pfb><C:/Program Files (x86)/MiKTeX 2.9
+/fonts/type1/public/amsfonts/cm/cmsy9.pfb><C:/Program Files (x86)/MiKTeX 2.9/fo
+nts/type1/public/amsfonts/cm/cmti9.pfb><C:/Program Files (x86)/MiKTeX 2.9/fonts
+/type1/public/amsfonts/cm/cmtt9.pfb>
+Output written on RSGHB_HowTo.pdf (11 pages, 273801 bytes).
 PDF statistics:
- 102 PDF objects out of 1000 (max. 8388607)
+ 108 PDF objects out of 1000 (max. 8388607)
  0 named destinations out of 1000 (max. 500000)
- 26 words of extra memory for PDF output out of 10000 (max. 10000000)
+ 31 words of extra memory for PDF output out of 10000 (max. 10000000)
 

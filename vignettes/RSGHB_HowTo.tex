@@ -442,7 +442,13 @@ The \emph{iter.detail} component now contains the additional model statistics: P
 ## 6                      NA                0.2970123
 ## 7                      NA                0.2943761
 \end{verbatim}
+\begin{alltt}
+\hlcom{# Plot model statistics}
+\hlkwd{plot}\hlstd{(model)}
+\end{alltt}
 \end{kframe}
+\includegraphics[width=\maxwidth]{figure/unnamed-chunk-11-1} 
+
 \end{knitrout}
 
 The \emph{A} component contains the sample-level means of the underlying normal. These can be plotted with the plot method.
@@ -541,7 +547,5 @@ These two components are equivalent to the conditional distributions from models
 
 
 The \emph{D} component contains a three-dimensional \emph{p} by \emph{p} by \emph{gNEREP} array containing the sample covariance at each iteration, where \emph{p} is the number of random parameters.   
-
-\end{description}
 
 \end{document}

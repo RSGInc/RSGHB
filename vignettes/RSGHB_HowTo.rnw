@@ -191,7 +191,7 @@ head(model[["iter.detail"]])
 
 The RSGHB plot method visualizes these model statistics conveniently.
 
-<<>>=
+<<fig.width = 5, fig.height=5>>=
 
 # Plot model statistics
 plot(model)
@@ -200,7 +200,7 @@ plot(model)
 
 Similarly, supplying the \emph{type} argument to the plot method will plot the fixed parameter estimates, which are contained in the \emph{F} component of the model object.
 
-<<>>=
+<<fig.width = 5, fig.height=5>>=
 
 # Plot parameter estimates (see ?plot.RSGHB for more uses)
 plot(model, type = "F")
@@ -333,16 +333,19 @@ The \emph{RSGHB} model object has more components in the case of a random or mix
 
 The \emph{iter.detail} component now contains the additional model statistics: Parameter Root Mean Square (RMS) and Average Variance at each stored iteration.
 
-<<>>=
+<<fig.width = 5, fig.height=5>>=
 
 # Model iteration details
 head(model[["iter.detail"]])
+
+# Plot model statistics
+plot(model)
 
 @
 
 The \emph{A} component contains the sample-level means of the underlying normal. These can be plotted with the plot method.
 
-<<>>=
+<<fig.width = 5, fig.height=5>>=
 
 # Sample-level means
 head(model[["A"]])
@@ -380,7 +383,5 @@ head(model[["Csd"]])
 
 
 The \emph{D} component contains a three-dimensional \emph{p} by \emph{p} by \emph{gNEREP} array containing the sample covariance at each iteration, where \emph{p} is the number of random parameters.   
-
-\end{description}
 
 \end{document}
