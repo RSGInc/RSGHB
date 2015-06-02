@@ -382,7 +382,7 @@ doHB <- function(likelihood_user, choicedata, control = list())
           
           if(gNIV > 0)
           {
-               ma   <- cbind(iteration = 1:gNEREP, t(ma))
+               ma   <- cbind(iteration = (gNCREP + 1):(gNCREP + gNEREP), t(ma))
                
                mcsd <- cbind(id = respIDs, sqrt((mc.squared - mc^2/gNEREP)/gNEREP))
                mc   <- cbind(id = respIDs, RLH = rowMeans(mp), mc/gNEREP)
@@ -406,7 +406,7 @@ doHB <- function(likelihood_user, choicedata, control = list())
           
           if (gFIV > 0)
           {   
-               mf  <- cbind(iteration = 1:gNEREP, t(mf))
+               mf  <- cbind(iteration = (gNCREP + 1):(gNCREP + gNEREP), t(mf))
                colnames(mf) <- c("iteration", gVarNamesFixed)
                results$F <- mf
           }          
