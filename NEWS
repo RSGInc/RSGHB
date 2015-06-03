@@ -4,9 +4,9 @@ RSGHB 1.1.0
 * RSGHB has been made R-object oriented rather than CSV-file oriented
 * This primarily affects how users interact with model outputs
 * doHB now returns a model object of class 'RSGHB'
-* Save results to disk by setting the 'save.results' argument in doHB to TRUE, or by using the new 'writeModel' function on an 'RSGHB' object
-* Updated documentation and examples
-* General code improvements to increase speed and reduce memory
+* Save results to disk by setting the 'writeModel' argument in doHB to TRUE, or by using the new 'writeModel' function on an 'RSGHB' object
+* Updated documentation, examples, and vignette
+* General code improvements to increase speed and reduce memory footprint
 
 RSGHB 1.0.2
 * Added ability to fix the mean and variance of random parameters
