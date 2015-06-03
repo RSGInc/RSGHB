@@ -128,9 +128,6 @@ Train, K. Original Gauss and Matlab code: http://elsa.berkeley.edu/Software/abst
 \author{
  Jeffrey Dumont <jeff.dumont@rsginc.com>, Jeff Keller <jeff.keller@rsginc.com>
 }
-\note{
-%%  ~~further notes~~
-}
 
 %% ~Make other sections like Warning with \section{Warning }{....} ~
 
