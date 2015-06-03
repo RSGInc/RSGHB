@@ -38,14 +38,8 @@ None, though a series of files is written to \code{path}:
   \item{modelname_F.csv}{If \code{object} was estimated with fixed parameters, contains the set of fixed (non-random) parameters at each iteration in \code{object[["gNEREP"]]}.}
   \item{modelname_pvMatrix.csv}{If \code{object} was estimated with random parameters, contains the prior variance-covariance matrix that was assumed to estimate the model.}
 }
-\references{
-%% ~put references to the literature/web site here ~
-}
 \author{
 Jeff Keller <jeff.keller@rsginc.com>
-}
-\note{
-%%  ~~further notes~~
 }
 
 %% ~Make other sections like Warning with \section{Warning }{....} ~
