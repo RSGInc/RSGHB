@@ -369,7 +369,7 @@ head(model[["Bsd"]])
 
 The \emph{C} component contains the average across iterations of the individual level draws for the random parameters including the appropriate distribution transformations (if applicable). The \emph{C} component also contains the Root-Likelihood (RLH), an individual-specific measure of model fit. The \emph{Csd} component provides the standard deviations of those individual draws.
 
-These two components are asymptotically equivalent to the conditional distributions from mixed logit models estimated using Maximum Simulated Likelihood methods.
+These two components are asymptotically equivalent to the conditional distributions calculated from mixed logit models estimated using Maximum Simulated Likelihood methods.
 
 <<>>=
 
