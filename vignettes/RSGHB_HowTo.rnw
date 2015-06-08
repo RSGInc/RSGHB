@@ -170,7 +170,7 @@ The \emph{doHB} function will perform a series of diagnostic tests on the model 
 \begin{figure}
 \caption{Plotting of the Markov Chains during estimation}
 \centering
-\includegraphics[scale=0.50]{MNL_MarkovChains.png}
+\includegraphics[scale=0.50]{MNL_markovChains.png}
 \label{MarkovChain}
 \end{figure}
 
