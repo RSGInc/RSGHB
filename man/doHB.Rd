@@ -165,8 +165,8 @@ likelihood <- function(fc, b) {
 control <- list(
      modelname = "MNL_WTPSpace",
      gVarNamesNormal = c("WTP", "Price"),
-     gNCREP = 500,
-     gNEREP = 500,
+     gNCREP = 300,
+     gNEREP = 200,
      gINFOSKIP = 10,
      nodiagnostics = TRUE,
      gSeed = 1987
