@@ -1,2 +1,5 @@
 ^.*\.Rproj$
 ^\.Rproj\.user$
+Readme.md
+unit_tests.R
+LICENSE
