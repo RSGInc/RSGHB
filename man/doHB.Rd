@@ -166,8 +166,9 @@ control <- list(
      modelname = "MNL_WTPSpace",
      gVarNamesNormal = c("WTP", "Price"),
      gNCREP = 300,
-     gNEREP = 200,
+     gNEREP = 100,
      gINFOSKIP = 10,
+     gNSKIP = 2,
      nodiagnostics = TRUE,
      gSeed = 1987
 )
