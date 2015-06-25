@@ -345,7 +345,7 @@ doHB <- function(likelihood_user, choicedata, control = list())
           r <- 1
           # Post Burn-in iterations          
           ma <- matrix(0, nrow = gNIV, ncol = gNEREP)
-          md <- array(0, dim = c(gNIV, gNIV, floor(gNEREP / gNSKIP)), dimnames = list(NULL, NULL, 1:floor(gNEREP / gNSKIP)))
+          md <- array(0, dim = c(gNIV, gNIV, gNEREP), dimnames = list(NULL, NULL, 1:gNEREP))
           mb <- matrix(0, nrow = gNP, ncol = gNIV)
           mb.squared <- matrix(0, nrow = gNP, ncol = gNIV)
           mp <- matrix(0, nrow = gNP, ncol = gNEREP)
