@@ -16,7 +16,7 @@ writeModel(object, writeDraws = FALSE, path = getwd())
 an \code{RSGHB} model object.
 }
   \item{writeDraws}{
-whether to write out the individual draw files. (Defaults to \code{TRUE})
+whether to write out the individual draw files. (Defaults to \code{FALSE})
 }
   \item{path}{
 the folder location to write the files. (Defaults to \code{getwd()})
