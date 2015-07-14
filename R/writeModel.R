@@ -70,9 +70,7 @@ writeModel <- function(object, writeDraws = FALSE, path = getwd()) {
           print(object[["pv"]])
      }
      
-     cat("\nEstimated:", format(object[["duration"]], format = "%h:%Mm:%s", digits = 3), "\n", sep = "\t")
-     
-     cat("-----------------------------------------------------------","\n")
+     cat("\n-----------------------------------------------------------\n\n")
      
      print(object[["iter.detail"]], row.names = FALSE)
      
