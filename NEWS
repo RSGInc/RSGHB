@@ -1,3 +1,6 @@
+RSGHB 1.1.1
+* Fixed a bug when estimating a model with thinning (gNSKIP > 1)
+
 RSGHB 1.1.0
 * doHB now defaults to normal distribution assumptions, if not specified
 * doHB now defaults to starting values of 0, if not specified
