@@ -1,4 +1,8 @@
 import(methods)
+importFrom("graphics", "axis", "mtext", "par", "plot", "points", "segments")
+importFrom("grDevices", "dev.flush", "graphics.off", "rainbow")
+importFrom("stats", "aggregate", "complete.cases", "density", "rnorm", "runif", "var")
+importFrom("utils", "write.table")
 export(doHB)
 export(writeModel)
 S3method(plot, RSGHB)
