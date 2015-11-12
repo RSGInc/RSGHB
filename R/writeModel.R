@@ -95,13 +95,15 @@ writeModel <- function(object, writeDraws = FALSE, path = getwd()) {
           # 2D labeling
           labelmatrix <- matrix(1:(length(object[["params.vary"]])^2), length(object[["params.vary"]]), length(object[["params.vary"]]))
           rownames(labelmatrix) <- colnames(labelmatrix) <- object[["params.vary"]]
-          dlabels <- paste0(rownames(labelmatrix)[vech(row(labelmatrix))], " x ", colnames(labelmatrix)[vech(col(labelmatrix))])
+          dlabels <- paste0(rownames(labelmatrix)[row(labelmatrix)[lower.tri(labelmatrix, diag = TRUE)]],
+                            " x ",
+                            colnames(labelmatrix)[col(labelmatrix)[lower.tri(labelmatrix, diag = TRUE)]])
           md.write <- matrix(0, nrow = dim(object[["D"]])[3], ncol = length(dlabels) + 1)
           colnames(md.write) <- c("Iteration", dlabels)
           
           # Convert to 2D
           md.write[, "Iteration"] <- as.numeric(dimnames(object[["D"]])[[3]])
-          for (i in 1:dim(object[["D"]])[3]) md.write[i, -1] <- vech(object[["D"]][,,i])
+          for (i in 1:dim(object[["D"]])[3]) md.write[i, -1] <- object[["D"]][,,i][lower.tri(object[["D"]][,,i], diag = TRUE)]
           
           write.table(signif(md.write, gSIGDIG), paste0(modelname, "_D.csv"), sep = ",", row.names = FALSE)
      }
@@ -121,9 +123,3 @@ writeModel <- function(object, writeDraws = FALSE, path = getwd()) {
      setwd(orig.path)
 
 }
-
-
-#           if (write.results) {
-#                dev.copy(png,paste(modelname,"_markovChains.png",sep=""))
-#                dev.off()
-#           }
