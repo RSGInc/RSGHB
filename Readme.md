@@ -1,8 +1,8 @@
 # This Site Has Changed!
 
-The RSGHB model examples have moved to their own GitHub site: https://github.com/jeffkeller87/RSGHB_Examples
+The RSGHB model examples have moved to their own GitHub site: https://github.com/RSGInc/RSGHB_Examples
 
-The 2014 ART Forum poster code has moved to its own GitHub site: https://github.com/jeffkeller87/ART2014_RSGHB
+The 2014 ART Forum poster code has moved to its own GitHub site: https://github.com/RSGInc/ART2014_RSGHB
 
 # The RSGHB Package
 
