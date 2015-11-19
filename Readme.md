@@ -22,4 +22,4 @@ See: https://github.com/jeffdumont/RSGHB/blob/master/LICENSE
 
 # LICENSE
 
-RSGHB and its examples are covered by the GPL-3 license. See text for more detail.
+RSGHB and its examples are covered by the GPL-3 license. See https://github.com/RSGInc/RSGHB/blob/master/LICENSE for more detail.
