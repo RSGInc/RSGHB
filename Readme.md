@@ -19,3 +19,7 @@ and his paper on using HB with non-normal distributions here: http://elsa.berkel
 RSGHB and all its example files are covered by the GPL 3 license. 
 
 See: https://github.com/jeffdumont/RSGHB/blob/master/LICENSE
+
+# LICENSE
+
+RSGHB and its examples are covered by the GPL-3 license. See text for more detail.
