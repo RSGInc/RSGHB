@@ -1,6 +1,6 @@
 Package: RSGHB
-Version: 1.1.2
-Date: 2015-12-07
+Version: 1.1.3
+Date: 2015-12-17
 Title: Functions for Hierarchical Bayesian Estimation: A Flexible Approach
 Authors@R: c(person("Jeff", "Dumont", role = c("aut", "cre"), email = "Jeff.Dumont@rsginc.com"),
              person("Jeff", "Keller", role = "aut", email = "Jeff.Keller@rsginc.com"),
@@ -10,4 +10,4 @@ Depends: methods
 Imports: graphics, grDevices, stats, utils
 URL: https://github.com/RSGInc/RSGHB
 License: GPL-3
-Copyright: Resource Systems Group, Inc. 2015
+Copyright: Resource Systems Group, Inc. 2016

@@ -392,9 +392,9 @@ doHB <- function(likelihood_user, choicedata, control = list())
                colnames(mc) <- c("Respondent", "RLH", gVarNamesNormal)
                colnames(ma) <- c("iteration", gVarNamesNormal)
                
-               colnames(mcsd) <- c("Respondent", gVarNamesNormal)
-               colnames(mb)   <- c("Respondent", gVarNamesNormal)
-               colnames(mbsd) <- c("Respondent", gVarNamesNormal)
+               colnames(mcsd) <- c("id", gVarNamesNormal)
+               colnames(mb)   <- c("id", gVarNamesNormal)
+               colnames(mbsd) <- c("id", gVarNamesNormal)
                
                results$A   <- ma
                results$B   <- mb

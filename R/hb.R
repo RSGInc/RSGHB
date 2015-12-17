@@ -43,8 +43,6 @@ hb <- function(a, b, d, f, env = parent.frame())
                          if (!is.na(env$fixedD[rp])) d[rp, rp] <- env$fixedD[rp]
                     }
                } 
-               
-               
           }
 
           # drawing a new set of fixed coefficients

@@ -110,9 +110,9 @@ checkModel <- function(nodiagnostics = FALSE, verbose = TRUE, env = parent.frame
                                             "Number of Observations:",
                                             "Custom Prior Matrix Used:",
                                             "Prior variance:",
+                                            "Degrees of Freedom:",                                            
                                             "Target Acceptance (Fixed):",
                                             "Target Acceptance (Normal):",
-                                            "Degrees of Freedom:",
                                             "Avg. Number of Observations per Individual:",
                                             "Initial Log-Likelihood:"),
                                     ` ` = as.character(rep(NA, 9)),
@@ -125,9 +125,9 @@ checkModel <- function(nodiagnostics = FALSE, verbose = TRUE, env = parent.frame
           } else {
                diagnostics[4,2] <- signif(env$priorVariance, env$gSIGDIG)
           }
-          if (env$gFIV > 0) diagnostics[5,2]  <- signif(env$targetAcceptanceFixed, env$gSIGDIG)
-          if (env$gNIV > 0) diagnostics[6,2] <- signif(env$targetAcceptanceNormal, env$gSIGDIG)
-          diagnostics[7,2] <- signif(env$degreesOfFreedom, env$gSIGDIG)
+          diagnostics[5,2] <- signif(env$degreesOfFreedom, env$gSIGDIG)
+          if (env$gFIV > 0) diagnostics[6,2]  <- signif(env$targetAcceptanceFixed, env$gSIGDIG)
+          if (env$gNIV > 0) diagnostics[7,2] <- signif(env$targetAcceptanceNormal, env$gSIGDIG)
           diagnostics[8,2] <- signif(env$gNOBS / env$gNP, env$gSIGDIG)
           diagnostics[9,2] <- signif(sum(log(env$likelihood(env$FC, env$B, env))), env$gSIGDIG)
           cat("-----------------------------------------------------------\n")
