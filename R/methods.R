@@ -64,58 +64,84 @@ plot.RSGHB <- function(x, ...) { # add column argument?
 }
 
 
-# print.RSGHB <- function(model, conf.level = 0.95) {
-#      
-#      alpha <- (1 - conf.level)/2
-#      
-#      A.mean <- colMeans(as.matrix(model[["A"]][, -1]))
-#      A.sd   <- apply(X = as.matrix(model[["A"]][, -1]), MARGIN = 2, FUN = sd)
-#      A.t    <- A.mean / A.sd
-#      A.p    <- pnorm(abs(A.t), lower.tail = FALSE)
-#      sig    <- ifelse(A.p < 0.001, "***",
-#                       ifelse(A.p < 0.01, "**",
-#                              ifelse(A.p < 0.05, "*",
-#                                     ifelse(A.p < 0.1, ".", " "))))
-#      
-#      cat("Model:", model[["modelname"]])
-#      cat("\n")
-#      cat("Estimated in", format(model[["duration"]], format = "%h:%Mm:%s", digits = 3), "on", format(model[["endtime"]], "%a %b %d %X %Y"))
-#      cat("\n\n")
-#      cat("Individuals:", length(unique(model[["C"]][, "Respondent"])))
-#      cat("\n")
-#      cat("Iterations Kept:", nrow(model[["A"]]))
-#      cat("\n\n")
-#      cat("Hyper-Parameter Estimates (Underlying Normals)\n")
-#      cat("---------------------------------------------\n")
-#      print(data.frame(Estimate = signif(A.mean, 3),
-#                       `Std Dev` = signif(A.sd, 3),
-#                       t = signif(A.t, 3),
-#                       `P(>|t|)` = signif(A.p, 3),
-#                       ` ` = sig,
-#                       check.names = FALSE,
-#                       row.names = model[["params.vary"]]))
-#      cat("--------------------------------------------------------------\n")
-#      cat("Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1\n")
-#      cat("--------------------------------------------------------------\n")
-#      cat(round(conf.level*100, 0), "%", " level of confidence\n\n", sep = "")
-#      
-#      if (!is.null(model[["choices"]])) {
-#           cat("Prediction rates\n")
-#           cat("----------------\n")
-#           pred.table <- aggregate(model[["p"]], by = list(model[["choices"]]), FUN = mean)
-#           names(pred.table) <- c("Choice", "Prob.")
-#           pred.table[,2] <- paste0(round(pred.table[,2] * 100, 1), "%")
-#           print(pred.table)
-#      }
-# }
-# 
-# summary.RSGHB <- function(model) {
-#      print(model)
-# }
+print.RSGHB <- function(model) {
+     cat("Model:", model[["modelname"]])
+     cat("\n")
+     cat("Estimated in", format(model[["duration"]], format = "%h:%Mm:%s", digits = 3), "on", format(model[["endtime"]], "%a %b %d %X %Y"))
+     cat("\n\n")
+     cat("Individuals:", length(unique(model[["C"]][, "Respondent"])))
+     cat("\n")
+     cat("Iterations Kept:", nrow(model[["A"]]))
+     cat("\n\n")
+     
+     # summary fit statistics
+     # report statistics for posterior iterations
+     cat("Fit statistics\n")
+     posterior <- (model[["iter.detail"]]$Iteration > model[["gNCREP"]])
+     
+     # need to make this clear if it is the lower level model
+     cat("Mean log-likelihood:", mean(model[["iter.detail"]][posterior,"Log-Likelihood"]),"\n")
+     cat("Mean root likelihood:", mean(model[["iter.detail"]][posterior,"RLH"]),"\n")
+     cat("Hit rate:","***NEEDS Predict method**** hit rate table\n")
+     cat("\n")
+     
+     cat("Model comparisons statistics\n")
+     cat("Prob(D|M):",NULL,"\n")
+     cat("Deviance Information Criterion:",NULL,"\n")
+         
+     # if has random parameters
+     if(!is.null(model[["A"]]))
+     {
+          posterior.means <- colMeans(model[["A"]][,-1])
+          posterior.stdev <- apply(model[["A"]][,-1],2,sd)
+     
+          cat("Random Parameters (Underlying Normals)\n")
+          cat("---------------------------------------------\n")
+          cat("                        95% Credible Regions \n")
+          print(
+               data.frame(
+                        Estimate  = signif(posterior.means, 3),
+                        `Std Dev` = signif(posterior.stdev, 3),
+                        `Min`     = apply(model[["A"]][,-1],2,quantile,0.025),
+                        `Max`     = apply(model[["A"]][,-1],2,quantile,0.975),
+                        check.names = FALSE,
+                        row.names = model[["params.vary"]]
+                        )
+                )
+     }
+     
+     # if has fixed parameters
+     if(!is.null(model[["F"]]))
+     {
+          posterior.means <- colMeans(model[["F"]][,-1])
+          posterior.stdev <- apply(model[["F"]][,-1],2,sd)
+     
+          cat("Fixed Parameters\n")
+          cat("---------------------------------------------\n")
+          cat("                        95% Credible Regions \n")
+          print(
+               data.frame(
+                        Estimate  = signif(posterior.means, 3),
+                        `Std Dev` = signif(posterior.stdev, 3),
+                        `Min`     = apply(model[["F"]][,-1],2,quantile,0.025),
+                        `Max`     = apply(model[["F"]][,-1],2,quantile,0.975),
+                        check.names = FALSE,
+                        row.names = model[["params.fixed"]]
+                        )
+                )
+     }     
+
+}
+ 
+
+
+summary.RSGHB <- function(model) {
+      print(model)
+}
 # # 
 # # Here are some thoughts:
-# #   1.  Model fit
-# # 2.	Prediction table
-# # 3.	The statistics should reflect the Bayesian-ness of the model - for example, std error = std dev. 
-# # 4.	Use the Bayesian equivalent of p-values and t-tests.
-# # 5.	I would like to see the bayes factor relative to a null model.
+# # 1. Model fit
+# # 2. Prediction table
+# # 3. The statistics should reflect the Bayesian-ness of the model - for example, std error = std dev. 
+# # 4. Use the Bayesian equivalent of p-values and t-tests.
+# # 5. I would like to see the bayes factor relative to a null model.
