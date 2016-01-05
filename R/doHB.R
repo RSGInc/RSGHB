@@ -378,6 +378,9 @@ doHB <- function(likelihood_user, choicedata, control = list())
                                                    check.names = FALSE)
           )
           
+          # object to hold the sample-level log-likelihoods
+          sLikelihood <- NULL
+          
           hb(A, B, Dmat, FC)
           
           if(gNIV > 0)
@@ -425,6 +428,8 @@ doHB <- function(likelihood_user, choicedata, control = list())
           results$ll0 <- sum(log(likelihood_user(fc = FC, b = matrix(svN, ncol = length(svN), nrow = length(gIDS), byrow = TRUE))))
           results$llf <- sum(log(results[["p"]]))
           results[["iter.detail"]] <- results[["iter.detail"]][-1, ]
+          
+          results$sLikelihood <- sLikelihood
           
           if (verbose) cat("Estimation complete.\n")
           

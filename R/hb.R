@@ -164,6 +164,47 @@ hb <- function(a, b, d, f, env = parent.frame())
           if (r %% env$gINFOSKIP == 0) {
                progreport(env$gNCREP + r, p, a, b, d, f, env)
           }
+          
+          # calculating the sample level log-likelihood
+          # for some of the tougher distributions, I'm simulating the means
+          means <- a
+          for(k in 1:length(gVarNamesNormal))
+          {
+               if(gDIST[k]==2) # postive log-normal
+               {
+                    a[k] <- exp(a+d[k,k]/2)
+               }
+               if(gDIST[k]==3) # negative log-normal
+               {
+                    a[k] <- -exp(a+d[k,k]/2)
+               }
+               if(gDIST[k]==4) # censored normal where negative numbers are massed @ 0
+               {
+                    # i'm simulating the mean here
+                    sim  <- rnorm(1000000,a,sqrt(d[k,k]))
+                    sim[sim<0] <- 0
+                    a[k] <- mean(sim)
+               }
+               if(gDIST[k]==5) # censored normal where postive numbers are massed @ 0
+               {
+                    # i'm simulating the mean here
+                    sim  <- rnorm(1000000,a,sqrt(d[k,k]))
+                    sim[sim>0] <- 0
+                    a[k] <- mean(sim)
+               }             
+               if(gDIST[k]==6) # Johnson SB
+               {
+                    # i'm simulating the mean here
+                    sim <- rnorm(1000000,a,sqrt(d[k,k]))
+                    sim <- exp(sim) / (1 + sim)
+                    sim <- (sim * ( gMAXCOEF[k] - gMINCOEF[k] ) ) + gMINCOEF[k] 
+                    a[k] <- mean(sim)
+               }
+          }
+               
+          means <- matrix(a,nrow(b),ncol(b),byrow=T)
+          sLL   <- sum(log(env$likelihood(f,means,env)))
+          env$sLikelihood <- c(env$sLikelihood,sll)
      }
      
      return(TRUE)

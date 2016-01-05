@@ -66,8 +66,6 @@ plot.RSGHB <- function(x, ...) { # add column argument?
 
 print.RSGHB <- function(model) {
      cat("Model:", model[["modelname"]])
-     cat("\n")
-     cat("Estimated in", format(model[["duration"]], format = "%h:%Mm:%s", digits = 3), "on", format(model[["endtime"]], "%a %b %d %X %Y"))
      cat("\n\n")
      cat("Individuals:", length(unique(model[["C"]][, "Respondent"])))
      cat("\n")
@@ -80,14 +78,27 @@ print.RSGHB <- function(model) {
      posterior <- (model[["iter.detail"]]$Iteration > model[["gNCREP"]])
      
      # need to make this clear if it is the lower level model
-     cat("Mean log-likelihood:", mean(model[["iter.detail"]][posterior,"Log-Likelihood"]),"\n")
+     if(!is.null(model[["A"]]))
+     {
+          cat("Mean log-likelihood (upper-level):",mean(model$sLikelihood),"\n")     
+     }
+     
+     cat("Mean log-likelihood (lower-level):", mean(model[["iter.detail"]][posterior,"Log-Likelihood"]),"\n")
      cat("Mean root likelihood:", mean(model[["iter.detail"]][posterior,"RLH"]),"\n")
      cat("Hit rate:","***NEEDS Predict method**** hit rate table\n")
-     cat("\n")
+     cat("\n\n")
      
      cat("Model comparisons statistics\n")
-     cat("Prob(D|M):",NULL,"\n")
-     cat("Deviance Information Criterion:",NULL,"\n")
+     cat("Bayes Factor:",mean(model$sLikelihood)/model[["ll0"]],"\n") # can be used in calculating bayes factor
+     
+     D_hat <- -2*mean(model$sLikelihood)
+     
+     p_d   <- D_hat # - D(mean)
+     
+     DIC   <- p_d + D_hat
+     
+     cat("Deviance Information Criterion (not complete):",DIC,"\n")
+     cat("\n")
          
      # if has random parameters
      if(!is.null(model[["A"]]))
@@ -138,10 +149,3 @@ print.RSGHB <- function(model) {
 summary.RSGHB <- function(model) {
       print(model)
 }
-# # 
-# # Here are some thoughts:
-# # 1. Model fit
-# # 2. Prediction table
-# # 3. The statistics should reflect the Bayesian-ness of the model - for example, std error = std dev. 
-# # 4. Use the Bayesian equivalent of p-values and t-tests.
-# # 5. I would like to see the bayes factor relative to a null model.
