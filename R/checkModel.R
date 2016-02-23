@@ -37,7 +37,12 @@ checkModel <- function(nodiagnostics = FALSE, verbose = TRUE, env = parent.frame
           passChecks <- FALSE
           cat("\n********FATAL ERROR: The likelihood function is undefined.\n")
      }
-     
+     #Check to make sure the likelihood user function has named parameters fc and b
+     if (!all(c("fc", "b") %in% names(formals(env$likelihood_user))))
+     {
+          passChecks <- FALSE
+          cat("\n********FATAL ERROR: Please include the named parameters 'fc' and 'b' to the user specified likelihood function.\n")
+     }
      if (env$gNIV + env$gFIV == 0)
      {
           passChecks <- FALSE
