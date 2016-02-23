@@ -168,31 +168,31 @@ hb <- function(a, b, d, f, env = parent.frame())
           # calculating the sample level log-likelihood
           # for some of the tougher distributions, I'm simulating the means
           means <- a
-          for(k in 1:length(gVarNamesNormal))
+          for(k in 1:length(env$gVarNamesNormal))
           {
-               if(gDIST[k]==2) # postive log-normal
+               if(env$gDIST[k]==2) # postive log-normal
                {
                     a[k] <- exp(a+d[k,k]/2)
                }
-               if(gDIST[k]==3) # negative log-normal
+               if(env$gDIST[k]==3) # negative log-normal
                {
                     a[k] <- -exp(a+d[k,k]/2)
                }
-               if(gDIST[k]==4) # censored normal where negative numbers are massed @ 0
+               if(env$gDIST[k]==4) # censored normal where negative numbers are massed @ 0
                {
                     # i'm simulating the mean here
                     sim  <- rnorm(1000000,a,sqrt(d[k,k]))
                     sim[sim<0] <- 0
                     a[k] <- mean(sim)
                }
-               if(gDIST[k]==5) # censored normal where postive numbers are massed @ 0
+               if(env$gDIST[k]==5) # censored normal where postive numbers are massed @ 0
                {
                     # i'm simulating the mean here
                     sim  <- rnorm(1000000,a,sqrt(d[k,k]))
                     sim[sim>0] <- 0
                     a[k] <- mean(sim)
                }             
-               if(gDIST[k]==6) # Johnson SB
+               if(env$gDIST[k]==6) # Johnson SB
                {
                     # i'm simulating the mean here
                     sim <- rnorm(1000000,a,sqrt(d[k,k]))
@@ -204,7 +204,7 @@ hb <- function(a, b, d, f, env = parent.frame())
                
           means <- matrix(a,nrow(b),ncol(b),byrow=T)
           sLL   <- sum(log(env$likelihood(f,means,env)))
-          env$sLikelihood <- c(env$sLikelihood,sll)
+          env$sLikelihood <- c(env$sLikelihood,sLL)
      }
      
      return(TRUE)
