@@ -32,12 +32,17 @@ checkModel <- function(nodiagnostics = FALSE, verbose = TRUE, env = parent.frame
           passChecks <- FALSE
           cat("\n********FATAL ERROR: Variable - gINFOSKIP - is undefined.\n")
      }
-     if (is.null(env$likelihood))
+     if (!class(env$likelihood_user) == "function")
      {
           passChecks <- FALSE
-          cat("\n********FATAL ERROR: The likelihood function is undefined.\n")
+          cat("\n********FATAL ERROR: The user specified likelihood function does not have class of 'function' Please review this function and make it a formal function.\n")
      }
-     
+     #Check to make sure the likelihood user function has named parameters fc and b
+     if (!all(c("fc", "b") %in% names(formals(env$likelihood_user))))
+     {
+          passChecks <- FALSE
+          cat("\n********FATAL ERROR: Please include the named parameters 'fc' and 'b' to the user specified likelihood function.\n")
+     }
      if (env$gNIV + env$gFIV == 0)
      {
           passChecks <- FALSE
