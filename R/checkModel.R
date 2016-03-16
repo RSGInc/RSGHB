@@ -43,15 +43,12 @@ checkModel <- function(nodiagnostics = FALSE, verbose = TRUE, env = parent.frame
           passChecks <- FALSE
           cat("\n********FATAL ERROR: Please include the named parameters 'fc' and 'b' to the user specified likelihood function.\n")
      }
-<<<<<<< HEAD
-=======
      #Check to make sure the likelihood user function has named parameters fc and b
      if (!all(c("fc", "b") %in% names(formals(env$likelihood_user))))
      {
           passChecks <- FALSE
           cat("\n********FATAL ERROR: Please include the named parameters 'fc' and 'b' to the user specified likelihood function.\n")
      }
->>>>>>> 4dac8871e467a32b62bf6f392a1942063b86d90f
      if (env$gNIV + env$gFIV == 0)
      {
           passChecks <- FALSE
@@ -137,13 +134,13 @@ checkModel <- function(nodiagnostics = FALSE, verbose = TRUE, env = parent.frame
           if (env$useCustomPVMatrix) {
                diagnostics[3,2] <- TRUE
           } else {
-               diagnostics[4,2] <- signif(env$priorVariance, env$gSIGDIG)
+               diagnostics[4,2] <- env$priorVariance
           }
-          diagnostics[5,2] <- signif(env$degreesOfFreedom, env$gSIGDIG)
-          if (env$gFIV > 0) diagnostics[6,2]  <- signif(env$targetAcceptanceFixed, env$gSIGDIG)
-          if (env$gNIV > 0) diagnostics[7,2] <- signif(env$targetAcceptanceNormal, env$gSIGDIG)
-          diagnostics[8,2] <- signif(env$gNOBS / env$gNP, env$gSIGDIG)
-          diagnostics[9,2] <- signif(sum(log(env$likelihood(env$FC, env$B, env))), env$gSIGDIG)
+          diagnostics[5,2] <- env$degreesOfFreedom
+          if (env$gFIV > 0) diagnostics[6,2]  <- env$targetAcceptanceFixed
+          if (env$gNIV > 0) diagnostics[7,2] <- env$targetAcceptanceNormal
+          diagnostics[8,2] <- env$gNOBS / env$gNP
+          diagnostics[9,2] <- sum(log(env$likelihood(env$FC, env$B, env)))
           cat("-----------------------------------------------------------\n")
           print(diagnostics[complete.cases(diagnostics), , drop = FALSE], row.names = FALSE)
           cat("\n-----------------------------------------------------------\n\n")

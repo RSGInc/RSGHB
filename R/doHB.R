@@ -150,15 +150,6 @@ doHB <- function(likelihood_user, choicedata, control = list())
           nodiagnostics <- control[["nodiagnostics"]]
      }
      
-     # number of significant digits for reporting purposes
-     if(is.null(control[["gSIGDIG"]]))
-     {
-          gSIGDIG <- 10 
-     } else
-     {
-          gSIGDIG <- control[["gSIGDIG"]]
-     }     
-     
      # Sawtooth uses a default of 2
      # Adjusting the prior variance upwards puts more emphasis on the 
      # fitting to the respondents' individual data
@@ -361,7 +352,6 @@ doHB <- function(likelihood_user, choicedata, control = list())
                           distributions = distNames[gDIST],
                           pv = pvMatrix,
                           df = degreesOfFreedom,
-                          gSIGDIG = gSIGDIG,
                           gNP = gNP,
                           gNOBS = gNOBS,
                           gNCREP = gNCREP,

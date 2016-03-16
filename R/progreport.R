@@ -27,22 +27,22 @@ progreport <- function(r, p, a, b, d, f, env)
                                        "Avg. Variance:",
                                        "Log-Likelihood:",
                                        "RLH:"),
-                               ` ` = as.character(NA), check.names = FALSE, stringsAsFactors = FALSE)
+                               ` ` = as.numeric(NA), check.names = FALSE, stringsAsFactors = FALSE)
           
           if(env$gFIV > 0) {  
-               mstats[1, 2] <- signif(env$rhoF, env$gSIGDIG)
-               mstats[2, 2] <- signif(env$acceptanceRateFPerc, env$gSIGDIG)
+               mstats[1, 2] <- env$rhoF
+               mstats[2, 2] <- env$acceptanceRateFPerc
           }
           
           if(env$gNIV > 0) {
-               mstats[3, 2] <- signif(env$rho, env$gSIGDIG)
-               mstats[4, 2] <- signif(env$acceptanceRatePerc, env$gSIGDIG)
-               mstats[5, 2] <- signif(paramRMS, env$gSIGDIG)
-               mstats[6, 2] <- signif(avgVariance, env$gSIGDIG)
+               mstats[3, 2] <- env$rho
+               mstats[4, 2] <- env$acceptanceRatePerc
+               mstats[5, 2] <- paramRMS
+               mstats[6, 2] <- avgVariance
           }
 
-          mstats[7, 2] <- signif(sum(log(p)), env$gSIGDIG)
-          mstats[8, 2] <- signif(mean(p^(1/env$TIMES)), env$gSIGDIG)
+          mstats[7, 2] <- sum(log(p))
+          mstats[8, 2] <- mean(p^(1/env$TIMES))
           print(mstats[complete.cases(mstats), , drop = FALSE], right = TRUE, row.names = FALSE)
           
           cat("\n-----------------------------------------------------------\n\n")
@@ -50,14 +50,14 @@ progreport <- function(r, p, a, b, d, f, env)
           # fixed coefficients
           if(env$gFIV > 0)
           {
-               print(data.frame(`Fixed Parameters` = paste0(env$gVarNamesFixed, ":"), Estimate = signif(f, env$gSIGDIG), check.names = FALSE), row.names = FALSE)
+               print(data.frame(`Fixed Parameters` = paste0(env$gVarNamesFixed, ":"), Estimate = f, check.names = FALSE), row.names = FALSE)
                cat("\n-----------------------------------------------------------\n\n")
           }
           
           # Normal Coefficients
           if(env$gNIV > 0)
           {
-               print(data.frame(`Random Parameters` = paste0(env$gVarNamesNormal, ":"), Estimate = signif(a, env$gSIGDIG), check.names = FALSE), row.names = FALSE)
+               print(data.frame(`Random Parameters` = paste0(env$gVarNamesNormal, ":"), Estimate = a, check.names = FALSE), row.names = FALSE)
                cat("\n-----------------------------------------------------------\n")
           }
           
@@ -117,12 +117,12 @@ progreport <- function(r, p, a, b, d, f, env)
      
      # Sink iteration details to the log file.
      detail <- c(r,
-                 signif(sum(log(p)), env$gSIGDIG),
-                 signif(mean(p^(1/env$TIMES)), env$gSIGDIG),
-                 signif(paramRMS, env$gSIGDIG),
-                 signif(avgVariance, env$gSIGDIG),
-                 if (env$gFIV > 0) {signif(env$acceptanceRateFPerc, env$gSIGDIG)} else {NA},
-                 if (env$gNIV > 0) {signif(env$acceptanceRatePerc, env$gSIGDIG)} else {NA})
+                 sum(log(p)),
+                 mean(p^(1/env$TIMES)),
+                 paramRMS,
+                 avgVariance,
+                 if (env$gFIV > 0) {env$acceptanceRateFPerc} else {NA},
+                 if (env$gNIV > 0) {env$acceptanceRatePerc } else {NA})
      
      env$results[["iter.detail"]] <- rbind(env$results[["iter.detail"]], detail)
      

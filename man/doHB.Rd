@@ -57,8 +57,6 @@ For example \code{constraintsNorm = list(c(5,1,0), c(6,1,5), c(7,1,6))} would co
 
 \emph{gNSKIP} - Number of iterations in between retaining draws for averaging. (Defaults to \code{1})
 
-\emph{gSIGDIG} - The number of significant digits for reporting purposes. (Defaults to \code{10})
-
 \emph{gVarNamesFixed} - A character vector of names for the fixed parameters. (REQUIRED)
 
 \emph{gVarNamesNormal} - A character vector of names for the random parameters. (REQUIRED)
@@ -99,7 +97,6 @@ a model object of class \code{RSGHB}. Contains:
   \item{distributions}{A character vector of assumed distributions for each random parameter.}
   \item{pv}{The prior variance-covariance matrix assumed for estimation.}
   \item{df}{Additional degrees of freedom in the model.}
-  \item{gSIGDIG}{The number of significant digits used in the reporting of the model results.}
   \item{gNP}{The number of individuals in the model.}
   \item{gOBS}{The number of observations in the model.}
   \item{gNCREP}{The number of burn-in iterations used prior to convergence.}

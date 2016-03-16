@@ -7,7 +7,6 @@ writeModel <- function(object, writeDraws = FALSE, path = getwd()) {
      orig.path <- getwd()
      setwd(path)
      
-     gSIGDIG <- object[["gSIGDIG"]]
      modelname <- object[["modelname"]]
      
      # Make sure the output files don't already exist
@@ -82,12 +81,12 @@ writeModel <- function(object, writeDraws = FALSE, path = getwd()) {
      if (!is.null(object[["pv"]]))  write.table(object[["pv"]], paste0(modelname, "_pvMatrix.csv"), sep = ",", col.names = NA)
      
      # CSVs
-     if (!is.null(object[["A"]]))   write.table(signif(object[["A"]],   gSIGDIG), paste0(modelname, "_A.csv"),   sep = ",", row.names = FALSE)
-     if (!is.null(object[["B"]]))   write.table(signif(object[["B"]],   gSIGDIG), paste0(modelname, "_B.csv"),   sep = ",", row.names = FALSE)
-     if (!is.null(object[["Bsd"]])) write.table(signif(object[["Bsd"]], gSIGDIG), paste0(modelname, "_Bsd.csv"), sep = ",", row.names = FALSE)
-     if (!is.null(object[["C"]]))   write.table(signif(object[["C"]],   gSIGDIG), paste0(modelname, "_C.csv"),   sep = ",", row.names = FALSE)
-     if (!is.null(object[["Csd"]])) write.table(signif(object[["Csd"]], gSIGDIG), paste0(modelname, "_Csd.csv"), sep = ",", row.names = FALSE)
-     if (!is.null(object[["F"]]))   write.table(signif(object[["F"]], gSIGDIG), paste0(modelname, "_F.csv"), sep = ",", row.names = FALSE)
+     if (!is.null(object[["A"]]))   write.table(object[["A"]], paste0(modelname, "_A.csv"),   sep = ",", row.names = FALSE)
+     if (!is.null(object[["B"]]))   write.table(object[["B"]], paste0(modelname, "_B.csv"),   sep = ",", row.names = FALSE)
+     if (!is.null(object[["Bsd"]])) write.table(object[["Bsd"]], paste0(modelname, "_Bsd.csv"), sep = ",", row.names = FALSE)
+     if (!is.null(object[["C"]]))   write.table(object[["C"]], paste0(modelname, "_C.csv"),   sep = ",", row.names = FALSE)
+     if (!is.null(object[["Csd"]])) write.table(object[["Csd"]], paste0(modelname, "_Csd.csv"), sep = ",", row.names = FALSE)
+     if (!is.null(object[["F"]]))   write.table(object[["F"]], paste0(modelname, "_F.csv"), sep = ",", row.names = FALSE)
      
      # D file
      if (!is.null(object[["D"]])) {
@@ -105,7 +104,7 @@ writeModel <- function(object, writeDraws = FALSE, path = getwd()) {
           md.write[, "Iteration"] <- as.numeric(dimnames(object[["D"]])[[3]])
           for (i in 1:dim(object[["D"]])[3]) md.write[i, -1] <- object[["D"]][,,i][lower.tri(object[["D"]][,,i], diag = TRUE)]
           
-          write.table(signif(md.write, gSIGDIG), paste0(modelname, "_D.csv"), sep = ",", row.names = FALSE)
+          write.table(md.write, paste0(modelname, "_D.csv"), sep = ",", row.names = FALSE)
      }
      
      # individual draws
@@ -115,7 +114,7 @@ writeModel <- function(object, writeDraws = FALSE, path = getwd()) {
           {
                
                fn <- paste0("Draws_", names(object[["Draws"]])[[i]], ".csv") 
-               write.table(signif(object[["Draws"]][[i]], gSIGDIG), fn, sep = ",", row.names = FALSE, col.names = TRUE)
+               write.table(object[["Draws"]][[i]], fn, sep = ",", row.names = FALSE, col.names = TRUE)
                
           }
      }
