@@ -14,7 +14,7 @@ doHB <- function(likelihood_user, choicedata, control = HBControl())
                if (env$gNIV == 1) C <- matrix(C[gIDS], ncol = env$gNIV)
           }
 
-          p <- likelihood_user(fc, C)
+          p <- likelihood_user(fc = fc, b = C)
           
           p <- replace(p, is.na(p), 1e-323)
           
