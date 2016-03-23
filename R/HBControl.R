@@ -14,7 +14,6 @@ HBControl <- function(modelname = "HBModel",
                       targetAcceptanceNormal = 0.3,
                       targetAcceptanceFixed = 0.3,
                       gFULLCV = TRUE, gStoreDraws = FALSE,
-                      gSeed = 0,
                       gMINCOEF = 0, gMAXCOEF = 0,
                       verbose = TRUE, nodiagnostics = FALSE,
                       ...) {
@@ -23,6 +22,7 @@ HBControl <- function(modelname = "HBModel",
      
      if ("gSIGDIG" %in% deprecated.args) warning("'gSIGDIG' is deprecated and will be ignored. Use options(\"digits\"= ...) instead.", call. = FALSE)
      if ("writeModel" %in% deprecated.args) warning("'writeModel' is deprecated and will be ignored. Use writeModel() directly.", call. = FALSE)
+     if ("gSeed" %in% deprecated.args) warning("'gSeed' is deprecated and will be ignored. Use set.seed() directly.", call. = FALSE)
      
      return(list(modelname = modelname,
                  gVarNamesNormal = gVarNamesNormal,
@@ -46,7 +46,6 @@ HBControl <- function(modelname = "HBModel",
                  targetAcceptanceFixed = targetAcceptanceFixed,
                  gFULLCV = gFULLCV,
                  gStoreDraws = gStoreDraws,
-                 gSeed = gSeed,
                  gMINCOEF = gMINCOEF,
                  gMAXCOEF = gMAXCOEF,
                  verbose = verbose,

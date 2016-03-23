@@ -1,5 +1,5 @@
 doHB <- function(likelihood_user, choicedata, control = HBControl())
-{          
+{
      
      # turns the user specified likelihood function into something RSGHB can use
      likelihood <- function(fc, b, env)
@@ -110,7 +110,6 @@ doHB <- function(likelihood_user, choicedata, control = HBControl())
                           gNOBS = gNOBS,
                           gNCREP = gNCREP,
                           gNEREP = gNEREP,
-                          gSeed = gSeed,
                           constraints = constraintsNorm,
                           iter.detail = data.frame(Iteration = NA,
                                                    `Log-Likelihood` = NA,

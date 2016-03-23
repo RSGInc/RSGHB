@@ -3,11 +3,6 @@ hb <- function(a, b, d, f, env = parent.frame())
     
      env$starttime <- Sys.time()
      
-     # sets random seed.	  
-     if (env$gSeed == 0) env$gSeed <- ceiling(runif(1) * 1000000)
-     	       
-     set.seed(env$gSeed, kind = "default", normal.kind = "default")
-     
      p <- env$likelihood(f, b, env)
      
      # the burn-in iterations
