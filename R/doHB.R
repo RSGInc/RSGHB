@@ -57,7 +57,7 @@ doHB <- function(likelihood_user, choicedata, control = HBControl())
      
      gNIV          <- length(gVarNamesNormal)         # Number of random normal coefficients
      gFIV          <- length(gVarNamesFixed)         # Number of fixed (non-random) coefficients
-print("hi")     
+
      if (is.null(pvMatrix) & gNIV > 0) pvMatrix <- priorVariance * diag(gNIV)
 
      # need to make sure the pvMatrix is a matrix
