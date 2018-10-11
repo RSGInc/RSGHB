@@ -1,3 +1,7 @@
+RSGHB 1.2.0
+* Added outputs to allow for better integration with CMC model estimation code
+* Added additional options for sampling from posterior of the covariance matrix - hierarchical Inverted Wishart
+
 RSGHB 1.1.2
 * Fixed a bug in writeModel when only one random parameter is specified
 

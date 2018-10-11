@@ -63,6 +63,8 @@ For example \code{constraintsNorm = list(c(5,1,0), c(6,1,5), c(7,1,6))} would co
      
 \emph{gStoreDraws} - Whether to store the draws for the individual level parameters. Doing so can dramatically increase the memory usage of the model if there are a large number of individuals or draws. (Defaults to \code{FALSE})
 
+\emph{hIW} - A boolean indicating if a hierarchical Inverted Wishart should be used when sampling in posterior distribution for the covariance matrix. New in version 1.2.0. (Defaults to \code{FALSE})
+
 \emph{modelname} - The model name which is used for creating output files. (Defaults to \code{"HBModel"})
 
 \emph{nodiagnostics} - If \code{TRUE}, an initial diagnostic report and prompt is not reported to the screen. This makes batch processing more seamless. (Defaults to \code{FALSE})

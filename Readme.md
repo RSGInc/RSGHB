@@ -20,6 +20,8 @@ RSGHB and all its example files are covered by the GPL 3 license.
 
 See: https://github.com/jeffdumont/RSGHB/blob/master/LICENSE
 
+The authors would also like to thank the invaluable contributions of Stephane Hess and the Choice Modelling Centre: https://cmc.leeds.ac.uk/
+
 # LICENSE
 
 RSGHB and its examples are covered by the GPL-3 license. See https://github.com/RSGInc/RSGHB/blob/master/LICENSE for more detail.
