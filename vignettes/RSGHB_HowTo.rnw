@@ -41,7 +41,7 @@ In this section, the code for estimating a multinomial logit (MNL) model with fi
 
 \subsection*{Setup and Data Preparation}
 
-<<>>=
+<<eval=FALSE>>=
 
 library(RSGHB)
 
@@ -80,7 +80,7 @@ The \emph{fc} argument is a vector of fixed coefficients (they do not vary acros
 
 It is important to note that the structure of the \emph{likelihood} function and choice data set is arbitrary, and completely up to the user, so long as the \emph{likelihood} function accepts \emph{fc} and \emph{b} as arguments and returns a vector of probabilities of appropriate length. However, the \emph{likelihood} function is the most computationally taxing part of the estimation process, so coding this function efficiently is essential to reducing the run time of the model.
 
-<<>>=
+<<eval=FALSE>>=
 
 # The likelihood function
 likelihood <- function(fc, b) {
@@ -106,7 +106,7 @@ likelihood <- function(fc, b) {
 
 There are a number of options and settings for controlling the model estimation process. Please see the help file for \emph{doHB} for more details. Note that most controls have default values and do not need to be directly specified if the default is acceptable.
 
-<<>>=
+<<eval=FALSE>>=
 
 ### Setting control list for estimation (see ?doHB for more estimation options)
 
@@ -154,7 +154,7 @@ To start the model estimation process, the analyst passes the \emph{likelihood} 
 model <- doHB(likelihood, choicedata, control)
 \end{verbatim}
 
-<<echo=FALSE>>=
+<<echo=FALSE,eval=FALSE>>=
 
 # Estimate model
 control$verbose <- FALSE
@@ -182,7 +182,7 @@ The \emph{doHB} function returns a model object of class \emph{RSGHB}. See \emph
 
 In addition to the modeling controls and settings, the model object includes an \emph{iter.detail} component that contains model statistics at every \emph{gINFOSKIP}th iteration. These can be used to assess whether the model has converged. This model has only fixed parameters, so only the Log-Likelihood, Root-Likelihood (RLH), and Acceptance Rate for the fixed parameters are meaningful.
 
-<<>>=
+<<eval=FALSE>>=
 
 # Model iteration details
 head(model[["iter.detail"]])
@@ -191,7 +191,7 @@ head(model[["iter.detail"]])
 
 The RSGHB plot method visualizes these model statistics conveniently.
 
-<<fig.width = 5, fig.height=5>>=
+<<eval=FALSE,fig.width = 5, fig.height=5>>=
 
 # Plot model statistics
 plot(model)
@@ -200,7 +200,7 @@ plot(model)
 
 Similarly, supplying the \emph{type} argument to the plot method will plot the fixed parameter estimates, which are contained in the \emph{F} component of the model object.
 
-<<fig.width = 5, fig.height=5>>=
+<<eval=FALSE,fig.width = 5, fig.height=5>>=
 
 # Plot parameter estimates (see ?plot.RSGHB for more uses)
 plot(model, type = "F")
@@ -219,7 +219,7 @@ The setup and data preparation are identical to Example 1.
 
 To introduce random effects into the model, the \emph{b} matrix is used in place of the \emph{fc} vector in the coding of the \emph{likelihood} function. The \emph{b} matrix contains the individual conditionals for the sample-level random coefficients. The matrix \emph{b} has one row per choice task (associated with the vector of probabilities returned by the \emph{likelihood} function) and one column for each of the random parameters.
 
-<<>>=
+<<eval=FALSE>>=
 
 likelihood <- function(fc, b) {
      
@@ -247,7 +247,7 @@ likelihood <- function(fc, b) {
 
 A few more controls can be supplied to the \emph{doHB} function when random parameters are to be estimated.
 
-<<>>=
+<<eval=FALSE>>=
 ### Setting control list for estimation (see ?doHB for more estimation options)
 
 # The model name/description
@@ -309,7 +309,7 @@ As in Example 1, the model estimation process is initiated with the analyst supp
 model <- doHB(likelihood, choicedata, control)
 \end{verbatim}
 
-<<echo=FALSE>>=
+<<eval=FALSE,echo=FALSE>>=
 
 # Estimate model
 control$verbose <- FALSE
@@ -333,7 +333,7 @@ The \emph{RSGHB} model object has more components in the case of a random or mix
 
 The \emph{iter.detail} component now contains the additional model statistics: Parameter Root Mean Square (RMS) and Average Variance at each stored iteration.
 
-<<fig.width = 5, fig.height=5>>=
+<<eval=FALSE,fig.width = 5, fig.height=5>>=
 
 # Model iteration details
 head(model[["iter.detail"]])
@@ -345,7 +345,7 @@ plot(model)
 
 The \emph{A} component contains the sample-level means of the underlying normal. These can be plotted with the plot method.
 
-<<fig.width = 5, fig.height=5>>=
+<<eval=FALSE,fig.width = 5, fig.height=5>>=
 
 # Sample-level means
 head(model[["A"]])
@@ -357,7 +357,7 @@ plot(model, type = "A")
 
 The \emph{B} component contains the average, across iterations, of the individual level draws for the underlying normals for the random parameters. The \emph{Bsd} component provides the standard deviations of those individual draws.
 
-<<>>=
+<<eval=FALSE>>=
 
 # Average individual-level draws
 head(model[["B"]])
@@ -371,7 +371,7 @@ The \emph{C} component contains the average across iterations of the individual 
 
 These two components are asymptotically equivalent to the conditional distributions calculated from mixed logit models estimated using Maximum Simulated Likelihood methods.
 
-<<>>=
+<<eval=FALSE>>=
 
 # Average individual-level draws (transformed; if applicable)
 head(model[["C"]])

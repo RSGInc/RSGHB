@@ -64,7 +64,9 @@ plot.RSGHB <- function(x, ...) { # add column argument?
 }
 
 
-print.RSGHB <- function(model) {
+print.RSGHB <- function(x,...) {
+     model = x
+     
      cat("Model:", model[["modelname"]])
      cat("\n\n")
      cat("Individuals:", length(unique(model[["C"]][, "Respondent"])))
@@ -146,6 +148,7 @@ print.RSGHB <- function(model) {
  
 
 
-summary.RSGHB <- function(model) {
+summary.RSGHB <- function(object,...) {
+      model = object
       print(model)
 }
