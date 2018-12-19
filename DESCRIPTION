@@ -1,6 +1,6 @@
 Package: RSGHB
-Version: 1.2.0
-Date: 2018-10-15
+Version: 1.2.1
+Date: 2018-12-19
 Title: Functions for Hierarchical Bayesian Estimation: A Flexible Approach
 Authors@R: c(person("Jeff", "Dumont", role = c("aut", "cre"), email = "Jeff.Dumont@rsginc.com"),
              person("Jeff", "Keller", role = "aut", email = "Jeff.Keller@rsginc.com"),
