@@ -80,31 +80,26 @@ print.RSGHB <- function(x,...) {
      posterior <- (model[["iter.detail"]]$Iteration > model[["gNCREP"]])
      
      # need to make this clear if it is the lower level model
-     if(!is.null(model[["A"]]))
-     {
-          cat("Mean log-likelihood (upper-level):",mean(model$sLikelihood),"\n")     
+     if(!is.null(model[["A"]])){
+          #cat("Mean log-likelihood (upper-level):",mean(model$sLikelihood),"\n")     
      }
      
      cat("Mean log-likelihood (lower-level):", mean(model[["iter.detail"]][posterior,"Log-Likelihood"]),"\n")
      cat("Mean root likelihood:", mean(model[["iter.detail"]][posterior,"RLH"]),"\n")
-     cat("Hit rate:","***NEEDS Predict method**** hit rate table\n")
+     #cat("Hit rate:","***NEEDS Predict method**** hit rate table\n")
      cat("\n\n")
      
-     cat("Model comparisons statistics\n")
-     cat("Bayes Factor:",mean(model$sLikelihood)/model[["ll0"]],"\n") # can be used in calculating bayes factor
+     #cat("Model comparisons statistics\n")
+     #cat("Bayes Factor:",mean(model$sLikelihood)/model[["ll0"]],"\n") # can be used in calculating bayes factor
+     #D_hat <- -2*mean(model$sLikelihood)
+     #p_d   <- D_hat # - D(mean)
+     #DIC   <- p_d + D_hat
      
-     D_hat <- -2*mean(model$sLikelihood)
-     
-     p_d   <- D_hat # - D(mean)
-     
-     DIC   <- p_d + D_hat
-     
-     cat("Deviance Information Criterion (not complete):",DIC,"\n")
+     #cat("Deviance Information Criterion (not complete):",DIC,"\n")
      cat("\n")
          
      # if has random parameters
-     if(!is.null(model[["A"]]))
-     {
+     if(!is.null(model[["A"]])){
           posterior.means <- colMeans(model[["A"]][,-1])
           posterior.stdev <- apply(model[["A"]][,-1],2,sd)
      
@@ -124,8 +119,7 @@ print.RSGHB <- function(x,...) {
      }
      
      # if has fixed parameters
-     if(!is.null(model[["F"]]))
-     {
+     if(!is.null(model[["F"]])){
           posterior.means <- colMeans(model[["F"]][,-1])
           posterior.stdev <- apply(model[["F"]][,-1],2,sd)
      

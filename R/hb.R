@@ -50,7 +50,8 @@ hb = function(a, b, d, f, env = parent.frame()) {
           }
         }
       }
-      if (env$gFIV > 0) {
+    }
+    if (env$gFIV > 0) {
         out <- nextF(p, f, b, env)
         if (sum(out[[1]] == f) != env$gFIV) {
           env$acceptanceRateF <- env$acceptanceRateF + 1
@@ -68,10 +69,9 @@ hb = function(a, b, d, f, env = parent.frame()) {
         f <- out[[1]]
         p <- out[[2]]
       }
-      if (r%%env$gINFOSKIP == 0 | r == 1) {
+    if (r%%env$gINFOSKIP == 0 | r == 1) {
         progreport(r, p, a, b, d, f, env)
       }
-    }
     if (env$gStoreDraws) {
       for (i in 1:env$gNP) {
         env$storedDraws[[i]] <- matrix(0, env$gNEREP, env$gNIV)
@@ -79,7 +79,7 @@ hb = function(a, b, d, f, env = parent.frame()) {
       }
     }
   }
-  
+  #browser()
   n <- env$gNEREP * env$gNSKIP
   for (r in 1:n) {
     if (env$gNIV > 0) {
@@ -118,7 +118,7 @@ hb = function(a, b, d, f, env = parent.frame()) {
         C <- trans(b, env)
         env$ma[, r/env$gNSKIP] <- a
         env$md[, , r/env$gNSKIP] <- d
-        env$mp[, r/env$gNSKIP] <- p^(1/env$TIMES)
+        #env$mp[, r/env$gNSKIP] <- p^(1/env$TIMES)
         env$mb <- env$mb + b
         env$mb.squared <- env$mb.squared + b^2
         env$mc <- env$mc + C
@@ -132,6 +132,7 @@ hb = function(a, b, d, f, env = parent.frame()) {
       }
     }
     if (env$gFIV > 0) {
+      
       out <- nextF(p, f, b, env)
       if (sum(out[[1]] == f) != env$gFIV) {
         env$acceptanceRateF <- env$acceptanceRateF + 1
@@ -145,17 +146,18 @@ hb = function(a, b, d, f, env = parent.frame()) {
           }
           env$acceptanceRateF <- 0
         }
-        f <- out[[1]]
-        p <- out[[2]]
-        if (r%%env$gNSKIP == 0) {
-          env$mf[, (r/env$gNSKIP)] <- f
-        }
+      }
+      f <- out[[1]]
+      p <- out[[2]]
+
+      if (r%%env$gNSKIP == 0) {
+        env$mf[, (r/env$gNSKIP)] <- f
       }
     }
     ### CMC: independently of whether we've used random or fixed, we now save LL and RLH, next four lines added
     if (r%%env$gNSKIP == 0) {
       env$cmcLLout[, (r/env$gNSKIP)] <- p
-      env$cmcRLHout[, (r/env$gNSKIP)] <- p^(1/env$TIMES)
+      #env$cmcRLHout[, (r/env$gNSKIP)] <- p^(1/env$TIMES)
     }
     if (r%%env$gINFOSKIP == 0) {
       progreport(env$gNCREP + r, p, a, b, d, f, env)

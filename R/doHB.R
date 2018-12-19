@@ -103,7 +103,7 @@ doHB = function(likelihood_user, choicedata, control = list()) {
     degreesOfFreedom <- control[["degreesOfFreedom"]]
   }
   ### CMC: additional checks for using hIW
-  if (is.null(control[["hIW"]])) {
+  if (is.null(control[["hIW"]])|is.null(control[["gVarNamesNormal"]])) {
     hIW <- FALSE
   } else {
     hIW <- control[["hIW"]]
@@ -224,7 +224,7 @@ doHB = function(likelihood_user, choicedata, control = list()) {
     mc <- matrix(0, nrow = gNP, ncol = gNIV)
     mc.squared <- matrix(0, nrow = gNP, ncol = gNIV)
     ### CMC: added two output matrices in two lines below
-    cmcLLout <- matrix(0, nrow = gNP, ncol = gNEREP)
+    cmcLLout  <- matrix(0, nrow = gNP, ncol = gNEREP)
     cmcRLHout <- matrix(0, nrow = gNP, ncol = gNEREP)
     storedDraws <- list()
     results <- list(modelname = modelname, params.fixed = gVarNamesFixed, 
@@ -239,7 +239,10 @@ doHB = function(likelihood_user, choicedata, control = list()) {
                     cmcLLout = cmcLLout,
                     cmcRLHout = cmcRLHout)
     hb(A, B, Dmat, FC)
+    matTIMES = matrix(1/TIMES,nrow=gNP,ncol=gNEREP,byrow = FALSE)
     if (gNIV > 0) {
+      #browser()
+      mp = cmcLLout^(matTIMES)
       ma <- cbind(iteration = (gNCREP + 1):(gNCREP + gNEREP), t(ma))
       mcsd <- cbind(id = respIDs, sqrt((mc.squared - mc^2/gNEREP)/gNEREP))
       mc <- cbind(id = respIDs, RLH = rowMeans(mp), mc/gNEREP)
@@ -264,7 +267,7 @@ doHB = function(likelihood_user, choicedata, control = list()) {
     }
     ### CMC: independently of whether we've used random or fixed, we now save LL and RLH, next two lines added
     results$cmcLLout <- cmcLLout
-    results$cmcRLHout <- cmcRLHout
+    results$cmcRLHout <- results$cmcLLout^(matTIMES)
     if (gStoreDraws) {
       results$Draws <- storedDraws
       names(results$Draws) <- respIDs

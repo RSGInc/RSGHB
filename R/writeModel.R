@@ -45,10 +45,10 @@ writeModel = function(object, writeDraws = FALSE, path = getwd()) {
     cat("Constraints applied to random parameters (param1 - inequality - param2):\n")
     for (i in 1:length(object[["constraints"]])) {
       if (object[["constraints"]][[i]][3] == 0) {
-        cat(object[["params.vary"]][i], cond[object[["constraints"]][[i]][2]],0, "\n")
+        cat(object[["params.vary"]][object[["constraints"]][[i]][1]], cond[object[["constraints"]][[i]][2]],0, "\n")
       }
       if (object[["constraints"]][[i]][3] != 0) {
-        cat(object[["params.vary"]][i], cond[object[["constraints"]][[i]][2]], object[["params.vary"]][object[["constraints"]][[i]][3]], "\n")
+        cat(object[["params.vary"]][object[["constraints"]][[i]][1]], cond[object[["constraints"]][[i]][2]], object[["params.vary"]][object[["constraints"]][[i]][3]], "\n")
       }
     }
   }
