@@ -131,7 +131,6 @@ Train, K. Original Gauss and Matlab code: http://elsa.berkeley.edu/Software/abst
 \code{\link{plot.RSGHB}, \link{writeModel}}
 }
 \examples{
-
 # Organize choicedata for modeling
 data(choicedata)
 tt1 <- choicedata$tt1
@@ -170,8 +169,9 @@ control <- list(
 
 # Estimate the model
 set.seed(1987)
-model <- doHB(likelihood, choicedata, control)
-
+     \donttest{
+          model <- doHB(likelihood, choicedata, control)
+     }
 }
 % Add one or more standard keywords, see file 'KEYWORDS' in the
 % R documentation directory.

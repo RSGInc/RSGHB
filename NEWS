@@ -1,3 +1,7 @@
+RSGHB 1.2.1
+* Fixed bug in write out for fixed coefficients
+* Increased max.print for log file
+
 RSGHB 1.2.0
 * Added outputs to allow for better integration with CMC model estimation code
 * Added additional options for sampling from posterior of the covariance matrix - hierarchical Inverted Wishart

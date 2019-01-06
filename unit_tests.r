@@ -10,8 +10,10 @@ package.dir <- choose.dir(caption = "Select folder containing RSGHB package file
 cat("Package contents located at", package.dir)
 
 ### Folders containing the example models
-examples.dir <- paste(package.dir, "Examples", sep = "/")
+examples.dir <- paste(package.dir, "RSGHB_Examples", sep = "/")
 examples <- list.dirs(path = examples.dir, full.names = FALSE, recursive = FALSE)
+
+examples = examples[-1]
 
 ### Create a temporary folder to store the unit tests
 test.dir <- paste(examples.dir, "temp", sep = "/")

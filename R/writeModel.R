@@ -1,5 +1,7 @@
 writeModel = function(object, writeDraws = FALSE, path = getwd()) {
 
+  options(max.print=1000000)     
+     
   if (!"RSGHB" %in% class(object)) {
     stop("'object' is not of class RSGHB")
   }
