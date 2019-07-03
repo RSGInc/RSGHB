@@ -224,7 +224,7 @@ doHB = function(likelihood_user, choicedata, control = list()) {
     mc <- matrix(0, nrow = gNP, ncol = gNIV)
     mc.squared <- matrix(0, nrow = gNP, ncol = gNIV)
     ### CMC: added two output matrices in two lines below
-    cmcLLout  <- matrix(0, nrow = gNP, ncol = gNEREP)
+    cmcLLout  <- list()
     cmcRLHout <- matrix(0, nrow = gNP, ncol = gNEREP)
     storedDraws <- list()
     results <- list(modelname = modelname, params.fixed = gVarNamesFixed, 

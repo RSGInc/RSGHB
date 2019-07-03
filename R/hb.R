@@ -150,18 +150,19 @@ hb = function(a, b, d, f, env = parent.frame()) {
       f <- out[[1]]
       p <- out[[2]]
 
-      if (r%%env$gNSKIP == 0) {
+      if (r %% env$gNSKIP == 0) {
         env$mf[, (r/env$gNSKIP)] <- f
       }
     }
     ### CMC: independently of whether we've used random or fixed, we now save LL and RLH, next four lines added
-    if (r%%env$gNSKIP == 0) {
-      env$cmcLLout[, (r/env$gNSKIP)] <- p
+    if (r %% env$gNSKIP == 0) {
+      env$cmcLLout[[(r / env$gNSKIP)]] <- p
       #env$cmcRLHout[, (r/env$gNSKIP)] <- p^(1/env$TIMES)
     }
-    if (r%%env$gINFOSKIP == 0) {
+    if (r %% env$gINFOSKIP == 0) {
       progreport(env$gNCREP + r, p, a, b, d, f, env)
     }
   }
+  env$cmcLLout = do.call(cbind, env$cmcLLout)
   return(TRUE)
 }
